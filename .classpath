@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/framework"/>
+	<classpathentry kind="src" path="src/test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/common/rd-commons-di-1.4.jar"/>
+	<classpathentry kind="lib" path="libs/common/rd-commons-io-1.0.jar"/>
+	<classpathentry kind="lib" path="libs/common/rd-commons-lang-1.2.jar"/>
+	<classpathentry kind="lib" path="libs/common/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/servletapi/jsp-api.jar"/>
+	<classpathentry kind="lib" path="libs/servletapi/servlet-api.jar"/>
+	<classpathentry kind="lib" path="libs/mule/mule-core-2.0.2.jar"/>
+	<classpathentry kind="lib" path="libs/mule/mule-module-client-2.0.2.jar"/>
+	<classpathentry kind="lib" path="libs/common/commons-beanutils-1.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/struts/struts.jar"/>
+	<classpathentry kind="lib" path="libs/common/commons-lang-2.3.jar"/>
+	<classpathentry kind="lib" path="libs/velocity/velocity-1.5.jar"/>
+	<classpathentry kind="lib" path="libs/velocity/velocity-tools-1.3.jar"/>
+	<classpathentry kind="lib" path="libs/asm/asm-2.2.1.jar"/>
+	<classpathentry kind="lib" path="libs/cglib/cglib-2.1.3.jar"/>
+	<classpathentry kind="lib" path="libs/aopaliance/aopalliance.jar"/>
+	<classpathentry kind="lib" path="libs/spring/spring-aop.jar"/>
+	<classpathentry kind="lib" path="libs/spring/spring-core.jar"/>
+	<classpathentry kind="lib" path="libs/javamail/mail.jar"/>
+	<classpathentry kind="lib" path="libs/common/commons-io-1.3.1.jar"/>
+	<classpathentry kind="lib" path="libs/mule/backport-util-concurrent-3.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

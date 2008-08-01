@@ -1,0 +1,152 @@
+/*
+ * ====================================================================
+ * 
+ *  Copyright 2007 Eiji Yamane(yamane@super-gs.jp)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * ====================================================================
+ */
+/**
+ * 
+ */
+package jp.rough_diamond.framework.user;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * セッションにセットされているユーザーオブジェクトをユーザー管理オブジェクトにセットする。
+ * 併せて、ユーザー情報がセッション内の情報と一致しない場合にセッションをクリアする
+ * web.xmlには以下のように、ユーザーオブジェクトのセッション名（必須）、
+ * クリアするオブジェクトのプレフィックス（任意）を指定することが可能である。
+ * クリアするオブジェクトのプレフィックスを省略した場合はセッションのクリーンアップは行わない
+ *   <init-param>
+ *     <param-name>sessionName</param-name>
+ *     <param-value>user</param-value>
+ *   </init-param>
+ *   <init-param>
+ *     <param-name>clearObjectPrefix</param-name>
+ *     <param-value>jp.co.webshark</param-value>
+ *   </init-param>
+ * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
+ * @date $Date: 2006-04-13 13:15:23 +0900 (譛ｨ, 13 4 2006) $
+ */
+public class UserCacheFilter implements Filter {
+    private final static Log log = LogFactory.getLog(UserCacheFilter.class);
+
+    private String userSessionName;
+    private String clearObjectPrefix;
+    
+    private UserChangeListenerImpl listener;
+    private FilterConfig config;
+    
+    public void init(FilterConfig arg0) throws ServletException {
+        this.config = arg0;
+        listener = new UserChangeListenerImpl();
+        UserController controller = UserController.getController();
+        controller.addListener(listener);
+        
+        userSessionName = config.getInitParameter("sessionName");
+        if(userSessionName == null) {
+        	throw new ServletException("sessionName isn't specification.");
+        }
+        clearObjectPrefix = config.getInitParameter("clearObjectPrefix");
+    }
+
+    public void doFilter(ServletRequest req, ServletResponse res,
+            FilterChain chain) throws IOException, ServletException {
+        log.debug("リクエストを受けました。");
+        HttpServletRequest request = (HttpServletRequest)req;
+        listener.tl.set(request);
+        HttpSession session = request.getSession(false);
+        User user = null;
+        if(session != null) {
+            user = (User)session.getAttribute(userSessionName);
+            if(user != null) {
+            	initUser(user, request);
+            }
+        }
+        UserController.getController().setUser(user);
+        chain.doFilter(req, res);
+    }
+
+    public void destroy() {
+        UserController controller = UserController.getController();
+        controller.removeListener(listener);
+    }
+
+    /**
+     * ユーザーオブジェクトに何らかの処理を施す場合には本メソッドをオーバーライドすること
+     * @param user
+     * @param request
+     */
+    protected void initUser(Object user, HttpServletRequest request) {
+    	
+    }
+    
+    private final class UserChangeListenerImpl implements UserChangeListener {
+        private ThreadLocal<HttpServletRequest> tl = new ThreadLocal<HttpServletRequest>();
+
+        public void notify(Object oldUser, Object newUser) {
+            log.debug("ユーザー変更要求です。");
+            HttpServletRequest request = tl.get();
+            if(request == null) {
+                log.debug("リクエストが渡ってないのでセットしません");
+                return;
+            }
+            HttpSession session = request.getSession(false);
+            if(newUser == null && session != null) {
+                log.debug("セッションをクリアします。");
+                clearSession(session);
+            } else if(newUser != null) {
+                session = (session == null) ? request.getSession() : session;
+                Object user = session.getAttribute(userSessionName);
+                if(user == null || !user.equals(newUser)) {
+                    clearSession(session);
+                    log.debug("セッションをセットします。");
+                    session.setAttribute(userSessionName, newUser);
+                } else {
+                    log.debug("セッション的に変化は無いのでセッションのクリアは行いません");
+                    session.setAttribute(userSessionName, newUser);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void clearSession(HttpSession session) {
+    	if(clearObjectPrefix == null) {
+    		return;
+    	}
+        Enumeration en = session.getAttributeNames();
+        while(en.hasMoreElements()) {
+            String name = (String)en.nextElement();
+            Object o = session.getAttribute(name);
+            if(o.getClass().getName().startsWith(clearObjectPrefix)) {
+                session.removeAttribute(name);
+            }
+        }
+    }
+}

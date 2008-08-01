@@ -1,0 +1,108 @@
+package jp.rough_diamond.framework.es;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+
+import jp.rough_diamond.framework.service.Service;
+
+public class ServiceFinder implements
+		jp.rough_diamond.framework.service.ServiceFinder {
+	private final static Log log = LogFactory.getLog(ServiceFinder.class);
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Service> T getService(Class<T> cl) {
+		if(!isTarget(cl)) {
+			return null;
+		}
+		T ret = (T)Proxy.newProxyInstance(cl.getClassLoader(), new Class[]{cl}, getInvocationHandler());
+		return ret;
+	}
+	
+	InvocationHandler getInvocationHandler() {
+		return ih;
+	}
+	
+	InvocationHandler ih = new InvocationHandler() {
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			try {
+				init();
+				String serviceName = method.getName();
+				ServiceConnecter sc = method.getAnnotation(ServiceConnecter.class);
+				String inboundName = null;
+				if(sc != null) {
+					serviceName = sc.serviceName();
+					inboundName = sc.inboundName().trim();
+					if(inboundName.length() == 0) {
+						inboundName = null;
+					}
+				}
+				MuleMessage msg = makeMessage(args);
+				log.debug(String.format("serviceName=%s, inboundName=%s", serviceName, inboundName));
+				MuleMessage result = client.sendDirect(serviceName, inboundName, msg);
+				ExceptionPayload exceptionPayload = result.getExceptionPayload();
+				if(exceptionPayload != null) {
+					throwException(method, exceptionPayload.getException());
+				}
+				if(method.getReturnType() != Void.TYPE) {
+					return result.getPayload();
+				} else {
+					return null;
+				}
+			} catch(MuleException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		void throwException(Method method, Throwable exception) throws Throwable {
+			Class<?> exceptionType = exception.getClass();
+			Class<?>[] methodExceptionTypes = method.getExceptionTypes();
+			for(Class<?> methodExceptionType : methodExceptionTypes) {
+				if(methodExceptionType.isAssignableFrom(exceptionType)) {
+					throw exception;
+				}
+			}
+			throw new RuntimeException(exception);
+		}
+	};
+	
+	private MuleClient client;
+	synchronized void init() {
+		try {
+			if(client == null) {
+				MuleContext context = ServiceBus.getInstance().getContext();
+				client = new MuleClient(context);
+			}
+		} catch(MuleException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	static MuleMessage makeMessage(Object[] args) {
+		if(args.length == 0) {
+			return new DefaultMuleMessage(null);
+		} else if(args.length != 1) {
+			return new DefaultMuleMessage(args);
+		} else if(args[0] instanceof MuleMessage) {
+			return (MuleMessage)args[0];
+		} else {
+			return new DefaultMuleMessage(args[0]);
+		}
+	}
+
+	static <T extends Service> boolean isTarget(Class<T> cl) {
+		if(EnterpriseService.class.isAssignableFrom(cl) && cl.isInterface()) {
+			return true;
+		}
+		return false;
+	}
+}
