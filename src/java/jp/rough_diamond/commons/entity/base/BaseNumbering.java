@@ -1,13 +1,17 @@
 package jp.rough_diamond.commons.entity.base;
 
-import java.io.Serializable;
+
+
+import  java.io.Serializable;
 
 
 /**
+ * ナンバリングテーブルのHibernateマッピングベースクラス
  * @hibernate.class
  *    table="NUMBERING"
  *    realClass="jp.rough_diamond.commons.entity.Numbering"
 **/
+
 public abstract class BaseNumbering  implements Serializable {
     public BaseNumbering() {
     }
@@ -16,7 +20,8 @@ public abstract class BaseNumbering  implements Serializable {
      * ＩＤ
     **/ 
     private String id;
-    
+
+    public final static String ID = "id";
     /**
      * ＩＤを取得する
      * @hibernate.id
@@ -64,6 +69,8 @@ public abstract class BaseNumbering  implements Serializable {
      * 現在割り当てている番号
     **/ 
     private Long nextNumber;
+    public final static String NEXT_NUMBER = "nextNumber";
+
     /**
      * 現在割り当てている番号を取得する
      * @hibernate.property
@@ -76,7 +83,6 @@ public abstract class BaseNumbering  implements Serializable {
         return nextNumber;
     }
 
-
     /**
      * 現在割り当てている番号を設定する
      * @param nextNumber  現在割り当てている番号
@@ -84,6 +90,8 @@ public abstract class BaseNumbering  implements Serializable {
     public void setNextNumber(Long nextNumber) {
         this.nextNumber = nextNumber;
     }
+
+
 
     
     private static final long serialVersionUID = 1L;

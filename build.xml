@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="Shift_JIS"?>
+
+<project name="Framework" basedir="." default="dummy">
+  <import file="../framework/build-common.xml" />
+  
+  <target name="makeYamaneConfig" description="山根開発環境用のbeans.xmlを作成する">
+    <property name="filtering.filename" value="${conf.dir}/filtering.yamane.properties" />
+    <antcall target="makeConfig" />
+  </target>
+
+<!--
+  <target name="makeReleaseConfig" description="リリースモジュール用のbeans.xmlを作成する">
+    <property name="filtering.filename" value="${conf.dir}/filtering.release.properties" />
+    <antcall target="makeConfig" />
+  </target>
+-->
+
+  <target name="makeConfig" depends="init-task">
+    <antcall target="makeConfigBase" />
+
+    <basename property="conf.target.name" file="${filtering.filename}" />
+    <dirname property="conf.target.dir" file="${filtering.filename}" />
+    <mkdir dir="${conf.dir}/tmp" />
+    <native2ascii src="${conf.target.dir}" dest="${conf.dir}/tmp" includes="${conf.target.name}" />
+    <filter filtersfile="${conf.dir}/tmp/${conf.target.name}" />
+    <copy file="${conf.dir}/template/beans.xml" tofile="${src.dir}/beans.xml" filtering="true" overwrite="true" />
+    <copy file="${conf.dir}/template/log4j.properties" tofile="${src.dir}/log4j.properties" filtering="true" overwrite="true" />
+    <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" />
+    <delete dir="${conf.dir}/tmp" />
+    <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
+  </target>
+
+  <target name="makeMultipleSQL" description="複数データベースのCreate Table文を作成する">
+    <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
+    <filter token="torque.sql.dir"              value="${torque.sql.dir}/oracle" />
+    <filter token="torque.database.type"        value="oracle" />
+    <copy file="${framework.root}/build-torque.properties" tofile="torque-gen/build.properties" filtering="true" overwrite="true" />
+    <replace file="torque-gen/build.properties" token="\" value="/" />
+    <echo message="Create Table文を作成します。" />
+    <antcall target="execAnt">
+      <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
+      <param name="exec.target" value="sql" />
+    </antcall>
+    <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
+    <filter token="torque.sql.dir"              value="${torque.sql.dir}/postgresql" />
+    <filter token="torque.database.type"        value="postgresql" />
+    <copy file="${framework.root}/build-torque.properties" tofile="torque-gen/build.properties" filtering="true" overwrite="true" />
+    <replace file="torque-gen/build.properties" token="\" value="/" />
+    <echo message="Create Table文を作成します。" />
+    <antcall target="execAnt">
+      <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
+      <param name="exec.target" value="sql" />
+    </antcall>
+  </target>
+
+  <target name="dummy">
+    <echo message="xxxxx" />
+  </target>
+</project>

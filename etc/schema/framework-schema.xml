@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="Shift_JIS" standalone="no"?>
+<!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database_3_1.dtd">
+
+<!--
+DTDは、
+
+ DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database_3_1.dtd"
+です。
+ /database/table/columnタグにencrypt属性（デフォルトfalse）を追加しています。
+-->
+<database defaultIdMethod="none" name="framework tables" package="jp.rough_diamond.commons.entity" defaultJavaType="object">
+  <!-- 
+      Hibernate強引対応拡張ルール
+      その１．
+        親子間のリレーションが有る場合、子の方にはouter joinが自動的に付与
+        その際のアクセサは「/database/table*/foreign-key@name」となる
+      その２．
+        autoIncrementをtrueにすると、そのカラムはバージョニングカラムとなるようにする。
+        （typeはINTEGER)
+        その代わり、自動インクリメント機能はなくなるので注意
+      その３．
+      　required="true"のカラムには必須チェックが自動的に付与される
+      その４．
+      　sizeが指定されている文字列系のカラムについては自動的にサイズチェックが付与される
+  -->
+
+  <table name="numbering" description="ナンバリングテーブル">
+    <column name="id"             primaryKey="true" required="true" type="VARCHAR" size="128"     description="ＩＤ" />
+    <column name="next_number"                      required="true" type="BIGINT"         description="現在割り当てている番号" />
+  </table>
+</database>
