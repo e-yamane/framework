@@ -20,7 +20,6 @@
   <property name="src.encoding"           value="Windows-31J" />
 
   <!-- データベース関連 -->
-  <property name="hibernate.pattern"      value="**/entity/**/*.java" />
   <property name="export.dir"             value="./etc/export" />
   <property name="table.doc.dir"          value="${my.build.dir}/doc/table" />
   <property name="torque.schema.dir"      value="${my.build.dir}/etc/schema" />
@@ -160,7 +159,6 @@
     <copy file="${framework.root}/build-torque.properties" tofile="torque-gen/build.properties" filtering="true" overwrite="true" />
     <replace file="torque-gen/build.properties" token="\" value="/" />
 
-
 <!--
     <echo message="Create Table文を作成します。" />
     <antcall target="execAnt">
@@ -179,19 +177,16 @@
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="hibernate-java" />
     </antcall>
-
     <echo message="スキーマプロパティを作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="schema-properties" />
     </antcall>
 -->
-
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/build.xml" />
       <param name="exec.target" value="hibernatedoclet" />
     </antcall>
-
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 
@@ -203,15 +198,24 @@
         <isset property="hibernate.otherResources" />
       </not>
     </condition>
+    <condition property="hibernate.fileset.dirs" value="${src.dir}" >
+      <not>
+        <isset property="hibernate.fileset.dirs" />
+      </not>
+    </condition>
+    <condition property="hibernate.pattern" value="**/entity/**/*.java" >
+      <not>
+        <isset property="hibernate.pattern" />
+      </not>
+    </condition>
     <echo message="${hibernate.otherResources}" />
     <hibernatedoclet destdir="${src.dir}"
       excludedtags="@version, @author, @todo"
       force="true"
       mergedir="${classes.dir}"
-      verbose="false">
-      <fileset dir="${src.dir}">
-        <include name="${hibernate.pattern}"/>
-      </fileset>
+      verbose="false"
+      fileSetDirs="${hibernate.fileset.dirs}"
+      >
       <hibernate version="3.0"/>
       <hibernatecfg 
           dialect="${hibernate.dialect}"
