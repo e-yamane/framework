@@ -1,0 +1,11 @@
+#foreach ($dataModel in $dataModels)
+#foreach ($database in $dataModel.Databases)
+#foreach ($tbl in $database.Tables)
+$tbl.javaName=$tbl.description
+#set ($baseTable = $tbl)
+#foreach ($col in $tbl.Columns)
+${baseTable.javaName}.${col.uncapitalisedJavaName}=${col.description}
+#end
+#end
+#end
+#end

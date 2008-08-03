@@ -1,0 +1,64 @@
+#set ($basePath = $generator.OutputPath)
+#set ($frameworkPrefix = "jp.rough_diamond")
+
+targetdatabase = $targetDatabase
+#set ( $dbprops = $properties.load("sql/base/$targetDatabase/db.props") )
+dbprops.idMethod = $dbprops.get("idMethod")
+#include ( "sql/base/$targetDatabase/db.props" )
+
+#foreach ($dataModel in $dataModels)
+  #foreach ($database in $dataModel.Databases)
+
+    #if ($database.Package)
+      #set ($package = $database.Package)
+    #else
+      #set ($package = $targetPackage)
+    #end
+
+    #set ( $pkbase = "${package}" )
+    #set ( $pkpeer = "${package}" )
+
+    $pkbase
+    $pkpeer
+
+    #set ( $path = $strings.getPackageAsPath($pkpeer) )
+    $files.mkdir("$outputDirectory/$path")
+
+    #set ( $path = $strings.getPackageAsPath($pkbase) )
+    $files.mkdir("$outputDirectory/$path")
+    $files.mkdir("$outputDirectory/${path}base")
+
+    #foreach ($tbl in $database.Tables)
+      #if ($tbl.baseClass =="notImplements")
+        ##ÉNÉâÉXÇÕçÏê¨ÇµÇ‹ÇπÇÒÅB
+      #else
+        #if (!$tbl.isForReferenceOnly())
+          $tbl.Name
+          #set ( $firstcap=$tbl.JavaName )
+          
+          #set ( $fname = "$basePrefix${firstcap}.java" )
+          #set ( $path = "${strings.getPackageAsPath($pkbase)}base/$fname" )
+          $generator.parse("hibernate/BaseBean.vm", $path,"table",$tbl)
+
+          #set ( $fname = "${firstcap}.java" )
+          #set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+          #if (!$files.file($basePath,$path).exists())
+            $generator.parse("hibernate/Bean.vm",$path,"table",$tbl)
+          #end
+        #end
+        #if ($tbl.ChildrenColumn)
+          #set ($col = $tbl.ChildrenColumn)
+          #if ($col.isEnumeratedClasses())
+            #foreach ($child in $col.Children)
+              #set ( $fname = "${child.ClassName}.java" )
+              #set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+              #if (!$files.file($basePath,$path).exists())
+                $generator.parse("hibernate/inheritanceBean.vm",$path,"child",$child)
+              #end
+            #end
+          #end
+        #end
+      #end
+    #end
+  #end
+#end
