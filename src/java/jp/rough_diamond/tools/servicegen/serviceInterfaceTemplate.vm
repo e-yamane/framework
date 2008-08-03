@@ -1,0 +1,27 @@
+package $service.packageName;
+
+#foreach ($import in $service.imports )
+import $import;
+#end
+
+import javax.jws.WebService;
+import jp.rough_diamond.framework.es.EnterpriseService;
+import jp.rough_diamond.framework.es.ServiceConnecter;
+
+@WebService(
+    serviceName="$service.className",
+    name="${service.className}PortType",
+    portName="${service.className}Port"
+)
+public interface $service.className extends EnterpriseService {
+    @ServiceConnecter(serviceName="${service.className}Connector")
+#foreach ($op in $service.operations)
+    public $op.returnType ${op.name}(
+#set($delimiter = "")
+#foreach ($arg in $op.args)
+            ${delimiter}${arg.type} $arg.name
+#set($delimiter = ", ")
+#end
+    );
+#end
+}

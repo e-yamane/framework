@@ -26,9 +26,6 @@
   <property name="torque.sql.dir"         value="${my.build.dir}/etc/sql" />
   <property name="sql.createtables"       value="${torque.sql.dir}/*-schema.sql" />
   <property name="sql.addalter"           value="${torque.sql.dir}/*-schema-fk.sql" />
-<!--
-  <property name="sql.schema"             value="${torque.schema.dir}/*-schema.xml" />
--->
   <property name="sql.schema"             value="${torque.schema.dir}/*-schema.xml" />
 
   <!-- テスト関連 -->
@@ -62,6 +59,7 @@
   <property name="javadoc.dir" value="${my.build.dir}/doc/api" />
   <property name="testdoc.dir" value="${my.build.dir}/doc/testdoc" />
 
+<!--
   <path id="src.real">
     <pathelement location="${src.dir}" />
     <pathelement location="${framework.src.dir}" />
@@ -74,6 +72,7 @@
     <pathelement location="${test.src.dir}" />
     <pathelement location="${test.aspect.src.dir}" />
   </path>
+-->
 
   <!-- servletAPIのバージョンで異なる -->
   <path id="servletapi.path">
@@ -83,14 +82,26 @@
     </fileset>
   </path>
 
+<!--
+  <path id="classpath.tmp">
+    <fileset dir="${other.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+-->
+
   <path id="classpath.real">
     <fileset dir="${lib.dir}">
       <include name="**/*.jar" />
     </fileset>
-    <fileset dir="${other.lib.dir}">
-      <include name="junit*.jar" />
-    </fileset>
     <path refid="servletapi.path"/>
+  </path>
+
+  <path id="framework.path">
+    <pathelement location="../framework/bin" />
+    <fileset dir="../framework/libs">
+      <include name="**/*.jar" />
+    </fileset>
   </path>
 
   <path id="classpath.all">
@@ -101,17 +112,12 @@
     </fileset>
   </path>
 
-  <path id="classpath.tmp">
+  <path id="wsdl2java.path">
+    <pathelement location="${classes.dir}" />
     <fileset dir="${other.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
-  </path>
-
-  <path id="framework.path">
-    <pathelement location="../framework/bin" />
-    <fileset dir="../framework/libs">
-      <include name="**/*.jar" />
-    </fileset>
+    <path refid="framework.path"/>
   </path>
 
   <target name="init-task">
@@ -132,6 +138,79 @@
 
   <target name="copyTorque-gen" description="Torque-Genのパッチを当てたものを当該プロジェクトへコピーする">
     <ant antfile="../torque-gen-patch/build.xml" target="copyTorque-gen" />
+  </target>
+
+  <target name="makeClientStub" description="WSDLをサーバから取得しスタブモジュールを作成する">
+<!--
+    <antcall target="getWSDL" />
+-->
+    <antcall target="wsdl2java" />
+  </target>
+
+  <target name="getWSDL">
+    <condition property="wsdl.dir" value="${my.build.dir}/etc/wsdl" >
+      <not>
+        <isset property="wsdl.dir" />
+      </not>
+    </condition>
+    <taskdef name="getWSDL" classpathref="framework.path"
+        classname="jp.rough_diamond.ant.taskdefs.GetAndMakeWSDLTask" />
+    <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="wsdl2java.path"/>
+  </target>
+
+  <target name="wsdl2java">
+    <condition property="wsdl.dir" value="${my.build.dir}/etc/wsdl" >
+      <not>
+        <isset property="wsdl.dir" />
+      </not>
+    </condition>
+    <condition property="cxf.dest.dir" value="${my.build.dir}/src/java" >
+      <not>
+        <isset property="cxf.dest.dir" />
+      </not>
+    </condition>
+    <condition property="cxf.stub.package" value="cxf.stub" >
+      <not>
+        <isset property="cxf.stub.package" />
+      </not>
+    </condition>
+    <condition property="cxf.mule.client.config" value="${my.build.dir}/src/java/mule/edi-client-config.xml" >
+      <not>
+        <isset property="cxf.mule.client.config" />
+      </not>
+    </condition>
+    <taskdef name="wsdl2java" classpathref="framework.path"
+        classname="jp.rough_diamond.ant.taskdefs.WSDL2JavaExt" />
+    <wsdl2java
+      wsdldir="${wsdl.dir}"
+      srcdir="${cxf.dest.dir}" 
+      rootPackage="${cxf.stub.package}" 
+      muleConfigFile="${cxf.mule.client.config}"
+      classPathRef="wsdl2java.path" />
+  </target>
+
+  <target name="makeCXFService" description="サービスの定義に基づいてサーバ側で必要なリソースを作成する">
+    <condition property="cxf.service.file" value="${my.build.dir}/etc/serviceDef/services.xml" >
+      <not>
+        <isset property="cxf.service.file" />
+      </not>
+    </condition>
+    <condition property="cxf.dest.dir" value="${my.build.dir}/src/java" >
+      <not>
+        <isset property="cxf.dest.dir" />
+      </not>
+    </condition>
+    <condition property="cxf.mule.server.config" value="${my.build.dir}/src/java/mule/edi-server-config.xml" >
+      <not>
+        <isset property="cxf.mule.server.config" />
+      </not>
+    </condition>
+    <taskdef name="makeCXFService" classpathref="framework.path"
+        classname="jp.rough_diamond.ant.taskdefs.ServiceGeneratorTask" />
+    <makeCXFService
+      input="${cxf.service.file}"
+      srcdir="${cxf.dest.dir}"
+      muleConfigFile="src/java/mule/edi-server-config.xml" />
   </target>
 
   <target name="execAnt">
