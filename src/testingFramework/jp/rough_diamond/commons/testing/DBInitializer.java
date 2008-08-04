@@ -1,5 +1,6 @@
 package jp.rough_diamond.commons.testing;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 import jp.rough_diamond.framework.transaction.ConnectionManager;
@@ -21,12 +29,17 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.excel.XlsDataSet;
+import org.dbunit.dataset.xml.XmlDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import org.hibernate.Interceptor;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.mapping.PersistentClass;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 @SuppressWarnings("unchecked")
 abstract public class DBInitializer implements Service {
@@ -117,25 +130,59 @@ abstract public class DBInitializer implements Service {
         
         for(String name : resourceNames) {
         	try {
-                InputStream is = this.getClass().getClassLoader().getResourceAsStream(name);
-	            HSSFWorkbook wb = new HSSFWorkbook(is);
-	            int sheetSize = wb.getNumberOfSheets();
-	            for(int i = 0 ; i < sheetSize ; i++) {
-	                String sheetName = wb.getSheetName(i).toUpperCase();
-	                Class cl = entityMap.get(sheetName);
-	                Set<DBInitializer> set = initializerObjects.get(cl);
-	                if(set == null) {
-	                    set = new HashSet<DBInitializer>();
-	                    initializerObjects.put(cl, set);
-	                }
-	                set.add(this);
-	            }
+                if(name.endsWith(".xls")) {
+                	loadExcel(name);
+                } else if(name.endsWith(".xml")) {
+                	loadXML(name);
+                }
         	} catch(RuntimeException e) {
         		log.warn("以下のリソースを実行中に例外が発生しました。[" + name + "]");
         		throw e;
         	}
         }
         
+    }
+    
+    private void loadXML(String name) throws IOException {
+    	try {
+	    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    	DocumentBuilder db = dbf.newDocumentBuilder();
+	        InputStream is = this.getClass().getClassLoader().getResourceAsStream(name);
+	        Document doc = db.parse(is);
+			XPathFactory xpf = XPathFactory.newInstance();
+			XPath xpath = xpf.newXPath();
+			XPathExpression exp = xpath.compile("/dataset/table");
+			NodeList nodeList = (NodeList)exp.evaluate(doc, XPathConstants.NODESET);
+			for(int i = 0 ; i < nodeList.getLength() ; i++) {
+				Element el = (Element)nodeList.item(i);
+				String tableName = el.getAttribute("name").toUpperCase();
+				addInitializedObject(tableName);
+			}
+    	} catch(IOException e) {
+    		throw e;
+    	} catch(Exception e) {
+    		throw new IOException(e);
+    	}
+    }
+    
+    private void loadExcel(String name) throws IOException {
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(name);
+        HSSFWorkbook wb = new HSSFWorkbook(is);
+        int sheetSize = wb.getNumberOfSheets();
+        for(int i = 0 ; i < sheetSize ; i++) {
+            String sheetName = wb.getSheetName(i);
+            addInitializedObject(sheetName);
+        }
+    }
+
+    private void addInitializedObject(String name) {
+        Class cl = entityMap.get(name.toUpperCase());
+        Set<DBInitializer> set = initializerObjects.get(cl);
+        if(set == null) {
+            set = new HashSet<DBInitializer>();
+            initializerObjects.put(cl, set);
+        }
+        set.add(this);
     }
     
     public void cleanInsert() throws Exception {
@@ -173,8 +220,17 @@ abstract public class DBInitializer implements Service {
         for(String name : tmp) {
         	try {
         		System.out.println(name + ":" + operation.getClass().getName());
-	            operation.execute(idc, new XlsDataSet(
-	                    this.getClass().getClassLoader().getResourceAsStream(name)));
+        		IDataSet dataset;
+        		if(name.endsWith("xls")) {
+        			dataset = new XlsDataSet(
+    	                    this.getClass().getClassLoader().getResourceAsStream(name)); 
+        		} else if(name.endsWith(".xml")) {
+        			dataset = new XmlDataSet(
+    	                    this.getClass().getClassLoader().getResourceAsStream(name)); 
+        		} else {
+        			throw new RuntimeException();
+        		}
+	            operation.execute(idc, dataset);
         	} catch(RuntimeException e) {
         		log.warn("以下のリソースを実行中に例外が発生しました：[" + name + "]");
         		throw e;

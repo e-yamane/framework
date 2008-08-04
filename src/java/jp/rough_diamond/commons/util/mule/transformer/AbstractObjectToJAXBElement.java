@@ -29,7 +29,7 @@ import org.mule.transformer.AbstractTransformer;
  * @author e-yamane
  */
 abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
-	private final static Log log = LogFactory.getLog(AbstractObjectToJAXBElementTest.class);
+	private final static Log log = LogFactory.getLog(AbstractObjectToJAXBElement.class);
 	
 	@Override
 	protected Object doTransform(Object src, String encoding) throws TransformerException {

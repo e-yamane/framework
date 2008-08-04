@@ -141,9 +141,7 @@
   </target>
 
   <target name="makeClientStub" description="WSDLをサーバから取得しスタブモジュールを作成する">
-<!--
     <antcall target="getWSDL" />
--->
     <antcall target="wsdl2java" />
   </target>
 
