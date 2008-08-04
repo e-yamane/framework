@@ -346,9 +346,6 @@
     <dbunit driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" 
             userid="${hibernate.connection.username}" password="${hibernate.connection.password}"
             schema="${hibernate.default_schema}">
-      <export dest="${export.dir}/numbering.xml" format="xml">
-        <table name="numbering" />
-      </export>
       <export4TorqueSchema dest="${export.dir}/{0}.xml" format="xml" schema="${sql.schema}" />
     </dbunit>
   </target>
@@ -359,9 +356,6 @@
     <dbunit driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" 
             userid="${hibernate.connection.username}" password="${hibernate.connection.password}"
             schema="${hibernate.default_schema}">
-      <export dest="${export.dir}/numbering.xls" format="excel">
-        <table name="numbering" />
-      </export>
       <export4TorqueSchema dest="${export.dir}/{0}.xls" format="excel" schema="${sql.schema}" />
     </dbunit>
   </target>
