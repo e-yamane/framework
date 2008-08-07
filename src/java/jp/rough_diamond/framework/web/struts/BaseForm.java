@@ -31,25 +31,34 @@ import org.apache.struts.action.ActionMapping;
  */
 abstract public class BaseForm extends ActionForm {
 	private static final long serialVersionUID = 1L;
-	transient private ThreadLocal<Messages> mgs;
-    private synchronized ThreadLocal<Messages> getMgs() {
-    	if(mgs == null) {
-    		mgs = new ThreadLocal<Messages>();
+	transient private ThreadLocal<Messages> mgs = new ThreadLocalMessages();
+	transient private ThreadLocal<Messages> errs = new ThreadLocalMessages();
+    private static class ThreadLocalMessages extends ThreadLocal<Messages> {
+    	@Override
+    	protected Messages initialValue() {
+    		return new Messages();
     	}
-    	return mgs;
     }
-    
+	
     public Messages getMessage(){
-        return getMgs().get();
+        return mgs.get();
     }
 
     protected void setMessage(Messages mgs) {
-        this.getMgs().set(mgs);
+        this.mgs.set(mgs);
+    }
+
+    public Messages getErrors(){
+        return errs.get();
+    }
+
+    protected void setErrors(Messages mgs) {
+        this.errs.set(mgs);
     }
 
     @Override
     public void reset(ActionMapping map, HttpServletRequest req){
-        setMessage(null);
+        setMessage(new Messages());
+        setErrors(new Messages());
     }
-
 }

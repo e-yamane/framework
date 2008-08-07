@@ -98,9 +98,14 @@ abstract public class BaseAction extends DispatchAction {
             forward = (ActionForward) method.invoke(this, args);
             if(form instanceof BaseForm) {
             	BaseForm baseForm = (BaseForm)form;
-                Messages msg = baseForm.getMessage();
-                if(msg != null && msg.hasError()) {
+            	Messages msg;
+            	msg = baseForm.getMessage();
+                if(msg.hasError()) {
                     saveMessages(request, MessagesTranslattor.translate(msg));
+                }
+            	msg = baseForm.getErrors();
+                if(msg.hasError()) {
+                    saveErrors(request, MessagesTranslattor.translate(msg));
                 }
             }
         } catch(ClassCastException e) {
