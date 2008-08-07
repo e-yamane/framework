@@ -41,7 +41,14 @@ public class Message  implements Serializable{
 
 	public Message(String key, String... values) {
 		this.key = key;
-		this.values = values;
+		if(values == null) {
+			this.values = new String[0];
+		} else {
+			this.values = new String[values.length];
+			for(int i = 0 ; i < this.values.length ; i++) {
+				this.values[i] = values[i];
+			}
+		}
 	}
 
 	public String getKey() {

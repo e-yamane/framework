@@ -43,6 +43,7 @@ public class ServiceLocator {
 
 	private final static String DEFAULT_SERVICE_FINDER_NAME = "jp.rough_diamond.framework.transaction.ServiceFinder";
 
+	public final static String SERVICE_FINDER_KEY = "serviceFinder";
     /**
      * サービスを取得する
      * 取得したオブジェクトはトランザクションマネージャがWeavingされている
@@ -64,7 +65,7 @@ public class ServiceLocator {
 	
     private synchronized static <T extends Service> void findService(Class<T> cl) {
     	if(serviceMap.get(cl) == null) {
-        	ServiceFinder finder = (ServiceFinder)DIContainerFactory.getDIContainer().getObject("serviceFinder");
+        	ServiceFinder finder = (ServiceFinder)DIContainerFactory.getDIContainer().getObject(SERVICE_FINDER_KEY);
         	if(finder == null) {
         		finder = getDefaultFinder();
         	}

@@ -89,7 +89,7 @@ public class HibernateBasicService extends BasicService {
             Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
             if(extractor.getValues().size() != 0) {
                 //厳密にエンティティはロードされていないのでイベントをファイアしてはいけないのでリターン
-                List<Object[]> tmp = query.list();
+                List<Object> tmp = query.list();
                 list = (List<T>) Extractor2HQL.makeMap(extractor, tmp);
             } else {
 //                list = query.list();
@@ -124,7 +124,7 @@ public class HibernateBasicService extends BasicService {
             long count;
             Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
             if(extractor.getValues().size() != 0) {
-                List<Object[]> tmp = query.list();
+                List<Object> tmp = query.list();
                 list = (List<T>) Extractor2HQL.makeMap(extractor, tmp);
             } else {
 //                list = query.list();

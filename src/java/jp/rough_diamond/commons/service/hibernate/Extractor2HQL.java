@@ -112,7 +112,7 @@ public class Extractor2HQL {
      * @param list
      * @return
      */
-    public static List<Map<String, Object>> makeMap(Extractor extractor, List<Object[]> list) {
+    public static List<Map<String, Object>> makeMap(Extractor extractor, List<Object> list) {
         List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
         List<ExtractValue> values = extractor.getValues();
         MakeMapStrategy strategy = (values.size() == 1) ? SingleStrategy.INSTANCE : MultiStrategy.INSTANCE;

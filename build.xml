@@ -69,6 +69,7 @@
         source="1.6"
         target="1.6"
         destdir="./target/classes"
+        debug="true"
     >
       <src path="src/java" />
       <src path="src/testingFramework" />
