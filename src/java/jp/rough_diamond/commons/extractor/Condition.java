@@ -203,28 +203,6 @@ abstract public class Condition implements Serializable{
     }
     
     /**
-     * 正規表現条件のオブジェクトを生成する
-     * @param propertyName プロパティ名
-     * @param target    プロパティを保持しているエンティティクラス
-     * @param aliase    エンティティの別名
-     * @param value     値群
-     * @return              正規表現条件オブジェクト
-     */
-    public static ValueHoldingCondition regularExp(String propertyName, Class target, String aliase, Object values) {
-        return new RegularExp(propertyName, target, aliase, values);
-    }
-    
-    /**
-     * 正規表現条件のオブジェクトを生成する
-     * @param propertyName プロパティ名
-     * @param value     値群
-     * @return              正規表現条件オブジェクト
-     */
-    public static ValueHoldingCondition regularExp(String propertyName, Object values) {
-        return new RegularExp(propertyName, null, null, values);
-    }
-
-    /**
      * 内部結合オブジェクトを生成する
      * @param target            ターゲットクラス
      * @param targetProperty    ターゲットプロパティ null、空白の場合はtargetと直接結合する
