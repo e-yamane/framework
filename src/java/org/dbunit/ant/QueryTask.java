@@ -17,150 +17,154 @@ import org.dbunit.database.IDatabaseConnection;
 
 @SuppressWarnings("unused")
 public class QueryTask extends AbstractStep {
-	private String query = "";
-	private String file = null;
-	private String encoding = null;
+    private String query = "";
+    private String file = null;
+    private String encoding = null;
     private String message;
-	private boolean isRegexp = false;
-	private Project project;
+    private boolean isRegexp = false;
+    private Project project;
 
-	public QueryTask(Project project) {
-		this.project = project;
-	}
+    public QueryTask(Project project) {
+        this.project = project;
+    }
 
-	public void setQuery(String query) {
-		this.query = query;
-	}
+    public void setQuery(String query) {
+        this.query = query;
+    }
 
     public void addText(String msg) {
-    	query = query + ";" + msg;
+        query = query + ";" + msg;
     }
 
     public void setFile(String file) {
-    	this.file = file;
+        this.file = file;
     }
 
     public void setEncoding(String encoding) {
-    	this.encoding = encoding;
+        this.encoding = encoding;
     }
 
-	public boolean isRegexp() {
-		return isRegexp;
-	}
-	public void setRegexp(boolean isRegexp) {
-		this.isRegexp = isRegexp;
-	}
+    public boolean isRegexp() {
+        return isRegexp;
+    }
+    public void setRegexp(boolean isRegexp) {
+        this.isRegexp = isRegexp;
+    }
 
-	public void execute(IDatabaseConnection idcon) throws DatabaseUnitException {
-    	readFile();
-    	try {
-	    	String[] queries = query.split(";");
-	    	for(int i = 0 ; i < queries.length ; i++) {
-	    		String query = queries[i].trim();
-	    		queries[i] = query;
-	    		if(query.length() == 0) {
-	    			continue;
-	    		}
-    			if(isRegexp())
-    			{
-    				executeRegexpQuery(idcon, query);
-    			}
-    			else
-    			{
-    	    		executeQuery(idcon, query);
-    			}
-	    	}
-    	}
-    	catch(SQLException e)
-		{
-    		throw new DatabaseUnitException(e);
-    	}
+    public void execute(IDatabaseConnection idcon) throws DatabaseUnitException {
+        readFile();
+        try {
+            String[] queries = query.split(";");
+            for(int i = 0 ; i < queries.length ; i++) {
+                String query = queries[i].trim();
+                queries[i] = query;
+                if(query.length() == 0) {
+                    continue;
+                }
+                if(isRegexp())
+                {
+                    executeRegexpQuery(idcon, query);
+                }
+                else
+                {
+                    executeQuery(idcon, query);
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            throw new DatabaseUnitException(e);
+        }
     }
 
     private File rootDir;
     
-	private void executeQuery(IDatabaseConnection idcon, String query) {
-		try
-		{
-			Statement stmt = idcon.getConnection().createStatement();
-			stmt.execute(query);
-		} catch(SQLException e) {
-			System.out.println("NG:" + query + "[" + e.getMessage() + "]");
-		}
-	}
+    private void executeQuery(IDatabaseConnection idcon, String query) {
+        try
+        {
+            Statement stmt = idcon.getConnection().createStatement();
+            try {
+                stmt.execute(query);
+            } finally {
+                stmt.close();
+            }
+        } catch(SQLException e) {
+            System.out.println("NG:" + query + "[" + e.getMessage() + "]");
+        }
+    }
 
-	private void executeRegexpQuery(IDatabaseConnection idcon, String query) throws SQLException {
-		String[] queries2 = RegexpUtil.getQueries(idcon, query, getParent().getSchema());
-		for(int i = 0 ; i < queries2.length ; i++)
-		{
+    private void executeRegexpQuery(IDatabaseConnection idcon, String query) throws SQLException {
+        String[] queries2 = RegexpUtil.getQueries(idcon, query, getParent().getSchema());
+        for(int i = 0 ; i < queries2.length ; i++)
+        {
             System.out.println(queries2[i]);
-			executeQuery(idcon, queries2[i]);
-		}
-	}
+            executeQuery(idcon, queries2[i]);
+        }
+    }
 
-	public String getLogMessage() {
-		return
-			"executing query task:\n" +
-			"\tquery=" + this.query + "\n" +
-			"\tfileName=" + this.file + "\n" +
-			"\tencoding=" + this.encoding + "\n";
-	}
+    public String getLogMessage() {
+        return
+            "executing query task:\n" +
+            "\tquery=" + this.query + "\n" +
+            "\tfileName=" + this.file + "\n" +
+            "\tencoding=" + this.encoding + "\n";
+    }
 
-	private void readFile() throws DatabaseUnitException {
-		try {
-			if(file == null)
-			{
-				return;
-			}
-			DirectoryScanner ds = FileScanUtil.getDirectoryScanner(file);
-			rootDir = ds.getBasedir();
-			String[] names = ds.getIncludedFiles();
-			if(names != null) {
+    private void readFile() throws DatabaseUnitException {
+        try {
+            if(file == null)
+            {
+                return;
+            }
+            DirectoryScanner ds = FileScanUtil.getDirectoryScanner(file);
+            rootDir = ds.getBasedir();
+            String[] names = ds.getIncludedFiles();
+            if(names != null) {
                 System.out.println(names.length);
-				StringBuffer buf = new StringBuffer(this.query);
-				for(int i = 0 ; i < names.length ; i++) {
+                StringBuffer buf = new StringBuffer(this.query);
+                for(int i = 0 ; i < names.length ; i++) {
                     System.out.println(names[i]);
-					buf.append(";");
-					buf.append(readFile(names[i]));
-				}
-				this.query = buf.toString();
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new DatabaseUnitException(e);
-		}
-	}
+                    buf.append(";");
+                    buf.append(readFile(names[i]));
+                }
+                this.query = buf.toString();
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            throw new DatabaseUnitException(e);
+        }
+    }
 
-	private String readFile(String name) throws IOException {
-		System.out.println(name);
-		File f = new File(rootDir, name);
-		final int size = 1024;
-		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f), size);
-		try
-		{
-			byte[] array = new byte[size];
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			int readSize;
-			do
-			{
-				readSize = bis.read(array);
-				if(readSize == -1) {
-					break;
-				}
-				baos.write(array, 0, readSize);
-			} while(readSize == size);
-			baos.close();
-			array = baos.toByteArray();
-			String query = (encoding == null) ? new String(array) : new String(array, encoding);
-			return query;
-		}
-		finally
-		{
-			bis.close();
-		}
-	}
+    private String readFile(String name) throws IOException {
+        System.out.println(name);
+        File f = new File(rootDir, name);
+        final int size = 1024;
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f), size);
+        try
+        {
+            byte[] array = new byte[size];
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int readSize;
+            do
+            {
+                readSize = bis.read(array);
+                if(readSize == -1) {
+                    break;
+                }
+                baos.write(array, 0, readSize);
+            } while(readSize == size);
+            baos.close();
+            array = baos.toByteArray();
+            String query = (encoding == null) ? new String(array) : new String(array, encoding);
+            return query;
+        }
+        finally
+        {
+            bis.close();
+        }
+    }
     
     public static void main(String[] args) throws Exception {
         String hoge = "./aaa**/*.sql";
