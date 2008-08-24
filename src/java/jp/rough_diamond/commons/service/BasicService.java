@@ -357,9 +357,9 @@ abstract public class BasicService implements Service {
 	    				ret.add(ml.property(), new Message("errors.maxlength", ResourceManager.getResource().getString(ml.property()), "" + ml.length()));
 	    			}
 	    		}
-    			Object val = m.invoke(o);
 	    		NotNull nn = m.getAnnotation(NotNull.class);
 	    		if(nn != null) {
+	    			Object val = m.invoke(o);
 	    			if(val == null) {
                         log.debug("•K{‘®«ƒGƒ‰[:" + nn.property());
 	    				ret.add(nn.property(), new Message("errors.required", ResourceManager.getResource().getString(nn.property())));
