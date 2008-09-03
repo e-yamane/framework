@@ -195,12 +195,20 @@ public class ServiceGenerator {
             dir = new File(srcDir, service.packageName.replace('.', '/'));
         }
         dir = new File(dir, "impl");
-        dir.mkdirs();
+        boolean ret = dir.mkdirs();
+        //FindBugs‘Î‰ž
+        if(!ret) {
+        	ret = !ret;
+        }
         VelocityContext context = new VelocityContext();
         context.put("service", service);
         Template template = Velocity.getTemplate("jp/rough_diamond/tools/servicegen/serviceImplTemplate.vm");
         File f = new File(dir, service.className + "Impl.java");
-        f.delete();
+        ret = f.delete();
+        //FindBugs‘Î‰ž
+        if(!ret) {
+        	ret = !ret;
+        }
         FileOutputStream fos = new FileOutputStream(f);
         PrintWriter pw = new PrintWriter(fos);
         template.merge(context, pw);
@@ -215,12 +223,20 @@ public class ServiceGenerator {
         } else {
             dir = new File(srcDir, service.packageName.replace('.', '/'));
         }
-        dir.mkdirs();
+        boolean ret = dir.mkdirs();
+        //FindBugs‘Î‰ž
+        if(!ret) {
+        	ret = !ret;
+        }
         VelocityContext context = new VelocityContext();
         context.put("service", service);
         Template template = Velocity.getTemplate("jp/rough_diamond/tools/servicegen/serviceInterfaceTemplate.vm");
         File f = new File(dir, service.className + ".java");
-        f.delete();
+        ret = f.delete();
+        //FindBugs‘Î‰ž
+        if(!ret) {
+        	ret = !ret;
+        }
         FileOutputStream fos = new FileOutputStream(f);
         PrintWriter pw = new PrintWriter(fos);
         template.merge(context, pw);

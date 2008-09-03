@@ -299,7 +299,11 @@ public class WSDL2JavaExt extends Task {
 				TRANSFORMER_CLASS_NAME, TRANSFORMER_CLASS_NAME, operation, portTypeClassName);
 		System.out.println(transformClassBody);
 		File packageDir = new File(getSrcdir(), packageName.replace('.', '/'));
-		packageDir.mkdirs();
+		boolean ret = packageDir.mkdirs();
+		//FindBug‘Î‰ž
+		if(!ret) {
+			ret = !ret;
+		}
 		FileUtils.writeStringToFile(new File(packageDir, TRANSFORMER_CLASS_NAME + ".java"), transformClassBody, "UTF-8");
 	}
 	

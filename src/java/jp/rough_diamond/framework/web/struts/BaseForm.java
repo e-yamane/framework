@@ -18,6 +18,9 @@
  */
 package jp.rough_diamond.framework.web.struts;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import org.apache.struts.action.ActionForm;
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,8 +34,8 @@ import org.apache.struts.action.ActionMapping;
  */
 abstract public class BaseForm extends ActionForm {
 	private static final long serialVersionUID = 1L;
-	transient private ThreadLocal<Messages> mgs = new ThreadLocalMessages();
-	transient private ThreadLocal<Messages> errs = new ThreadLocalMessages();
+	transient ThreadLocal<Messages> mgs = new ThreadLocalMessages();
+	transient ThreadLocal<Messages> errs = new ThreadLocalMessages();
     private static class ThreadLocalMessages extends ThreadLocal<Messages> {
     	@Override
     	protected Messages initialValue() {
@@ -40,8 +43,14 @@ abstract public class BaseForm extends ActionForm {
     	}
     }
 	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    	in.defaultReadObject();
+    	mgs = new ThreadLocalMessages();
+    	errs = new ThreadLocalMessages();
+    }
+    
     public Messages getMessage(){
-        return mgs.get();
+        return this.mgs.get();
     }
 
     protected void setMessage(Messages mgs) {
@@ -49,7 +58,7 @@ abstract public class BaseForm extends ActionForm {
     }
 
     public Messages getErrors(){
-        return errs.get();
+        return this.errs.get();
     }
 
     protected void setErrors(Messages mgs) {

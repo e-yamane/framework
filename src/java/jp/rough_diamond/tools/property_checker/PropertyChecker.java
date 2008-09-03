@@ -2,6 +2,7 @@ package jp.rough_diamond.tools.property_checker;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -16,9 +17,19 @@ public class PropertyChecker {
             String basePropertyFileName, String targetPropertyFileName) 
                     throws IOException {
         baseProperty = new Properties();
-        baseProperty.load(new FileInputStream(basePropertyFileName));
+        InputStream is = new FileInputStream(basePropertyFileName);
+        try {
+        	baseProperty.load(is);
+        } finally {
+        	is.close();
+        }
         targetProperties = new Properties();
-        targetProperties.load(new FileInputStream(targetPropertyFileName));
+        is = new FileInputStream(targetPropertyFileName);
+        try {
+        	targetProperties.load(is);
+        } finally {
+        	is.close();
+        }
     }
 
     /**

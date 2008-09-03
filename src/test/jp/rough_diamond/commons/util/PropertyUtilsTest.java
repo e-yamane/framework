@@ -57,7 +57,7 @@ public class PropertyUtilsTest extends TestCase {
 	
 	public static void main(String[] args) {
 		int[] array = new int[1];
-		Array.set(array, 0, new Integer(1));
+		Array.set(array, 0, Integer.valueOf(1));
 		System.out.println(array[0]);
 	}
 }

@@ -33,6 +33,7 @@ public class ServiceBus {
 	}
 
 	private Object muleStartMonitor = new Object();
+	private volatile boolean isStart = false;
 	private void startMule() {
 		Thread t = new Thread(new Runnable() {
 			public void run() {
@@ -49,16 +50,23 @@ public class ServiceBus {
 					throw new RuntimeException(e);
 				} finally {
 					synchronized(muleStartMonitor) {
+						isStart = true;
 						muleStartMonitor.notifyAll();
 					}
 				}
 			}
 		});
 		synchronized(muleStartMonitor) {
+			isStart = false;
 			t.setDaemon(true);
 			t.start();
 			try {
-				muleStartMonitor.wait();
+				while(true) {
+					muleStartMonitor.wait(100);
+					if(isStart) {
+						break;
+					}
+				}
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
