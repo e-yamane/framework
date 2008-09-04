@@ -139,7 +139,8 @@ public class HibernateBasicService extends BasicService {
 	            }
             }
             Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
-            count = (Long)countQuery.list().get(0);
+            Number n = (Number)countQuery.list().get(0);
+            count = n.longValue();
             FindResult<T> ret = new FindResult<T>(list, count);
             return ret;
         } catch(Exception e) {
