@@ -92,9 +92,21 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 			copyJAXElementOfArray(factory, pd, genericType, srcVal, dest);
 		} else {
 			String copyMethodName = getCopyMethodName(pd, dest);
-			Object destVal = getCreateMethod(factory, copyMethodName).invoke(factory, srcVal);
+			log.debug(copyMethodName);
+			Method m  = getCreateMethod(factory, copyMethodName);
+			if(!m.getParameterTypes()[0].isAssignableFrom(srcVal.getClass())) {
+				srcVal = createAndCopyJAXBElement(factory, srcVal, m.getParameterTypes()[0]);
+			}
+			Object destVal = m.invoke(factory, srcVal);
 			PropertyUtils.setProperty(dest, pd.getName(), destVal);
 		}
+	}
+
+	private Object createAndCopyJAXBElement(Object factory, Object srcVal, Class<?> cl) throws Exception {
+		Object destVal = createObjectByType(factory, cl);
+		log.debug(destVal.getClass().getName());
+		copyProperty(factory, srcVal, destVal);
+		return destVal;
 	}
 
 	@SuppressWarnings("unchecked")
