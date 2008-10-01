@@ -122,21 +122,25 @@ public class HibernateBasicService extends BasicService {
 //            }
             List<T> list;
             long count;
-            Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
-            if(extractor.getValues().size() != 0) {
-                List<Object> tmp = query.list();
-                list = (List<T>) Extractor2HQL.makeMap(extractor, tmp);
-            } else {
-//                list = query.list();
-            	list = makeList(type, query.list());
-            }
-            List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
-            fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
-            if(isNoCache) {
-	            Session session = HibernateUtils.getSession();
-	            for(Object o : loadedObjects) {
-	            	session.evict(o);
+            if(extractor.getLimit() != 0) {
+	            Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
+	            if(extractor.getValues().size() != 0) {
+	                List<Object> tmp = query.list();
+	                list = (List<T>) Extractor2HQL.makeMap(extractor, tmp);
+	            } else {
+//	            	list = query.list();
+	            	list = makeList(type, query.list());
 	            }
+	            List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
+	            fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
+	            if(isNoCache) {
+		            Session session = HibernateUtils.getSession();
+		            for(Object o : loadedObjects) {
+		            	session.evict(o);
+		            }
+	            }
+            } else {
+            	list = new ArrayList<T>();
             }
             Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
             Number n = (Number)countQuery.list().get(0);
