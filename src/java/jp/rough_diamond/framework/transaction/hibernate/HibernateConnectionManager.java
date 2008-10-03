@@ -223,6 +223,7 @@ public class HibernateConnectionManager extends ConnectionManager {
 		} catch(Exception e) {
 			log.warn("ロールバック中に例外が発生しましたが無視します。", e);
 		} finally {
+            ((Map)transactionMap.get()).remove(session);
 			accessCounter--;
 			session.close();
 		}
@@ -238,11 +239,9 @@ public class HibernateConnectionManager extends ConnectionManager {
 		Transaction t = (Transaction)((Map)transactionMap.get()).get(session);
 		try {
 			t.commit();
-			try {
-				session.close();
-			} finally {
-				((Stack)tl.get()).pop();
-			}
+			session.close();
+			((Stack)tl.get()).pop();
+            ((Map)transactionMap.get()).remove(session);
 		} catch(StaleObjectStateException e) {
 			Class[] exceptionTypes = mi.getMethod().getExceptionTypes();
 			for(int i = 0 ; i < exceptionTypes.length ; i++) {

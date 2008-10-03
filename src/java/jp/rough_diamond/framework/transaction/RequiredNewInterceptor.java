@@ -50,6 +50,7 @@ public class RequiredNewInterceptor extends TransactionInterceptor {
 			ex = e;
 			throw e;
 		} finally {
+            TransactionManager.popTransactionBeginingInterceptor();
 			if(ex == null && !isRollbackOnly()) {
 				try {
 					cm.commit(mi);

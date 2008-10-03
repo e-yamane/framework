@@ -15,7 +15,6 @@ import org.hibernate.metadata.ClassMetadata;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Extractor;
 import jp.rough_diamond.commons.service.BasicService;
-import jp.rough_diamond.commons.service.FindResult;
 import jp.rough_diamond.commons.service.NumberingService;
 import jp.rough_diamond.framework.transaction.TransactionAttribute;
 import jp.rough_diamond.framework.transaction.TransactionAttributeType;
@@ -58,9 +57,7 @@ public class HibernateNumberingService extends NumberingService {
             Serializable ser = supplimenter.suppliment(ret, length);
         	Extractor ex = new Extractor(entityClass);
         	ex.add(Condition.eq(prop.getName(), ser));
-        	ex.setLimit(0);
-        	FindResult<T> fr = bs.findByExtractorWithCount(ex);
-        	if(fr.count == 0) {
+        	if(bs.getCountByExtractor(ex) == 0) {
         		return ser;
         	}
             ret = getNumber(cm.getEntityName());
