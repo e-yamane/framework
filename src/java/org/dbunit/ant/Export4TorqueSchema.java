@@ -1,6 +1,8 @@
 package org.dbunit.ant;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +22,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class Export4TorqueSchema extends Export {
 	private String schema;
@@ -71,6 +76,21 @@ public class Export4TorqueSchema extends Export {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setValidating(false);
 			DocumentBuilder db = dbf.newDocumentBuilder();
+			db.setEntityResolver(new DefaultHandler() {
+				@Override
+				public InputSource resolveEntity(String publicId,
+						String systemId) throws IOException, SAXException {
+					InputSource is = super.resolveEntity(publicId, systemId);
+					if(is == null) {
+						//TODO Torqueのサポートバージョンが増えたら増やすこと！！
+						if("http://db.apache.org/torque/dtd/database_3_1.dtd".equals(systemId)) {
+							InputStream stream = this.getClass().getClassLoader().getResourceAsStream("org/dbunit/ant/database_3_1.dtd");
+							is = new InputSource(stream);
+						}
+					}
+					return is;
+				}
+			});
 			File f = new File(rootDir, schemaName);
 			execute(connection, db, f);
 		} catch(Exception e) {
