@@ -48,8 +48,8 @@ public class VelocityViewer {
 		if (request instanceof MultipartRequestWrapper) {
             request = ((MultipartRequestWrapper) request).getRequest();
         }
-		String text = getText(templateName, context, request, response);
 		response.setCharacterEncoding((String)VelocityWrapper.getInstance().getEngine().getProperty("output.encoding"));
+		String text = getText(templateName, context, request, response);
 		response.getWriter().print(text);
 		response.getWriter().flush();
 		return true;
