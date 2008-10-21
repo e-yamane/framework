@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="src" path="src/testingFramework"/>
+	<classpathentry excluding="**/.svn/*" kind="src" path="src/java"/>
+	<classpathentry excluding="**/.svn/*" kind="src" path="src/test"/>
+	<classpathentry excluding="**/.svn/*" kind="src" path="src/testingFramework"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/common/rd-commons-di-1.4.jar"/>
 	<classpathentry kind="lib" path="libs/common/rd-commons-io-1.0.jar"/>
