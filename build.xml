@@ -7,6 +7,11 @@
     <antcall target="makeConfig" />
   </target>
 
+  <import file="../framework/build-common.xml" />
+  <target name="makeOkumuraConfig" description="奥村開発環境用のbeans.xmlを作成する">
+    <property name="filtering.filename" value="${conf.dir}/filtering.okumura.properties" />
+    <antcall target="makeConfig" />
+  </target>
 
 <!--
   <target name="makeReleaseConfig" description="リリースモジュール用のbeans.xmlを作成する">
