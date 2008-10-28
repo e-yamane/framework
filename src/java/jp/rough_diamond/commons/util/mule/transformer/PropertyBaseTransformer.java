@@ -15,7 +15,7 @@ abstract public class PropertyBaseTransformer extends AbstractTransformer {
 		return dest;
 	}
 
-	protected void afterProcess(Object src, Object dest, String encoding){ }
+	protected void afterProcess(Object src, Object dest, String encoding) throws TransformerException { }
 	
 	abstract protected Object newTransformObject();
 }
