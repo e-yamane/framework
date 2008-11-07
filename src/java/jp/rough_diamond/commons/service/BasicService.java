@@ -79,20 +79,7 @@ abstract public class BasicService implements Service {
     private final static String DEFAULT_BASIC_SERVICE_CLASS_NAME = "jp.rough_diamond.commons.service.hibernate.HibernateBasicService";
     private final static BasicService INSTANCE;
     static {
-    	BasicService tmp = null;
-    	try {
-    		tmp = ServiceLocator.getService(BasicService.class);
-    	} catch(Exception e) {
-    		//指定されていない場合の可能性あり。デフォルトのクラスでサービスを生成する
-    		Class<? extends BasicService> cl;
-			try {
-				cl = (Class<BasicService>)Class.forName(DEFAULT_BASIC_SERVICE_CLASS_NAME);
-				tmp = (BasicService)ServiceLocator.getService(cl);
-			} catch (ClassNotFoundException e1) {
-				throw new RuntimeException(e);
-			}
-    	}
-    	INSTANCE = tmp;
+    	INSTANCE = ServiceLocator.getService(BasicService.class, DEFAULT_BASIC_SERVICE_CLASS_NAME);
     }
     
     /**

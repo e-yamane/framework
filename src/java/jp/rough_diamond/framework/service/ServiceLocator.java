@@ -39,21 +39,50 @@ import org.apache.commons.logging.LogFactory;
 @SuppressWarnings("unchecked")
 public class ServiceLocator {
 	private final static Log log = LogFactory.getLog(ServiceLocator.class);
-	private static Map<Class, Service> serviceMap = new HashMap<Class, Service>();
+	static Map<Class<?>, Service> serviceMap = new HashMap<Class<?>, Service>();
 
 	private final static String DEFAULT_SERVICE_FINDER_NAME = "jp.rough_diamond.framework.transaction.ServiceFinder";
 
 	public final static String SERVICE_FINDER_KEY = "serviceFinder";
-    /**
+
+	/**
      * サービスを取得する
-     * 取得したオブジェクトはトランザクションマネージャがWeavingされている
+	 * @param <T>	返却するインスタンスのタイプ
      * @param cl    取得対象サービスクラス
-     * @return      取得対象サービス 
+     * @return      サービス 
      */
 	public static <T extends Service> T getService(Class<T> cl) {
+		return getService(cl, cl);
+    }	
+	
+	/**
+	 * サービスを取得する
+	 * @param <T>				返却するインスタンスのタイプ
+	 * @param cl				サービスの基点となるインスタンスのタイプ
+	 * @param defaultClassName	DIコンテナに設定が無い場合に実体化するインスタンスのタイプ名	
+     * @return      サービス 
+	 */
+	public static <T extends Service> T getService(Class<T> cl, String defaultClassName) {
+		Class<? extends T> defaultClass;
+		try {
+			defaultClass = (Class<? extends T>)Class.forName(defaultClassName);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		return getService(cl, defaultClass);
+	}
+	
+	/**
+	 * サービスを取得する
+	 * @param <T>				返却するインスタンスのタイプ
+	 * @param cl				サービスの基点となるインスタンスのタイプ
+	 * @param defaultClass		DIコンテナに設定が無い場合に実体化するインスタンスのタイプ	
+     * @return      サービス 
+	 */
+	public static <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass) {
 		T service = (T)serviceMap.get(cl);
 		if(service == null) {
-			findService(cl);
+			findService(cl, defaultClass);
 			service = (T)serviceMap.get(cl);
 		}
 		if(service == null) {
@@ -61,15 +90,15 @@ public class ServiceLocator {
 			throw new RuntimeException();
 		}
 		return service;
-    }	
+	}
 	
-    private synchronized static <T extends Service> void findService(Class<T> cl) {
+    private synchronized static <T extends Service> void findService(Class<T> cl, Class<? extends T> defaultClass) {
     	if(serviceMap.get(cl) == null) {
         	ServiceFinder finder = (ServiceFinder)DIContainerFactory.getDIContainer().getObject(SERVICE_FINDER_KEY);
         	if(finder == null) {
         		finder = getDefaultFinder();
         	}
-        	T service = finder.getService(cl);
+        	T service = finder.getService(cl, defaultClass);
         	serviceMap.put(cl, service);
     	}
     }

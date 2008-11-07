@@ -13,9 +13,9 @@ public class ServiceFinderChain implements ServiceFinder {
 		this.serviceFinderChain = serviceFinderChain;
 	}
 	
-	public <T extends Service> T getService(Class<T> cl) {
+	public <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass) {
 		for(ServiceFinder serviceFinder : serviceFinderChain) {
-			T ret = serviceFinder.getService(cl);
+			T ret = serviceFinder.getService(cl, defaultClass);
 			if(ret != null) {
 				return ret;
 			}

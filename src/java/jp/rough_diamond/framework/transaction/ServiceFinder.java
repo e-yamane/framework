@@ -39,10 +39,10 @@ import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
  */
 public class ServiceFinder extends SimpleServiceFinder {
 	@SuppressWarnings("unchecked")
-	public <T extends Service> T getService(Class<T> cl) {
+	public <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass) {
 		init();
 		try {
-			T base = super.getService(cl);
+			T base = super.getService(cl, defaultClass);
 			ProxyFactory pf = new ProxyFactory(base);
 			pf.addAdvice(mi);
 			pf.addAdvisor(interceptor);

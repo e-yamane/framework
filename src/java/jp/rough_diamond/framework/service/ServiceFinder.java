@@ -24,5 +24,12 @@ package jp.rough_diamond.framework.service;
  *
  */
 public interface ServiceFinder {
-    public <T extends Service> T getService(Class<T> cl);
+	/**
+	 * サービスを取得する
+	 * @param <T>				返却するインスタンスのタイプ
+	 * @param cl				サービスの基点となるインスタンスのタイプ
+	 * @param defaultClass		DIコンテナに設定が無い場合に実体化するインスタンスのタイプ	
+     * @return      サービス 
+	 */
+    public <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass);
 }

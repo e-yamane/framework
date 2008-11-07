@@ -20,11 +20,11 @@ public class ServiceFinder implements
 	private final static Log log = LogFactory.getLog(ServiceFinder.class);
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Service> T getService(Class<T> cl) {
-		if(!isTarget(cl)) {
+	public <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass) {
+		if(!isTarget(defaultClass)) {
 			return null;
 		}
-		T ret = (T)Proxy.newProxyInstance(cl.getClassLoader(), new Class[]{cl}, getInvocationHandler());
+		T ret = (T)Proxy.newProxyInstance(defaultClass.getClassLoader(), new Class[]{defaultClass}, getInvocationHandler());
 		return ret;
 	}
 	
