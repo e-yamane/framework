@@ -48,7 +48,11 @@
     <constructor-arg index="0" type="java.lang.String"><value>UTF-8</value></constructor-arg>
   </bean>
 
-  <bean id="localeController" class="jp.rough_diamond.commons.resource.LocaleControllerByThreadLocal">
+  <!-- 
+    Webの場合はLocaleControllerByThreadLocalにすること
+    SimpleLocaleControllerは、動作ＯＳ上の言語情報からローケルを特定するのでまずい
+  -->
+  <bean id="localeController" class="jp.rough_diamond.commons.resource.SimpleLocaleController">
     <description>どのレイヤからも透過的にローケルに対してアクセス可能なインタフェース</description>
   </bean>
 

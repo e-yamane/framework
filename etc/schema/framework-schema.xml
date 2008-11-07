@@ -24,6 +24,31 @@ DTDは、
       　sizeが指定されている文字列系のカラムについては自動的にサイズチェックが付与される
   -->
 
+  <table name="AMOUNT"  description="量" skipSql="true">
+    <!-- 単位無しを見越してUNIT_IDはnull許可 -->
+    <column name="UNIT_ID"                        required="false"  type="BIGINT"               description="数量尺度ID" />
+    <column name="QUANTITY"                       required="true"   type="DECIMAL"              description="量" />
+    <foreign-key foreignTable="UNIT" name="unit" onUpdate="restrict" onDelete="restrict">
+      <reference local="UNIT_ID" foreign="ID" />
+    </foreign-key>
+  </table>
+
+  <table name="UNIT" description="数量尺度">
+    <column name="ID"           primaryKey="true" required="true"   type="BIGINT"               description="OID" />
+    <column name="NAME"                           required="true"   type="VARCHAR"  size="32"   description="数量尺度名" />
+    <column name="DESCRIPTION"                    required="false"  type="VARCHAR"  size="64"   description="単位説明" />
+    <column name="BASE_UNIT_ID"                   required="true"   type="BIGINT"               description="ベース数量尺度" />
+    <column name="RATE" javaName="rateStr"        required="true"   type="VARCHAR"  size="16"   description="変換係数。浮動小数点では誤差が生じるため文字列で格納" />
+    <column name="SCALE"                          required="true"   type="INTEGER"              description="変換時に保持する少数精度。負数を指定すると整数の切捨て判断する" />
+    <column name="VERSION"  autoIncrement="true"  required="true"   type="BIGINT"               description="楽観的ロッキングキー" />
+    <unique name="1">
+      <unique-column name="NAME" />
+    </unique>
+    <foreign-key foreignTable="UNIT" name="base" onUpdate="restrict" onDelete="restrict">
+      <reference local="BASE_UNIT_ID" foreign="ID" />
+    </foreign-key>
+  </table>
+
   <table name="numbering" description="ナンバリングテーブル">
     <column name="id"             primaryKey="true" required="true" type="VARCHAR" size="128"     description="ＩＤ" />
     <column name="next_number"                      required="true" type="BIGINT"         description="現在割り当てている番号" />
