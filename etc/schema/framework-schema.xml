@@ -27,7 +27,8 @@ DTDは、
   <table name="AMOUNT"  description="量" skipSql="true">
     <!-- 単位無しを見越してUNIT_IDはnull許可 -->
     <column name="UNIT_ID"                        required="false"  type="BIGINT"               description="数量尺度ID" />
-    <column name="QUANTITY"                       required="true"   type="DECIMAL"              description="量" />
+    <column name="VALUE"                          required="true"   type="BIGINT"               description="量(整数)" />
+    <column name="SCALE"                          required="true"   type="INTEGER"              description="小数点位置。正の数なら左へ、負の数なら右へ移動させる" />
     <foreign-key foreignTable="UNIT" name="unit" onUpdate="restrict" onDelete="restrict">
       <reference local="UNIT_ID" foreign="ID" />
     </foreign-key>

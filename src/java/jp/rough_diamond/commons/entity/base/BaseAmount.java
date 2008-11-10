@@ -3,7 +3,6 @@ package jp.rough_diamond.commons.entity.base;
 
 
 import  java.io.Serializable;
-import  java.math.BigDecimal;
 
 
 /**
@@ -16,29 +15,56 @@ public abstract class BaseAmount  implements Serializable {
 
 
     /**
-     * 量
+     * 量(整数)
     **/ 
-    private BigDecimal quantity;
-    public final static String QUANTITY = "quantity";
+    private Long value;
+    public final static String VALUE = "value";
 
     /**
-     * 量を取得する
+     * 量(整数)を取得する
      * @hibernate.property
-     *    column="QUANTITY"
+     *    column="VALUE"
      *    not-null="true"
-     * @return 量
+     * @return 量(整数)
     **/
-    @jp.rough_diamond.commons.service.annotation.NotNull(property="Amount.quantity")
-    public BigDecimal getQuantity() {
-        return quantity;
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="Amount.value")
+    public Long getValue() {
+        return value;
     }
 
     /**
-     * 量を設定する
-     * @param quantity  量
+     * 量(整数)を設定する
+     * @param value  量(整数)
     **/
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
+    public void setValue(Long value) {
+        this.value = value;
+    }
+
+
+    /**
+     * 小数点位置。正の数なら左へ、負の数なら右へ移動させる
+    **/ 
+    private Integer scale;
+    public final static String SCALE = "scale";
+
+    /**
+     * 小数点位置。正の数なら左へ、負の数なら右へ移動させるを取得する
+     * @hibernate.property
+     *    column="SCALE"
+     *    not-null="true"
+     * @return 小数点位置。正の数なら左へ、負の数なら右へ移動させる
+    **/
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="Amount.scale")
+    public Integer getScale() {
+        return scale;
+    }
+
+    /**
+     * 小数点位置。正の数なら左へ、負の数なら右へ移動させるを設定する
+     * @param scale  小数点位置。正の数なら左へ、負の数なら右へ移動させる
+    **/
+    public void setScale(Integer scale) {
+        this.scale = scale;
     }
 
 
