@@ -305,7 +305,7 @@ abstract public class BasicService implements Service {
      * @throws MessagesIncludingException	論理削除時の検証例外
      */
     public void deleteByExtractor(Extractor extractor) throws VersionUnmuchException, MessagesIncludingException {
-    	List list = findByExtractor(extractor);
+    	List list = findByExtractor(extractor, true);
     	delete(list.toArray());
     }
     
@@ -340,7 +340,7 @@ abstract public class BasicService implements Service {
      * @throws MessagesIncludingException	論理削除時の検証例外
      */
     public <T> void deleteByPK(Class<T> type, Serializable pk) throws VersionUnmuchException, MessagesIncludingException {
-        T o = findByPK(type, pk);
+        T o = findByPK(type, pk, true);
         if(o != null) {
             delete(o);
         }
