@@ -1,6 +1,7 @@
 package jp.rough_diamond.commons.service;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import jp.rough_diamond.commons.entity.Amount;
 import jp.rough_diamond.commons.entity.Unit;
@@ -39,12 +40,12 @@ public class SimpleUnitConversionService extends UnitConversionService {
 	private final int defaultRoundingMode;
 	
 	@Override
-	public Amount convertUnit(Amount srcAmount, Unit destUnit) {
-		return convertUnit(srcAmount, destUnit, defaultRoundingMode);
+	public Amount convertUnit(Amount srcAmount, Unit destUnit, Date d) {
+		return convertUnit(srcAmount, destUnit, defaultRoundingMode, d);
 	}
 
 	@Override
-	public Amount convertUnit(Amount srcAmount, Unit destUnit, int roundingMode) throws NotConversionException {
+	public Amount convertUnit(Amount srcAmount, Unit destUnit, int roundingMode, Date d) throws NotConversionException {
 		if(srcAmount.getUnit() == null && destUnit != null) {
 			throw new NotConversionException();
 		}
