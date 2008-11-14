@@ -63,7 +63,6 @@ public class SimpleUnitConversionService extends UnitConversionService {
 			throw new NotConversionException();
 		}
 		//[Œ³‚Ì”] ~ [Œ³‚Ì’PˆÊ‚ÌŒW”] / [•ÏŠ·Œã‚Ì’PˆÊ‚ÌŒW”]
-		System.out.println(destUnit.getRate().decimal());
 		BigDecimal bd = srcAmount.getQuantity().decimal().multiply(
 				srcAmount.getUnit().getRate().decimal()).divide(
 						destUnit.getRate().decimal(), destUnit.getScale(), roundingMode);

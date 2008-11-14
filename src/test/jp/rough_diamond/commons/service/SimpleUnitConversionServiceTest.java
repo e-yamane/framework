@@ -57,7 +57,6 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
 		srcAmount.setQuantity(new ScalableNumber("1.5"));
-		Unit tmp = bService.findByPK(Unit.class, 4L);
 		Amount dest = service.convertUnit(srcAmount, bService.findByPK(Unit.class, 4L));
 		assertEquals("”—Ê‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 200, dest.getQuantity().intValue());
 		assertEquals("’PˆÊ‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 4L, dest.getUnit().getId().longValue());
