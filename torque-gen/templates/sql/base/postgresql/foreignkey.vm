@@ -44,7 +44,7 @@ ${fk}#end
 #if($table.baseClass != "BaseObject")
 #set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
 #if($foreignTable)
-#if($foreignTable.isSkipSql() && $foreignTable.isAbstract())
+#if($foreignTable.isSkipSqlOrg())
 ##外部テーブル展開
 #if($currentIndex != $cnt)
 #set($currentIndex = $cnt)

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import jp.rough_diamond.commons.entity.Amount;
+import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 
 /**
@@ -61,10 +62,11 @@ public class SimpleUnitConversionService extends UnitConversionService {
 		if(!srcAmount.getUnit().getBase().equals(destUnit.getBase())) {
 			throw new NotConversionException();
 		}
-		//[Œ³‚Ì”] ~ [Œ³‚Ì’PˆÊ‚ÌŒW”] / [•ÏŠ·Œã‚Ì’PˆÊ‚ÌŒW”] 
-		BigDecimal bd = srcAmount.getQuantity().multiply(
-				srcAmount.getUnit().getRate()).divide(
-						destUnit.getRate(), destUnit.getScale(), roundingMode);
-		return new Amount(bd, destUnit);
+		//[Œ³‚Ì”] ~ [Œ³‚Ì’PˆÊ‚ÌŒW”] / [•ÏŠ·Œã‚Ì’PˆÊ‚ÌŒW”]
+		System.out.println(destUnit.getRate().decimal());
+		BigDecimal bd = srcAmount.getQuantity().decimal().multiply(
+				srcAmount.getUnit().getRate().decimal()).divide(
+						destUnit.getRate().decimal(), destUnit.getScale(), roundingMode);
+		return new Amount(new ScalableNumber(bd), destUnit);
 	}
 }

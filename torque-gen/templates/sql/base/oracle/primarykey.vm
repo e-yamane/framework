@@ -8,7 +8,7 @@ PRIMARY KEY ($table.printPrimaryKey());
 #if($table.baseClass != "BaseObject")
 #set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
 #if($foreignTable)
-#if($foreignTable.isSkipSql() && $foreignTable.isAbstract())
+#if($foreignTable.isSkipSqlOrg() && $foreignTable.isAbstract())
 ##外部テーブル展開
 $generator.parse("$basepath/primarykey.vm", "", "table", $foreignTable)#end#end#end
 #end

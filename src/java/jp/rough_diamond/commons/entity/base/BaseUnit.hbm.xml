@@ -52,15 +52,30 @@
             not-null="false"
         />
 
+        <component
+            name="rate"
+            class="jp.rough_diamond.commons.entity.ScalableNumber"
+        >
+
         <property
-            name="rateStr"
-            type="java.lang.String"
+            name="value"
+            type="java.lang.Long"
             update="true"
             insert="true"
-            column="RATE"
-            length="16"
+            column="RATE_VALUE"
             not-null="true"
         />
+
+        <property
+            name="scale"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="RATE_SCALE"
+            not-null="true"
+        />
+
+        </component>
 
         <property
             name="scale"

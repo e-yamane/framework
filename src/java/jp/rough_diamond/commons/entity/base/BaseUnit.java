@@ -11,14 +11,6 @@ import  java.io.Serializable;
  *    table="UNIT"
  *    realClass="jp.rough_diamond.commons.entity.Unit"
 **/
-@jp.rough_diamond.commons.service.annotation.Unique(
-    entity="Unit",
-    groups= {
-          @jp.rough_diamond.commons.service.annotation.Check(properties={
-              "name"
-        })
-    }
-)
 
 public abstract class BaseUnit  implements Serializable {
     public BaseUnit() {
@@ -130,33 +122,31 @@ public abstract class BaseUnit  implements Serializable {
 
 
     /**
-     * •ÏŠ·ŒW”B•‚“®¬”“_‚Å‚ÍŒë·‚ª¶‚¶‚é‚½‚ß•¶š—ñ‚ÅŠi”[
+     * •ÏŠ·ŒW”
     **/ 
-    private String rateStr;
-    public final static String RATE = "rateStr";
+    private jp.rough_diamond.commons.entity.ScalableNumber rate =  new jp.rough_diamond.commons.entity.ScalableNumber();
+
+    public final static String RATE = "rate.";
 
     /**
-     * •ÏŠ·ŒW”B•‚“®¬”“_‚Å‚ÍŒë·‚ª¶‚¶‚é‚½‚ß•¶š—ñ‚ÅŠi”[‚ğæ“¾‚·‚é
-     * @hibernate.property
-     *    column="RATE"
-     *    not-null="true"
-     *    length="16"
-     * @return •ÏŠ·ŒW”B•‚“®¬”“_‚Å‚ÍŒë·‚ª¶‚¶‚é‚½‚ß•¶š—ñ‚ÅŠi”[
+     * •ÏŠ·ŒW”‚ğæ“¾‚·‚é
+     * @hibernate.component
+     *    prefix="RATE_"
+     * @return •ÏŠ·ŒW”
     **/
-    @jp.rough_diamond.commons.service.annotation.MaxLength(length=16, property="Unit.rateStr")
-    @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.rateStr")
-    public String getRateStr() {
-        return rateStr;
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.rate")
+    @jp.rough_diamond.commons.service.annotation.NestedComponent(property="Unit.rate")
+    public jp.rough_diamond.commons.entity.ScalableNumber getRate() {
+        return rate;
     }
 
     /**
-     * •ÏŠ·ŒW”B•‚“®¬”“_‚Å‚ÍŒë·‚ª¶‚¶‚é‚½‚ß•¶š—ñ‚ÅŠi”[‚ğİ’è‚·‚é
-     * @param rateStr  •ÏŠ·ŒW”B•‚“®¬”“_‚Å‚ÍŒë·‚ª¶‚¶‚é‚½‚ß•¶š—ñ‚ÅŠi”[
+     * •ÏŠ·ŒW”‚ğİ’è‚·‚é
+     * @param rate  •ÏŠ·ŒW”
     **/
-    public void setRateStr(String rateStr) {
-        this.rateStr = rateStr;
+    public void setRate(jp.rough_diamond.commons.entity.ScalableNumber rate) {
+        this.rate = rate;
     }
-
 
     /**
      * •ÏŠ·‚É•Û‚·‚é­”¸“xB•‰”‚ğw’è‚·‚é‚Æ®”‚ÌØÌ‚Ä”»’f‚·‚é

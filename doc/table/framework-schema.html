@@ -26,6 +26,11 @@
       <td class="normalFont"> 数量尺度</td>
     </tr>
       <tr>
+      <td class="normalFont"><a href="#SCALABLE_NUMBER">SCALABLE_NUMBER</a></td>
+      <td class="normalFont">ScalableNumber</td>
+      <td class="normalFont"> 小数点位置指定数値</td>
+    </tr>
+      <tr>
       <td class="normalFont"><a href="#numbering">numbering</a></td>
       <td class="normalFont">Numbering</td>
       <td class="normalFont"> ナンバリングテーブル</td>
@@ -60,36 +65,31 @@
     <td class="normalFont"> 数量尺度ID</td>
   </tr>
   <tr>
-    <td class="normalFont" id="AMOUNTVALUE">VALUE</td>
+    <td class="normalFont" id="SCALABLE_NUMBERQ_VALUE">Q_VALUE</td>
     <td class="normalFont">BIGINT</td>
     <td class="normalFont"> &nbsp;</td>
     <td class="normalFont"> &nbsp;</td>
-    <td class="normalFont">value</td>
+    <td class="normalFont">quantity.value</td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> 量(整数)</td>
+    <td class="normalFont">量. 量(整数)</td>
   </tr>
   <tr>
-    <td class="normalFont" id="AMOUNTSCALE">SCALE</td>
+    <td class="normalFont" id="SCALABLE_NUMBERQ_SCALE">Q_SCALE</td>
     <td class="normalFont">INTEGER</td>
     <td class="normalFont"> &nbsp;</td>
     <td class="normalFont"> &nbsp;</td>
-    <td class="normalFont">scale</td>
+    <td class="normalFont">quantity.scale</td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> 小数点位置。正の数なら左へ、負の数なら右へ移動させる</td>
+    <td class="normalFont">量. 小数点位置。正の数なら左へ、負の数なら右へ移動させる</td>
   </tr>
+
 
 </table>
 <script>
-if( document.getElementById  )
-{
-var col = document.getElementById("AMOUNTUNIT_ID");
-col.style.backgroundColor = "afe295";
-col.title="Foreignkey from UNIT.ID";
-}
 </script>
 
       <a name="UNIT"/>
@@ -153,18 +153,30 @@ col.title="Foreignkey from UNIT.ID";
     <td class="normalFont"> ベース数量尺度</td>
   </tr>
   <tr>
-    <td class="normalFont" id="UNITRATE">RATE</td>
-    <td class="normalFont">VARCHAR</td>
-    <td class="normalFont"> (16) </td>
+    <td class="normalFont" id="SCALABLE_NUMBERRATE_VALUE">RATE_VALUE</td>
+    <td class="normalFont">BIGINT</td>
     <td class="normalFont"> &nbsp;</td>
-    <td class="normalFont">rateStr</td>
+    <td class="normalFont"> &nbsp;</td>
+    <td class="normalFont">rate.value</td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> 変換係数。浮動小数点では誤差が生じるため文字列で格納</td>
+    <td class="normalFont">変換係数. 量(整数)</td>
   </tr>
   <tr>
-    <td class="normalFont" id="UNITSCALE">SCALE</td>
+    <td class="normalFont" id="SCALABLE_NUMBERRATE_SCALE">RATE_SCALE</td>
+    <td class="normalFont">INTEGER</td>
+    <td class="normalFont"> &nbsp;</td>
+    <td class="normalFont"> &nbsp;</td>
+    <td class="normalFont">rate.scale</td>
+    <td class="normalFont"><center>  &nbsp; </center></td>
+    <td class="normalFont"><center>  &nbsp; </center></td>
+    <td class="normalFont"><center> X </center></td>
+    <td class="normalFont">変換係数. 小数点位置。正の数なら左へ、負の数なら右へ移動させる</td>
+  </tr>
+
+  <tr>
+    <td class="normalFont" id="SCALABLE_NUMBERSCALE">SCALE</td>
     <td class="normalFont">INTEGER</td>
     <td class="normalFont"> &nbsp;</td>
     <td class="normalFont"> &nbsp;</td>
@@ -175,7 +187,7 @@ col.title="Foreignkey from UNIT.ID";
     <td class="normalFont"> 変換時に保持する少数精度。負数を指定すると整数の切捨て判断する</td>
   </tr>
   <tr>
-    <td class="normalFont" id="UNITVERSION">VERSION</td>
+    <td class="normalFont" id="SCALABLE_NUMBERVERSION">VERSION</td>
     <td class="normalFont">BIGINT</td>
     <td class="normalFont"> &nbsp;</td>
     <td class="normalFont"> &nbsp;</td>
@@ -188,12 +200,49 @@ col.title="Foreignkey from UNIT.ID";
 
 </table>
 <script>
-if( document.getElementById  )
-{
-var col = document.getElementById("UNITBASE_UNIT_ID");
-col.style.backgroundColor = "afe295";
-col.title="Foreignkey from UNIT.ID";
-}
+</script>
+
+      <a name="SCALABLE_NUMBER"/>
+<h2>SCALABLE_NUMBER （クラスのみ）</h2>
+小数点位置指定数値
+<p/>
+<table border="1" cellspacing="0">
+  <tr>
+    <th class="normalFont" bgcolor="#CCCCCC">Name</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Type</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Size</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Default</th>
+    <th class="normalFont" bgcolor="#CCCCCC">JavaName</th>
+    <th class="normalFont" bgcolor="#CCCCCC">PK</th>
+    <th class="normalFont" bgcolor="#CCCCCC">FK</th>
+    <th class="normalFont" bgcolor="#CCCCCC">not null</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Description</th>
+  </tr>
+    <tr>
+    <td class="normalFont" id="SCALABLE_NUMBERVALUE">VALUE</td>
+    <td class="normalFont">BIGINT</td>
+    <td class="normalFont"> &nbsp;</td>
+    <td class="normalFont"> &nbsp;</td>
+    <td class="normalFont">value</td>
+    <td class="normalFont"><center>  &nbsp; </center></td>
+    <td class="normalFont"><center>  &nbsp; </center></td>
+    <td class="normalFont"><center> X </center></td>
+    <td class="normalFont"> 量(整数)</td>
+  </tr>
+  <tr>
+    <td class="normalFont" id="SCALABLE_NUMBERSCALE">SCALE</td>
+    <td class="normalFont">INTEGER</td>
+    <td class="normalFont"> &nbsp;</td>
+    <td class="normalFont"> &nbsp;</td>
+    <td class="normalFont">scale</td>
+    <td class="normalFont"><center>  &nbsp; </center></td>
+    <td class="normalFont"><center>  &nbsp; </center></td>
+    <td class="normalFont"><center> X </center></td>
+    <td class="normalFont"> 小数点位置。正の数なら左へ、負の数なら右へ移動させる</td>
+  </tr>
+
+</table>
+<script>
 </script>
 
       <a name="numbering"/>

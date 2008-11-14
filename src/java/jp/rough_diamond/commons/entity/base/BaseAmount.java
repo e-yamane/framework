@@ -15,58 +15,31 @@ public abstract class BaseAmount  implements Serializable {
 
 
     /**
-     * 量(整数)
+     * 量
     **/ 
-    private Long value;
-    public final static String VALUE = "value";
+    private jp.rough_diamond.commons.entity.ScalableNumber quantity =  new jp.rough_diamond.commons.entity.ScalableNumber();
+
+    public final static String Q = "quantity.";
 
     /**
-     * 量(整数)を取得する
-     * @hibernate.property
-     *    column="VALUE"
-     *    not-null="true"
-     * @return 量(整数)
+     * 量を取得する
+     * @hibernate.component
+     *    prefix="Q_"
+     * @return 量
     **/
-    @jp.rough_diamond.commons.service.annotation.NotNull(property="Amount.value")
-    public Long getValue() {
-        return value;
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="Amount.quantity")
+    @jp.rough_diamond.commons.service.annotation.NestedComponent(property="Amount.quantity")
+    public jp.rough_diamond.commons.entity.ScalableNumber getQuantity() {
+        return quantity;
     }
 
     /**
-     * 量(整数)を設定する
-     * @param value  量(整数)
+     * 量を設定する
+     * @param quantity  量
     **/
-    public void setValue(Long value) {
-        this.value = value;
+    public void setQuantity(jp.rough_diamond.commons.entity.ScalableNumber quantity) {
+        this.quantity = quantity;
     }
-
-
-    /**
-     * 小数点位置。正の数なら左へ、負の数なら右へ移動させる
-    **/ 
-    private Integer scale;
-    public final static String SCALE = "scale";
-
-    /**
-     * 小数点位置。正の数なら左へ、負の数なら右へ移動させるを取得する
-     * @hibernate.property
-     *    column="SCALE"
-     *    not-null="true"
-     * @return 小数点位置。正の数なら左へ、負の数なら右へ移動させる
-    **/
-    @jp.rough_diamond.commons.service.annotation.NotNull(property="Amount.scale")
-    public Integer getScale() {
-        return scale;
-    }
-
-    /**
-     * 小数点位置。正の数なら左へ、負の数なら右へ移動させるを設定する
-     * @param scale  小数点位置。正の数なら左へ、負の数なら右へ移動させる
-    **/
-    public void setScale(Integer scale) {
-        this.scale = scale;
-    }
-
 
 
                                                                     

@@ -3,6 +3,7 @@ package jp.rough_diamond.commons.service;
 import java.math.BigDecimal;
 
 import jp.rough_diamond.commons.entity.Amount;
+import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
@@ -21,7 +22,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Unit unit = bService.findByPK(Unit.class, 2L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
-		srcAmount.setQuantity(new BigDecimal("10"));
+		srcAmount.setQuantity(new ScalableNumber("10"));
 		Amount dest = service.convertUnit(srcAmount, bService.findByPK(Unit.class, 1L));
 		assertEquals("数量が誤っています。", 10000, dest.getQuantity().intValue());
 		assertEquals("単位が誤っています。", 1L, dest.getUnit().getId().longValue());
@@ -31,7 +32,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
-		srcAmount.setQuantity(new BigDecimal("100"));
+		srcAmount.setQuantity(new ScalableNumber("100"));
 		Amount dest = service.convertUnit(srcAmount, bService.findByPK(Unit.class, 2L));
 		assertEquals("数量が誤っています。", 0.1D, dest.getQuantity().doubleValue());
 		assertEquals("単位が誤っています。", 2L, dest.getUnit().getId().longValue());
@@ -41,7 +42,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
-		srcAmount.setQuantity(new BigDecimal("2000"));
+		srcAmount.setQuantity(new ScalableNumber("2000"));
 		System.out.println(2000 / 1609.344);
 		Amount dest = service.convertUnit(srcAmount, bService.findByPK(Unit.class, 3L));
 		assertEquals("数量が誤っています。", 1.24D, dest.getQuantity().doubleValue());
@@ -55,7 +56,8 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
-		srcAmount.setQuantity(new BigDecimal("1.5"));
+		srcAmount.setQuantity(new ScalableNumber("1.5"));
+		Unit tmp = bService.findByPK(Unit.class, 4L);
 		Amount dest = service.convertUnit(srcAmount, bService.findByPK(Unit.class, 4L));
 		assertEquals("数量が誤っています。", 200, dest.getQuantity().intValue());
 		assertEquals("単位が誤っています。", 4L, dest.getUnit().getId().longValue());
@@ -65,7 +67,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
-		srcAmount.setQuantity(new BigDecimal("100"));
+		srcAmount.setQuantity(new ScalableNumber("100"));
 		try {
 			service.convertUnit(srcAmount, bService.findByPK(Unit.class, 5L));
 			fail("例外が送出されていません");
@@ -94,7 +96,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
-		srcAmount.setQuantity(new BigDecimal("100"));
+		srcAmount.setQuantity(new ScalableNumber("100"));
 		Amount dest = service.convertUnit(srcAmount, null);
 		assertEquals("数量が誤っています。", 100, dest.getQuantity().intValue());
 		assertNull("単位が指定されています", dest.getUnit());
@@ -104,7 +106,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
-		srcAmount.setQuantity(new BigDecimal("100"));
+		srcAmount.setQuantity(new ScalableNumber("100"));
 		Amount dest = service.convertUnit(srcAmount, bService.findByPK(Unit.class, 1L));
 		assertEquals("数量が誤っています。", 100, dest.getQuantity().intValue());
 		assertEquals("単位が誤っています。", unit, dest.getUnit());

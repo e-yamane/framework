@@ -61,6 +61,6 @@
 #if($table.baseClass != "BaseObject")
 #set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
 #if($foreignTable)
-#if($foreignTable.isSkipSql() && $foreignTable.isAbstract() && !$foreignTable.isForReferenceOnly())
+#if($foreignTable.isSkipSqlOrg())
 ##外部テーブル展開
 $generator.parse("$basepath/columns.vm", "", "table", $foreignTable)#end#end#end

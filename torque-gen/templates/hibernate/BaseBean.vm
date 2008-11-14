@@ -34,7 +34,12 @@ import  java.math.BigDecimal;
 
 #set ($extends = "")
 #if($table.baseClass != "BaseObject")
+#set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
+#if($foreignTable)
 #set ($extends = "extends ${foreignTable.package}.${table.baseClass}$!{table.baseSignature}")
+#else
+#set ($extends = "extends ${table.baseClass}$!{table.baseSignature}")
+#end
 #end
 /**
  * $descriptionのHibernateマッピングベースクラス
