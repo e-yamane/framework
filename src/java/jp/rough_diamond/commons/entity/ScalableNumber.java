@@ -65,4 +65,8 @@ public class ScalableNumber extends jp.rough_diamond.commons.entity.base.BaseSca
 			return new BigDecimal(new BigInteger(value.toString()), scale);
 		}
 	}
+	
+	public String toString() {
+		return decimal().toString();
+	}
 }
