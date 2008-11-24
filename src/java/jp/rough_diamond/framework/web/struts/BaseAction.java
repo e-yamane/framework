@@ -101,11 +101,11 @@ abstract public class BaseAction extends DispatchAction {
             	Messages msg;
             	msg = baseForm.getMessage();
                 if(msg.hasError()) {
-                    saveMessages(request, MessagesTranslattor.translate(msg));
+                    saveMessages(request, MessagesTranslator.translate(msg));
                 }
             	msg = baseForm.getErrors();
                 if(msg.hasError()) {
-                    saveErrors(request, MessagesTranslattor.translate(msg));
+                    saveErrors(request, MessagesTranslator.translate(msg));
                 }
             }
         } catch(ClassCastException e) {

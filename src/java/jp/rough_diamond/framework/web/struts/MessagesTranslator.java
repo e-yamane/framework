@@ -8,7 +8,7 @@ import jp.rough_diamond.commons.resource.Messages;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 
-public class MessagesTranslattor {
+public class MessagesTranslator {
     public static ActionMessages translate(Messages msgs) {
         ActionMessages ret = new ActionMessages();
         for(String key : msgs.getProperties()) {
