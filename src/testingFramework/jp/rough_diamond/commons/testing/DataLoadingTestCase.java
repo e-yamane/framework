@@ -36,9 +36,11 @@ public abstract class DataLoadingTestCase extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-    	System.out.println("tearDown!!!:" + getName());
-        DIContainerExt ext = (DIContainerExt)DIContainerFactory.getDIContainer();
-        DIContainerFactory.setDIContainer(ext.org);
+    	DIContainer di = DIContainerFactory.getDIContainer();
+    	if(di instanceof DIContainerExt) {
+	        DIContainerExt ext = (DIContainerExt)di;
+	        DIContainerFactory.setDIContainer(ext.org);
+    	}
         super.tearDown();
         DBInitializer.clearModifiedData();
     }
