@@ -22,14 +22,6 @@
  */
 package jp.rough_diamond.framework.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jp.rough_diamond.commons.di.DIContainerFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * サービスを取得するラッパークラス
  * 一度取得できたクラスはキャッシュされる。
@@ -38,11 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @SuppressWarnings("unchecked")
 public class ServiceLocator {
-	private final static Log log = LogFactory.getLog(ServiceLocator.class);
-	static Map<Class<?>, Service> serviceMap = new HashMap<Class<?>, Service>();
-
-	private final static String DEFAULT_SERVICE_FINDER_NAME = "jp.rough_diamond.framework.transaction.ServiceFinder";
-
+	public final static String SERVICE_LOCATOR_KEY = "serviceLocator"; 
 	public final static String SERVICE_FINDER_KEY = "serviceFinder";
 
 	/**
@@ -80,45 +68,6 @@ public class ServiceLocator {
      * @return      サービス 
 	 */
 	public static <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass) {
-		T service = (T)serviceMap.get(cl);
-		if(service == null) {
-			findService(cl, defaultClass);
-			service = (T)serviceMap.get(cl);
-		}
-		if(service == null) {
-			log.warn("サービスが取得できません。");
-			throw new RuntimeException();
-		}
-		return service;
-	}
-	
-    private synchronized static <T extends Service> void findService(Class<T> cl, Class<? extends T> defaultClass) {
-    	if(serviceMap.get(cl) == null) {
-        	ServiceFinder finder = (ServiceFinder)DIContainerFactory.getDIContainer().getObject(SERVICE_FINDER_KEY);
-        	if(finder == null) {
-        		finder = getDefaultFinder();
-        	}
-        	T service = finder.getService(cl, defaultClass);
-        	serviceMap.put(cl, service);
-    	}
-    }
-    
-    private static ServiceFinder defaultFinder = null;
-	private static ServiceFinder getDefaultFinder() {
-		if(defaultFinder == null) {
-			createFinder();
-		}
-		return defaultFinder;
-	}
-	
-	private synchronized static void createFinder() {
-		try {
-			if(defaultFinder == null) {
-				Class cl = Class.forName(DEFAULT_SERVICE_FINDER_NAME);
-				defaultFinder = (ServiceFinder)cl.newInstance();
-			}
-		} catch(Exception ex) {
-			throw new RuntimeException(ex);
-		}
+    	return ServiceLocatorLogic.getServiceLocatorLogic().getService(cl, defaultClass);
 	}
 }

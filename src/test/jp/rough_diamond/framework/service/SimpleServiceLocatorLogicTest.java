@@ -10,10 +10,11 @@ import jp.rough_diamond.commons.di.DIContainerFactory;
 import jp.rough_diamond.commons.di.MapDIContainer;
 import junit.framework.TestCase;
 
-public class ServiceLocatorTest extends TestCase {
+public class SimpleServiceLocatorLogicTest extends TestCase {
 	private DIContainer orgDI;
 	private Map<Object, Object> map;
 	private Map<Class<?>, Service> serviceMap;
+	private SimpleServiceLocatorLogic logic;
 	@Override
 	protected void setUp() {
 		orgDI = DIContainerFactory.getDIContainer();
@@ -23,14 +24,15 @@ public class ServiceLocatorTest extends TestCase {
 		CompositeDIContainer newDI = new CompositeDIContainer(
 				Arrays.asList(new DIContainer[]{mapDI, orgDI}));
 		DIContainerFactory.setDIContainer(newDI);
-		serviceMap = ServiceLocator.serviceMap;
-		ServiceLocator.serviceMap = new HashMap<Class<?>, Service>();
+		logic = (SimpleServiceLocatorLogic)SimpleServiceLocatorLogic.getServiceLocatorLogic();
+		serviceMap = logic.serviceMap;
+		logic.serviceMap = new HashMap<Class<?>, Service>();
 	}
 
 	@Override
 	protected void tearDown() {
 		DIContainerFactory.setDIContainer(orgDI);
-		ServiceLocator.serviceMap = serviceMap;
+		logic.serviceMap = serviceMap;
 	}
 	
 	//Ç±ÇÍÇ‹Ç≈ÇÃÉãÅ[Éã

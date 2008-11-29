@@ -77,17 +77,13 @@ abstract public class BasicService implements Service {
     }
     
     private final static String DEFAULT_BASIC_SERVICE_CLASS_NAME = "jp.rough_diamond.commons.service.hibernate.HibernateBasicService";
-    private final static BasicService INSTANCE;
-    static {
-    	INSTANCE = ServiceLocator.getService(BasicService.class, DEFAULT_BASIC_SERVICE_CLASS_NAME);
-    }
     
     /**
      * Basicサービスを取得する
      * @return  Basicサービス
      */
     public static BasicService getService() {
-    	return INSTANCE;
+    	return ServiceLocator.getService(BasicService.class, DEFAULT_BASIC_SERVICE_CLASS_NAME);
     }
     
     /**

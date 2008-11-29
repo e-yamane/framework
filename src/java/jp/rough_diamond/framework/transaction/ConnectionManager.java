@@ -33,8 +33,10 @@ abstract public class ConnectionManager {
 	abstract public void rollback(MethodInvocation mi);
 	abstract public void commit(MethodInvocation mi) throws SQLException;
 
+	public final static String CONNECTION_MANAGER_KEY = "connectionManager";
+	
 	public static ConnectionManager getConnectionManager() {
 		DIContainer container = DIContainerFactory.getDIContainer();
-		return (ConnectionManager)container.getObject("connectionManager");
+		return (ConnectionManager)container.getObject(CONNECTION_MANAGER_KEY);
 	}
 }

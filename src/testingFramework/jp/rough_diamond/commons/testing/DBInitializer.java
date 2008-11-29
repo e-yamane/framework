@@ -47,7 +47,7 @@ abstract public class DBInitializer implements Service {
     private static List<DBInitializer> list;
     private static Map<String, Class> entityMap;
     private static Map<Class, Set<DBInitializer>> initializerObjects; 
-    private static Set<Class> modifiedClasses;
+    static Set<Class> modifiedClasses;
     private static TmpService service;
     
     static {
