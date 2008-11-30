@@ -16,12 +16,26 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 
+import jp.rough_diamond.commons.di.DIContainer;
+import jp.rough_diamond.commons.di.DIContainerFactory;
+import jp.rough_diamond.commons.di.SpringFramework;
 import jp.rough_diamond.framework.es.ServiceBus;
 
 
 public class GetAndMakeWSDL {
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
+		System.out.println(args.length);
 		String wsdlStorageDir = (args.length == 0) ? "etc/wsdl" : args[0];
+		Class cl = (args.length < 2) ? SpringFramework.class : Class.forName(args[1]);
+		String config = (args.length < 3) ? null : args[2];
+		DIContainer di;
+		if(config == null) {
+			di = (DIContainer)cl.newInstance();
+		} else {
+			di = (DIContainer)cl.getConstructor(String.class).newInstance(config);
+		}
+		DIContainerFactory.setDIContainer(di);
 		GetAndMakeWSDL t = new GetAndMakeWSDL(new File(wsdlStorageDir));
 		t.execute();
 	}

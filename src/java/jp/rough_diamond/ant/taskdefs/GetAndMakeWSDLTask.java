@@ -18,12 +18,32 @@ public class GetAndMakeWSDLTask extends Task {
 		java.setClassname(GetAndMakeWSDL.class.getName());
 		java.setFork(true);
 		java.createArg().setFile(getWsdlStorageDir());
+		java.createArg().setValue(getDiContainerType());
+		java.createArg().setValue(getDiConfig());
 		java.setClasspath((Path)getProject().getReference(getClassPathRef()));
 		java.execute();
 	}
 
 	private File wsdlStorageDir;
 	private String classPathRef;
+	private String diContainerType;
+	public String getDiContainerType() {
+		return diContainerType;
+	}
+
+	public void setDiContainerType(String diContainerType) {
+		this.diContainerType = diContainerType;
+	}
+
+	public String getDiConfig() {
+		return diConfig;
+	}
+
+	public void setDiConfig(String diConfig) {
+		this.diConfig = diConfig;
+	}
+
+	private String diConfig;
 	
 	public File getWsdlStorageDir() {
 		return wsdlStorageDir;

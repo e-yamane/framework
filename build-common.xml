@@ -151,9 +151,19 @@
         <isset property="wsdl.dir" />
       </not>
     </condition>
+    <condition property="di.container.type" value="jp.rough_diamond.commons.di.SpringFramework" >
+      <not>
+        <isset property="di.container.type" />
+      </not>
+    </condition>
+    <condition property="di.config.path" value="beans.xml" >
+      <not>
+        <isset property="di.config.path" />
+      </not>
+    </condition>
     <taskdef name="getWSDL" classpathref="framework.path"
         classname="jp.rough_diamond.ant.taskdefs.GetAndMakeWSDLTask" />
-    <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="wsdl2java.path"/>
+    <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="wsdl2java.path" diContainerType="${di.container.type}" diConfig="${di.config.path}" />
   </target>
 
   <target name="wsdl2java">
