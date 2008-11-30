@@ -57,20 +57,28 @@ public class ServiceGenerator {
         props.setProperty("class.resource.loader.class",        "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         Velocity.init(props);
 
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		DocumentBuilder muleDB = dbf.newDocumentBuilder();
-		this.doc = muleDB.parse(muleConfigFile);
-		isMuleConfigEdit = false;
+		if(!isInterfaceOnly()) {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			DocumentBuilder muleDB = dbf.newDocumentBuilder();
+			this.doc = muleDB.parse(muleConfigFile);
+		}
 		
+		isMuleConfigEdit = false;
 		for(ServiceInfo service : infos) {
         	makeServiceInterface(service);
-        	makeServiceDummyImplimentation(service);
-        	addServiceConnector(service);
+    		if(!isInterfaceOnly()) {
+	        	makeServiceDummyImplimentation(service);
+	        	addServiceConnector(service);
+    		}
         }
 		if(isMuleConfigEdit) {
 			output();
 		}
+	}
+	
+	boolean isInterfaceOnly() {
+		return (muleConfigFile == null);
 	}
 	
 	private Document doc;

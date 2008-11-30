@@ -12,20 +12,24 @@ public class ServiceGeneratorTask extends Task {
 	@Override
 	public void execute() throws BuildException {
 		try {
-			ServiceGenerator gen = new ServiceGenerator(input, srcDir, muleConfigFile);
+			//ディレクトリの場合はmuleConfigが省略されたと判断する
+			ServiceGenerator gen = new ServiceGenerator(input, srcDir, (muleConfigFile.isDirectory()) ? null : muleConfigFile);
 			gen.doIt();
 			deletebackupFile();
 		} catch(Exception e) {
+			e.printStackTrace();
 			throw new BuildException(e);
 		}
 	}
 	
 	void deletebackupFile() {
-		Delete task = new Delete();
-		task.setProject(getProject());
-		task.setDir(muleConfigFile.getParentFile());
-		task.setIncludes(muleConfigFile.getName() + ".*");
-		task.execute();
+		if(!muleConfigFile.isDirectory()) {
+			Delete task = new Delete();
+			task.setProject(getProject());
+			task.setDir(muleConfigFile.getParentFile());
+			task.setIncludes(muleConfigFile.getName() + ".*");
+			task.execute();
+		}
 	}
 
 	public File getInput() {

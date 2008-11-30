@@ -208,7 +208,7 @@
     <makeCXFService
       input="${cxf.service.file}"
       srcdir="${cxf.dest.dir}"
-      muleConfigFile="src/java/mule/edi-server-config.xml" />
+      muleConfigFile="${cxf.mule.server.config}" />
   </target>
 
   <target name="execAnt">
