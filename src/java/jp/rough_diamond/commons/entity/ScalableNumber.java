@@ -9,6 +9,9 @@ import java.math.BigInteger;
 public class ScalableNumber extends jp.rough_diamond.commons.entity.base.BaseScalableNumber {
     private static final long serialVersionUID = 1L;
 
+    private final static int maxScale = ("" + Long.MAX_VALUE).length() + 1;
+    private final static BigInteger limit = new BigInteger("" + Long.MAX_VALUE);
+    
     public ScalableNumber() {
     	this(0L, 0);
     }
@@ -51,6 +54,10 @@ public class ScalableNumber extends jp.rough_diamond.commons.entity.base.BaseSca
     		setValue(null);
     		setScale(null);
     	} else {
+    		int pos = 0;
+    		while(limit.compareTo(bd.unscaledValue()) < 0) {
+    			bd = bd.setScale(maxScale - pos++, BigDecimal.ROUND_HALF_UP);
+    		}
 	    	setValue(bd.unscaledValue().longValue());
 	    	setScale(bd.scale());
     	}

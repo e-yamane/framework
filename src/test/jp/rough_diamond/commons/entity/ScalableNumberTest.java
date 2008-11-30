@@ -22,5 +22,13 @@ public class ScalableNumberTest extends TestCase {
 		sn = new ScalableNumber(new BigDecimal("100"));
 		assertEquals("float値が誤っています。", 100F, sn.floatValue());
 		assertEquals("double値が誤っています。", 100D, sn.doubleValue());
+		
+		sn = new ScalableNumber(new BigDecimal(0.0105D));
+		assertEquals("unscaledValueが誤っています。", 1050000000000000065L, sn.getValue().longValue());
+		assertEquals("scaleが誤っています。", 20, sn.getScale().intValue());
+
+		sn = new ScalableNumber(new BigDecimal(0.93D));
+		assertEquals("unscaledValueが誤っています。", 930000000000000049L, sn.getValue().longValue());
+		assertEquals("scaleが誤っています。", 18, sn.getScale().intValue());
 	}
 }
