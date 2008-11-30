@@ -177,6 +177,11 @@
         <isset property="cxf.mule.client.config" />
       </not>
     </condition>
+    <condition property="mule.version" value="2.1" >
+      <not>
+        <isset property="mule.version" />
+      </not>
+    </condition>
     <taskdef name="wsdl2java" classpathref="framework.path"
         classname="jp.rough_diamond.ant.taskdefs.WSDL2JavaExt" />
     <wsdl2java
@@ -184,7 +189,8 @@
       srcdir="${cxf.dest.dir}" 
       rootPackage="${cxf.stub.package}" 
       muleConfigFile="${cxf.mule.client.config}"
-      classPathRef="wsdl2java.path" />
+      classPathRef="wsdl2java.path" 
+      version="${mule.version}" />
   </target>
 
   <target name="makeCXFService" description="サービスの定義に基づいてサーバ側で必要なリソースを作成する">
@@ -203,12 +209,18 @@
         <isset property="cxf.mule.server.config" />
       </not>
     </condition>
+    <condition property="mule.version" value="2.1" >
+      <not>
+        <isset property="mule.version" />
+      </not>
+    </condition>
     <taskdef name="makeCXFService" classpathref="framework.path"
         classname="jp.rough_diamond.ant.taskdefs.ServiceGeneratorTask" />
     <makeCXFService
       input="${cxf.service.file}"
       srcdir="${cxf.dest.dir}"
-      muleConfigFile="${cxf.mule.server.config}" />
+      muleConfigFile="${cxf.mule.server.config}" 
+      version="${mule.version}" />
   </target>
 
   <target name="execAnt">

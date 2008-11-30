@@ -13,7 +13,7 @@ public class ServiceGeneratorTask extends Task {
 	public void execute() throws BuildException {
 		try {
 			//ディレクトリの場合はmuleConfigが省略されたと判断する
-			ServiceGenerator gen = new ServiceGenerator(input, srcDir, (muleConfigFile.isDirectory()) ? null : muleConfigFile);
+			ServiceGenerator gen = new ServiceGenerator(input, srcDir, (muleConfigFile.isDirectory()) ? null : muleConfigFile, version);
 			gen.doIt();
 			deletebackupFile();
 		} catch(Exception e) {
@@ -50,8 +50,14 @@ public class ServiceGeneratorTask extends Task {
 	public void setMuleConfigFile(File muleConfigFile) {
 		this.muleConfigFile = muleConfigFile;
 	}
+	public String getVersion() {
+		return version;
+	}
+	public void setVersion(String version) {
+		this.version = version;
+	}
 	private File input;
 	private File srcDir;
 	private File muleConfigFile;
-
+	private String version;
 }

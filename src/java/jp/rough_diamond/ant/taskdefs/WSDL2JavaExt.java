@@ -58,6 +58,7 @@ public class WSDL2JavaExt extends Task {
 	        }
 	        deletebackupFile();
 		} catch(Exception e) {
+			e.printStackTrace();
 			throw new BuildException(e);
 		}
 	}
@@ -104,18 +105,19 @@ public class WSDL2JavaExt extends Task {
 		String packageName = getPackage(wsdl);
 		System.out.println(connectorName + "Çí«â¡ÇµÇ‹Ç∑ÅB");
 		
-		Element serviceEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "service");
+		String muleNameSpace = NameSpaceContextImpl.MULE_NAME_SPACE + getVersion();
+		Element serviceEL = doc.createElementNS(muleNameSpace, "service");
 		serviceEL.setAttribute("name", connectorName);
 		Text t = doc.createTextNode("\n    ");
 		model.appendChild(t);
 		model.appendChild(serviceEL);
 
-		Element inboundEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "inbound");
+		Element inboundEL = doc.createElementNS(muleNameSpace, "inbound");
 		t = doc.createTextNode("\n      ");
 		serviceEL.appendChild(t);
 		serviceEL.appendChild(inboundEL);
 
-		Element inboundEndpointEL = doc.createElementNS(NameSpaceContextImpl.VM_NAME_SPACE, "vm:inbound-endpoint");
+		Element inboundEndpointEL = doc.createElementNS(NameSpaceContextImpl.VM_NAME_SPACE + getVersion(), "vm:inbound-endpoint");
 		t = doc.createTextNode("\n        ");
 		inboundEL.appendChild(t);
 		inboundEL.appendChild(inboundEndpointEL);
@@ -125,31 +127,31 @@ public class WSDL2JavaExt extends Task {
 
 		t = doc.createTextNode("\n          ");
 		inboundEndpointEL.appendChild(t);
-		Element customTransformerEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "custom-transformer");
+		Element customTransformerEL = doc.createElementNS(muleNameSpace, "custom-transformer");
 		inboundEndpointEL.appendChild(customTransformerEL);
 		t = doc.createTextNode("\n        ");
 		inboundEndpointEL.appendChild(t);
 		customTransformerEL.setAttribute("name", connectorName + "InTransformer");
 		customTransformerEL.setAttribute("class", packageName + "." + TRANSFORMER_CLASS_NAME);
 		
-		Element bridgeComponentEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "bridge-component");
+		Element bridgeComponentEL = doc.createElementNS(muleNameSpace, "bridge-component");
 		t = doc.createTextNode("\n      ");
 		serviceEL.appendChild(t);
 		serviceEL.appendChild(bridgeComponentEL);
 
-		Element outboundEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "outbound");
+		Element outboundEL = doc.createElementNS(muleNameSpace, "outbound");
 		t = doc.createTextNode("\n      ");
 		serviceEL.appendChild(t);
 		serviceEL.appendChild(outboundEL);
 
-		Element outboundRouterEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "chaining-router");
+		Element outboundRouterEL = doc.createElementNS(muleNameSpace, "chaining-router");
 		t = doc.createTextNode("\n        ");
 		outboundEL.appendChild(t);
 		outboundEL.appendChild(outboundRouterEL);
 		t = doc.createTextNode("\n      ");
 		outboundEL.appendChild(t);
 		
-		Element outboundEndpointEL = doc.createElementNS(NameSpaceContextImpl.CXF_NAME_SPACE, "cxf:outbound-endpoint");
+		Element outboundEndpointEL = doc.createElementNS(NameSpaceContextImpl.CXF_NAME_SPACE + getVersion(), "cxf:outbound-endpoint");
 		t = doc.createTextNode("\n          ");
 		outboundRouterEL.appendChild(t);
 		outboundRouterEL.appendChild(outboundEndpointEL);
@@ -174,7 +176,7 @@ public class WSDL2JavaExt extends Task {
 	boolean hasServiceElement(Element model, Document wsdlDoc) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(getVersion()));
 		String serviceName = getConnectorName(wsdlDoc);
 		String xpathStr = "mule:service";
 		System.out.println(xpathStr);
@@ -195,7 +197,7 @@ public class WSDL2JavaExt extends Task {
 	private Element getModelElement(String modelName) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(getVersion()));
 		String xpathStr = "/mule:mule/mule:model";
 		System.out.println(xpathStr);
 		XPathExpression exp = xpath.compile(xpathStr);
@@ -210,7 +212,7 @@ public class WSDL2JavaExt extends Task {
 		}
 		isMuleConfigEdit = true;
 		System.out.println(modelName + "Ç™å©Ç¬Ç©ÇËÇ‹ÇπÇÒÇ≈ÇµÇΩÅBçÏê¨ÇµÇ‹Ç∑ÅB");
-		Element ret = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "model");
+		Element ret = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE + getVersion(), "model");
 		Text t = doc.createTextNode("\n  ");
 		doc.getDocumentElement().appendChild(t);
 		doc.getDocumentElement().appendChild(ret);
@@ -228,7 +230,7 @@ public class WSDL2JavaExt extends Task {
 	private String getWsdlPort(Document wsdlDoc) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(getVersion()));
 		String xpathStr = "//wsdl:port";
 		System.out.println(xpathStr);
 		XPathExpression exp = xpath.compile(xpathStr);
@@ -241,7 +243,7 @@ public class WSDL2JavaExt extends Task {
 	private String getOperation(Document wsdlDoc) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(getVersion()));
 		String xpathStr = "//wsdl:operation";
 		System.out.println(xpathStr);
 		XPathExpression exp = xpath.compile(xpathStr);
@@ -254,7 +256,7 @@ public class WSDL2JavaExt extends Task {
 	private String getPortType(Document wsdlDoc) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(getVersion()));
 		String xpathStr = "//wsdl:portType";
 		System.out.println(xpathStr);
 		XPathExpression exp = xpath.compile(xpathStr);
@@ -267,7 +269,7 @@ public class WSDL2JavaExt extends Task {
 	private String getServiceName(Document wsdlDoc) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(getVersion()));
 		String xpathStr = "/wsdl:definitions/wsdl:service";
 		System.out.println(xpathStr);
 		XPathExpression exp = xpath.compile(xpathStr);
@@ -326,7 +328,16 @@ public class WSDL2JavaExt extends Task {
 	private String rootPackage;
 	private String classPathRef;
 	private File muleConfigFile;
+	private String muleVersion;
 	
+	public String getVersion() {
+		return muleVersion;
+	}
+
+	public void setVersion(String version) {
+		this.muleVersion = version;
+	}
+
 	public File getMuleConfigFile() {
 		return muleConfigFile;
 	}

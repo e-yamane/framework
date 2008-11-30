@@ -36,11 +36,13 @@ public class ServiceGenerator {
 	private File input;
 	private File srcDir;
 	private File muleConfigFile;
+	private String muleVersion;
 	
-	public ServiceGenerator(File input, File srcDir, File muleConfigFile) {
+	public ServiceGenerator(File input, File srcDir, File muleConfigFile, String muleVersion) {
 		this.input = input;
 		this.srcDir = srcDir;
 		this.muleConfigFile = muleConfigFile;
+		this.muleVersion = muleVersion;
 	}
 	
 	public void doIt() throws Exception {
@@ -97,18 +99,21 @@ public class ServiceGenerator {
 		String serviceName = service.className;
 		System.out.println(serviceName + "Çí«â¡ÇµÇ‹Ç∑ÅB");
 		
-		Element serviceEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "service");
+		String muleNameSpace = NameSpaceContextImpl.MULE_NAME_SPACE + muleVersion;
+		String cxfNameSpace = NameSpaceContextImpl.CXF_NAME_SPACE + muleVersion;
+		
+		Element serviceEL = doc.createElementNS(muleNameSpace, "service");
 		serviceEL.setAttribute("name", serviceName);
 		Text t = doc.createTextNode("\n    ");
 		model.appendChild(t);
 		model.appendChild(serviceEL);
 
-		Element inboundEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "inbound");
+		Element inboundEL = doc.createElementNS(muleNameSpace, "inbound");
 		t = doc.createTextNode("\n      ");
 		serviceEL.appendChild(t);
 		serviceEL.appendChild(inboundEL);
 
-		Element inboundEndpointEL = doc.createElementNS(NameSpaceContextImpl.CXF_NAME_SPACE, "cxf:inbound-endpoint");
+		Element inboundEndpointEL = doc.createElementNS(cxfNameSpace, "cxf:inbound-endpoint");
 		t = doc.createTextNode("\n        ");
 		inboundEL.appendChild(t);
 		inboundEL.appendChild(inboundEndpointEL);
@@ -118,7 +123,7 @@ public class ServiceGenerator {
 		inboundEndpointEL.setAttribute("address", "http://${local.host}:${local.port}/services/" + serviceName);
 		inboundEndpointEL.setAttribute("serviceClass", service.packageName + "." + service.className);
 		
-		Element componentEL = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "component");
+		Element componentEL = doc.createElementNS(muleNameSpace, "component");
 		t = doc.createTextNode("\n      ");
 		serviceEL.appendChild(t);
 		serviceEL.appendChild(componentEL);
@@ -134,7 +139,7 @@ public class ServiceGenerator {
 	boolean hasServiceElement(Element model, ServiceInfo service) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(muleVersion));
 		String serviceName = service.className;
 //		serviceName = "CFXSampleServer2";
 		String xpathStr = "mule:service";
@@ -156,7 +161,7 @@ public class ServiceGenerator {
 	public Element getModelElement(ServiceInfo service) throws Exception {
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
-		xpath.setNamespaceContext(new NameSpaceContextImpl());
+		xpath.setNamespaceContext(new NameSpaceContextImpl(muleVersion));
 		String modelName = service.className + "Model";
 //		modelName = "SampleServer2";
 		String xpathStr = "/mule:mule/mule:model";
@@ -173,7 +178,7 @@ public class ServiceGenerator {
 		}
 		isMuleConfigEdit = true;
 		System.out.println(modelName + "Ç™å©Ç¬Ç©ÇËÇ‹ÇπÇÒÇ≈ÇµÇΩÅBçÏê¨ÇµÇ‹Ç∑ÅB");
-		Element ret = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE, "model");
+		Element ret = doc.createElementNS(NameSpaceContextImpl.MULE_NAME_SPACE + muleVersion, "model");
 		Text t = doc.createTextNode("\n  ");
 		doc.getDocumentElement().appendChild(t);
 		doc.getDocumentElement().appendChild(ret);
@@ -421,7 +426,7 @@ public class ServiceGenerator {
 		ServiceGenerator t = new ServiceGenerator(
 				new File("etc/serviceDef/services.xml"),
 				new File("src/other"),
-				new File("src/other/mule-sample-config.xml"));
+				new File("src/other/mule-sample-config.xml"), "2.1");
 		t.doIt();
 	}
 }
