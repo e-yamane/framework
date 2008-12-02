@@ -93,6 +93,13 @@ public class TransactionManager implements MethodInterceptor {
         return ti.invoke(arg0);
 	}
     
+	/**
+	 * 何らかのトランザクション無いか否かを返却する 
+	 */
+	public static boolean isInTransaction() {
+		return !transactionContext.get().isEmpty();
+	}
+	
     /**
      * トランザクションに関連するコンテキストマップを取得する
      */
