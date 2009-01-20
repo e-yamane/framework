@@ -14,14 +14,9 @@ import jp.rough_diamond.framework.service.ServiceLocator;
 abstract public class UnitConversionService implements Service {
 	public final static String DEFAULT_SERVICE_CLASS_NAME = 
 				"jp.rough_diamond.commons.service.SimpleUnitConversionService";
-	final static UnitConversionService INSTANCE;
-	
-	static {
-		INSTANCE = ServiceLocator.getService(UnitConversionService.class, DEFAULT_SERVICE_CLASS_NAME);
-	}
 	
 	public static UnitConversionService getService() {
-		return INSTANCE;
+		return ServiceLocator.getService(UnitConversionService.class, DEFAULT_SERVICE_CLASS_NAME);
 	}
 
 	/**
