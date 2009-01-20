@@ -329,9 +329,13 @@
           destinationFile="hibernate.cfg.xml"
           otherResources="${hibernate.otherResources}"
       >
-        <otherProperty name="connection.provider_class" value="${hibernate.connection.provider_class}" />
-        <otherProperty name="connection.pool_size"      value="${hibernate.connection.pool_size}" />
-        <otherProperty name="default_schema"          value="${hibernate.default_schema}" />
+        <otherProperty name="connection.provider_class"       value="${hibernate.connection.provider_class}" />
+        <otherProperty name="connection.pool_size"            value="${hibernate.connection.pool_size}" />
+        <otherProperty name="connection.c3p0.min_size"        value="${hibernate.connection.c3p0.min_size}" />
+        <otherProperty name="connection.c3p0.max_size"        value="${hibernate.connection.c3p0.max_size}" />
+        <otherProperty name="connection.c3p0.timeout"         value="${hibernate.connection.c3p0.timeout}" />
+        <otherProperty name="connection.c3p0.max_statements"  value="${hibernate.connection.c3p0.max_statements}" />
+        <otherProperty name="default_schema"                  value="${hibernate.default_schema}" />
       </hibernatecfg>
     </hibernatedoclet>
   </target>
