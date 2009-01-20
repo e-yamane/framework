@@ -506,7 +506,7 @@
     <taskdef name="junit" classpathref="classpath.all"
                       classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" />
     <junit printsummary="yes" haltonfailure="no" 
-          fork="yes" showOutput="true" failureproperty="tests.failed" maxmemory="1024m">
+          fork="yes" forkmode="once" showOutput="true" failureproperty="tests.failed" maxmemory="1024m">
       <classpath>
         <pathelement location="${test.classes.dir}"/>
         <path refid="classpath.all"/>
