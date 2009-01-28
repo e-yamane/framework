@@ -1,9 +1,10 @@
 package ${package};
 
 #set ($abstract = "")
+#if($table.description && $table.description.trim() != "")
 #set ($description = $table.description)
-#if ($description = "")
-#set ($description = $table.Name.toUpperCase)
+#else
+#set ($description = $table.Name.toUpperCase())
 #end
 /**
  * $descriptionのHibernateマッピングクラス

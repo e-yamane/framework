@@ -1,9 +1,12 @@
 package ${package}.base;
 
 #set ($abstract = "")
+
 #set ($description = $table.description)
-#if ($description = "")
-#set ($description = $table.Name.toUpperCase)
+#if($description && $description.trim() != "")
+#set ($description = $description)
+#else
+#set ($description = $table.Name.toUpperCase())
 #end
 
 ##set( $isPropertySkip = false )
@@ -174,8 +177,10 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #set ( $cloPK=$colPK.UncapitalisedJavaName )
 #set ( $cjtypePK = $colPK.JavaNative )
 #set ($description = $colPK.description)
-#if ($description == "")
-#set ($description = $colPK.name.toUpperCase)
+#if($description && $description.trim() != "")
+#set ($description = $description)
+#else
+#set ($description = $colPK.name.toUpperCase())
 #end
     /**
      * $description
@@ -208,7 +213,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #if($colPK.autoIncrement)
      * @hibernate.version
 #end
-     * @return $colPK.description
+     * @return $description
     **/
 #if("BOOLEANCHAR" == $col.torqueType)
 ## トレサオリジナル
@@ -225,7 +230,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $colPK.description
+     * @return $description
     **/
     public $cjtypePK is${cfcPK}() {
         return $cloPK;
@@ -233,7 +238,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $colPK.description
+     * @return $description
     **/
     public $cjtypePK get${cfcPK}() {
         return $cloPK;
@@ -253,7 +258,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $colPK.description
+     * @return $description
     **/
     public $cjtypePK is${cfcPK}() {
         return $cloPK;
@@ -261,7 +266,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $colPK.description
+     * @return $description
     **/
     public $cjtypePK get${cfcPK}() {
         return $cloPK;
@@ -276,7 +281,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #if("BOOLEANCHAR" == $col.torqueType)
     /**
      * $descriptionを設定する
-     * @param $cloPK  $colPK.description
+     * @param $cloPK  $description
     **/
     public void set${cfcPK}InDB(String $cloPK) {
     this.$cloPK = ("Y".equalsIgnoreCase($cloPK));
@@ -284,7 +289,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #elseif("BOOLEANINT" == $col.torqueType)
     /**
      * $descriptionを設定する
-     * @param $cloPK  $colPK.description
+     * @param $cloPK  $description
     **/
     public void set${cfcPK}InDB(int $cloPK) {
     this.$cloPK = ($cloPK != 0);
@@ -292,7 +297,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #end
     /**
      * $descriptionを設定する
-     * @param $cloPK  $colPK.description
+     * @param $cloPK  $description
     **/
     public void set${cfcPK}($cjtypePK $cloPK) {
         this.$cloPK = $cloPK;
@@ -344,8 +349,10 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #set ( $clo=$col.UncapitalisedJavaName )
 #set ( $cjtype= "${refTable.package}.${refTable.javaName}")
 #set ($description = $col.description)
-#if  ($description == "")
-#set ($description = $col.name.toUpperCase)
+#if($description && $description.trim() != "")
+#set ($description = $description)
+#else
+#set ($description = $col.name.toUpperCase())
 #end
     /**
      * $description
@@ -358,7 +365,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
      * $descriptionを取得する
      * @hibernate.component
      *    prefix="${col.Name}_"
-     * @return $col.description
+     * @return $description
     **/
 #if($col.notNull)
     @${frameworkPrefix}.commons.service.annotation.NotNull(property="${table.JavaName}.${clo}")
@@ -370,7 +377,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを設定する
-     * @param $clo  $col.description
+     * @param $clo  $description
     **/
     public void set${cfc}($cjtype $clo) {
         this.$clo = $clo;
@@ -381,8 +388,10 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #set ( $clo=$col.UncapitalisedJavaName )
 #set ( $cjtype = $col.JavaNative )
 #set ($description = $col.description)
-#if ($description == "")
-#set ($description = $col.name.toUpperCase)
+#if($description && $description.trim() != "")
+#set ($description = $description)
+#else
+#set ($description = $col.name.toUpperCase())
 #end
     /**
      * $description
@@ -416,7 +425,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
      *    length="$col.size"
 #end
 #end
-     * @return $col.description
+     * @return $description
     **/
 #if("BOOLEANCHAR" == $col.torqueType)
 ## トレサオリジナル
@@ -433,7 +442,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $col.description
+     * @return $description
     **/
     public $cjtype is${cfc}() {
         return $clo;
@@ -441,7 +450,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $col.description
+     * @return $description
     **/
     public $cjtype get${cfc}() {
         return $clo;
@@ -461,7 +470,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $col.description
+     * @return $description
     **/
     public $cjtype is${cfc}() {
         return $clo;
@@ -469,7 +478,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-     * @return $col.description
+     * @return $description
     **/
     public $cjtype get${cfc}() {
         return $clo;
@@ -496,7 +505,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #if("BOOLEANCHAR" == $col.torqueType)
     /**
      * $descriptionを設定する
-     * @param $clo  $col.description
+     * @param $clo  $description
     **/
     public void set${cfc}InDB(String $clo) {
         this.$clo = ("Y".equalsIgnoreCase($clo));
@@ -505,7 +514,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #elseif("BOOLEANINT" == $col.torqueType)
     /**
      * $descriptionを設定する
-     * @param $clo  $col.description
+     * @param $clo  $description
     **/
     public void set${cfc}InDB(int $clo) {
         this.$clo = ($clo != 0);
@@ -514,7 +523,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #end
     /**
      * $descriptionを設定する
-     * @param $clo  $col.description
+     * @param $clo  $description
     **/
     public void set${cfc}($cjtype $clo) {
         this.$clo = $clo;

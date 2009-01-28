@@ -2,6 +2,7 @@ package jp.rough_diamond.commons.entity.base;
 
 
 
+
 import  java.io.Serializable;
 
 
