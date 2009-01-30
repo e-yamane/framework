@@ -19,11 +19,42 @@ public class HibernateDocletTaskExt extends HibernateDocletTask {
 			System.out.println(token);
 			FileSet fs = new FileSet();
 			fs.setDir(new File(token));
-			fs.setIncludes(pattern);
+			setFilePatterns(fs, pattern);
+//			fs.setIncludes(pattern);
 			addFileset(fs);
 		}
 	}
 
+	static void setFilePatterns(FileSet fs, String pattern) {
+		String[] elements = pattern.split(";");
+		System.out.println(elements.length);
+		StringBuilder includesSB = new StringBuilder();
+		StringBuilder excludesSB = new StringBuilder();
+		for(String el : elements) {
+			Patterns p = new Patterns(el);
+			StringBuilder tmp = (p.isExclude) ? excludesSB : includesSB;
+			tmp.append(p.pattern);
+			tmp.append(",");
+		}
+		fs.setIncludes(includesSB.toString());
+		fs.setExcludes(excludesSB.toString());
+	}
+	
+	static class Patterns {
+		final boolean 	isExclude;
+		final String 	pattern;
+		Patterns(String patternElement) {
+			String[] split = patternElement.split(":");
+			if(split.length == 1) {
+				isExclude = false;
+				pattern = split[0];
+			} else {
+				isExclude = "e".equals(split[0].toLowerCase());
+				pattern = split[1];
+			}
+		}
+	}
+	
 	@Override
     public Object createDynamicElement(String name) throws BuildException {
 		System.out.println("ZZZZZZZZZ:" + name);
