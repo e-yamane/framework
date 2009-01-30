@@ -382,6 +382,9 @@ abstract public class BasicService implements Service {
             for(Object o : objects) {
                 SortedSet<Method> set = map.get(o.getClass());
                 for(Method m : set) {
+                	if(log.isDebugEnabled()) {
+                		log.debug(String.format("CallBack EventType[%s]:%s(%s)#%s()", eventType, o.getClass().getName(), m.getDeclaringClass().getName(), m.getName()));
+                	}
                     if(m.getParameterTypes().length == 0) {
                         m.invoke(o);
                     } else {
