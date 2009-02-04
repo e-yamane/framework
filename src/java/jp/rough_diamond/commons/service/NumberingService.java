@@ -33,6 +33,7 @@ import jp.rough_diamond.framework.transaction.TransactionAttribute;
 import jp.rough_diamond.framework.transaction.TransactionAttributeType;
 import jp.rough_diamond.framework.transaction.VersionUnmuchException;
 
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,6 +47,18 @@ import org.apache.commons.logging.LogFactory;
 abstract public class NumberingService implements Service {
 	private final static Log log = LogFactory.getLog(NumberingService.class);
 	
+	final int cashSize;
+	final CashingStrategy cStrategy;
+	
+	public NumberingService() {
+		this(1);
+	}
+	
+	public NumberingService(int cashSize) {
+		this.cashSize = cashSize;
+		this.cStrategy = ServiceLocator.getService(NonCashingStrategy.class);
+	}
+	
     /**
      * キーに対応するナンバーを取得する
      * 直前の値がLong.MAX_VALUE=2^64-1=9223372036854775807であれば、
@@ -53,18 +66,8 @@ abstract public class NumberingService implements Service {
      * @param key   キー
      * @return ナンバー
      */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED_NEW)
 	public synchronized long getNumber(String key) {
-		try {
-			return getNumber(key, false);
-		} catch(Exception e) {
-			log.warn("ナンバー生成時にエラーが発生しました。多重挿入の可能性があるのでも１回実行します。");
-			try {
-				return getNumber(key, true);
-			} catch (Exception e1) {
-				throw new RuntimeException(e1);
-			}
-		}
+		return cStrategy.getNumber(key);
 	}
 
     protected final static Map<Class, Supplimenter> NUMBERING_ALLOWED_CLASSES;
@@ -117,53 +120,108 @@ abstract public class NumberingService implements Service {
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRED_NEW)
     abstract public <T> Serializable getNumber(Class<T> entityClass);
-    
-	private static long getNumber(String key, boolean isLoadOnly) throws VersionUnmuchException, MessagesIncludingException {
-		BasicService service = BasicService.getService();
-		Numbering numbering = service.findByPK(Numbering.class, key, BasicService.RecordLock.FOR_UPDATE);
-		if(numbering == null) {
-			if(isLoadOnly) {
-				throw new RuntimeException();
-			}
-			numbering = new Numbering();
-			numbering.setId(key);
-			numbering.setNextNumber(1L);
-			service.insert(numbering);
-			return 1L;
-		} else {
-	        long ret = numbering.getNextNumber();
-	        if(ret == Long.MAX_VALUE) {
-	            ret = 1;
-	        } else {
-	            ret++;
-	        }
-			numbering.setNextNumber(ret);
-			service.update(numbering);
-			return ret;
-		}
-//		Session session = HibernateUtils.getSession();
-//		Numbering numbering = (isLoadOnly) 
-//				? (Numbering)session.load(Numbering.class, key, LockMode.UPGRADE)
-//				: (Numbering)session.get(Numbering.class, key, LockMode.UPGRADE);
-//		if(numbering == null) {
-//			numbering = new Numbering();
-//			numbering.setId(key);
-//			numbering.setNextNumber(0L);
-//		}
-//        long ret = numbering.getNextNumber();
-//        if(ret == Long.MAX_VALUE) {
-//            ret = 1;
-//        } else {
-//            ret++;
-//        }
-//		numbering.setNextNumber(ret);
-//		session.save(numbering);
-//		return ret;
-	}
 	
     private final static String DEFAULT_NUMBERING_SERVICE_CLASS_NAME = "jp.rough_diamond.commons.service.hibernate.HibernateNumberingService";
 
     public static NumberingService getService() {
 		return ServiceLocator.getService(NumberingService.class, DEFAULT_NUMBERING_SERVICE_CLASS_NAME);
 	}
+    
+    abstract public static class CashingStrategy implements Service {
+    	abstract public long getNumber(String key);
+
+		@TransactionAttribute(TransactionAttributeType.REQUIRED_NEW)
+		public Info getInfo(String key, boolean isLoadOnly) throws VersionUnmuchException, MessagesIncludingException {
+			BasicService service = BasicService.getService();
+			Numbering numbering = service.findByPK(Numbering.class, key, BasicService.RecordLock.FOR_UPDATE);
+			if(numbering == null) {
+				if(isLoadOnly) {
+					throw new RuntimeException();
+				}
+				numbering = new Numbering();
+				numbering.setId(key);
+				numbering.setNextNumber((long)getCashSize());
+				service.insert(numbering);
+				Info ret = new Info();
+				ret.currentNumber = 1L;
+				ret.numbering = numbering;
+				return ret;
+			} else {
+		        long currentNumber = numbering.getNextNumber();
+		        long nextValue = currentNumber + getCashSize();
+		        //桁あふれしたとき
+		        if(nextValue <= 0) {
+		        	nextValue = getCashSize();
+		        }
+		        if(currentNumber == Long.MAX_VALUE) {
+		        	currentNumber = 1;
+		        } else {
+		        	currentNumber++;
+		        }
+				numbering.setNextNumber(nextValue);
+				service.update(numbering);
+				Info ret = new Info();
+				ret.currentNumber = currentNumber;
+				ret.numbering = numbering;
+				return ret;
+			}
+		}
+
+		//for mock
+		protected int getCashSize() {
+			return NumberingService.getService().cashSize;
+		}
+		
+		//for mock
+		protected CashingStrategy getStrategy() {
+			return NumberingService.getService().cStrategy;
+		}
+		
+		static class Info {
+			long currentNumber;
+			Numbering numbering; 
+		}
+    }
+    
+    public static class NonCashingStrategy extends CashingStrategy {
+		@Override
+		public long getNumber(String key) {
+			Info info;
+			try {
+				info = getStrategy().getInfo(key, false);
+			} catch(Exception e) {
+				log.warn("ナンバー生成時にエラーが発生しました。多重挿入の可能性があるのでも１回実行します。");
+				try {
+					info = getStrategy().getInfo(key, true);
+				} catch (Exception e1) {
+					throw new RuntimeException(e1);
+				}
+			}
+			return info.currentNumber;
+		}
+    }
+    
+    public static class NumberCashingStrategy extends CashingStrategy {
+    	Map<String, Info> map = new LRUMap(1000);
+    	
+		@Override
+		public long getNumber(String key) {
+			Info info = map.get(key);
+			if(info != null && info.currentNumber < info.numbering.getNextNumber()) {
+				return ++info.currentNumber;
+			}
+			try {
+				info = getStrategy().getInfo(key, false);
+			} catch(Exception e) {
+				log.warn("ナンバー生成時にエラーが発生しました。多重挿入の可能性があるのでも１回実行します。");
+				try {
+					info = getStrategy().getInfo(key, true);
+				} catch (Exception e1) {
+					throw new RuntimeException(e1);
+				}
+			}
+			map.put(key, info);
+			return info.currentNumber;
+		}
+    }
 }

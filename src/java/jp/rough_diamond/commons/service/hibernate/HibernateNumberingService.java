@@ -18,8 +18,6 @@ import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Extractor;
 import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.service.NumberingService;
-import jp.rough_diamond.framework.transaction.TransactionAttribute;
-import jp.rough_diamond.framework.transaction.TransactionAttributeType;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
 public class HibernateNumberingService extends NumberingService {
@@ -29,10 +27,19 @@ public class HibernateNumberingService extends NumberingService {
 		this(false);
 	}
 	
+	public HibernateNumberingService(int cashSize) {
+		this(cashSize, false);
+	}
+	
 	public HibernateNumberingService(boolean skipCheckPK) {
+		this(1, skipCheckPK);
+	}
+	
+	public HibernateNumberingService(int cashSize, boolean skipCheckPK) {
+		super(cashSize);
 		strategy = (skipCheckPK) 
-				? new SkipCheckPKStrategy()
-				: new CheckPKStrategy();
+			? new SkipCheckPKStrategy()
+			: new CheckPKStrategy();
 	}
 	
     /**
@@ -43,7 +50,6 @@ public class HibernateNumberingService extends NumberingService {
      * @return  ÉiÉìÉoÅ[
      */
 	@Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED_NEW)
     public synchronized <T> Serializable getNumber(Class<T> entityClass) {
 		NumberGenerateInfo info = getGenerateInfo(entityClass);
 		return strategy.getPK(info);
