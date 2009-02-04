@@ -63,4 +63,30 @@ public class Amount extends jp.rough_diamond.commons.entity.base.BaseAmount {
     public Amount convertUnit(Unit destUnit, int roundingMode, Date d) throws UnitConversionService.NotConversionException{
     	return UnitConversionService.getService().convertUnit(this, destUnit, roundingMode, d);
     }
+    
+	@Override
+	public double doubleValue() {
+		return (getQuantity() == null) ? 0.0D : getQuantity().doubleValue();
+	}
+
+	@Override
+	public float floatValue() {
+		return (getQuantity() == null) ? 0.0F : getQuantity().floatValue();
+	}
+	@Override
+	public int intValue() {
+		return (getQuantity() == null) ? 0 : getQuantity().intValue();
+	}
+	@Override
+	public long longValue() {
+		return (getQuantity() == null) ? 0L : getQuantity().longValue();
+	}
+	/**
+	 * getQuantity().decimal()のショートカットメソッド
+	 * getQuantity()==nullの場合はBigDecimal.ZEROを返却
+	 * @return
+	 */
+	public BigDecimal decimal() {
+		return (getQuantity() == null) ? BigDecimal.ZERO : getQuantity().decimal();
+	}
 }

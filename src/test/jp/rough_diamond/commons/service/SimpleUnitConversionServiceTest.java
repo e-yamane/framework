@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import jp.rough_diamond.commons.entity.Amount;
 import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
+import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
 import jp.rough_diamond.framework.service.ServiceLocator;
@@ -16,6 +17,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		UnitLoader.init();
+		NumberingLoader.init();
 	}
 
 	public void test変換後の数値が整数のケースで正しく単位変換が行われること() throws Exception {

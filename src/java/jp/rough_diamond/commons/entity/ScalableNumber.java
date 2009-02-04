@@ -67,7 +67,7 @@ public class ScalableNumber extends jp.rough_diamond.commons.entity.base.BaseSca
 		Long value = getValue();
 		Integer scale = getScale();
 		if(value == null || scale == null) {
-			return new BigDecimal("0");
+			return BigDecimal.ZERO;
 		} else {
 			return new BigDecimal(new BigInteger(value.toString()), scale);
 		}

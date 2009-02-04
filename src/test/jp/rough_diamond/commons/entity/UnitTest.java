@@ -1,6 +1,7 @@
 package jp.rough_diamond.commons.entity;
 
 import jp.rough_diamond.commons.service.BasicService;
+import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
 
@@ -9,6 +10,7 @@ public class UnitTest extends DataLoadingTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		UnitLoader.init();
+		NumberingLoader.init();
 	}
 
 	public void testGateRate() throws Exception {

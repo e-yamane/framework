@@ -1,10 +1,13 @@
 package jp.rough_diamond.commons.service.hibernate;
 
+import java.io.Serializable;
+
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.service.NumberingService;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
+import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 
 public class HibernateNumberingServiceTest extends DataLoadingTestCase {
@@ -23,7 +26,22 @@ public class HibernateNumberingServiceTest extends DataLoadingTestCase {
 	}
 	
 	public void testGetNumberByClass() throws Exception {
-		NumberingService service = ServiceLocator.getService(HibernateNumberingService.class);
-		assertEquals("返却値が誤っています。", service.getNumber(Unit.class), 6L);
+		TestGetNumberByClassService service = ServiceLocator.getService(TestGetNumberByClassService.class);
+
+		//生成子の引数をチェックすることが目的なので、ServiceLocatorを経由せずに生成する
+		//よい子はまねしちゃだめです。
+		NumberingService nService = new HibernateNumberingService(true);
+		assertEquals("返却値が誤っています。", service.doIt(nService), 3L);
+		
+		//生成子の引数をチェックすることが目的なので、ServiceLocatorを経由せずに生成する
+		//よい子はまねしちゃだめです。
+		nService = new HibernateNumberingService();
+		assertEquals("返却値が誤っています。", service.doIt(nService), 6L);
+	}
+	
+	public static class TestGetNumberByClassService implements Service {
+		public Serializable doIt(NumberingService nService) {
+			return nService.getNumber(Unit.class);
+		}
 	}
 }

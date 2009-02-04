@@ -10,7 +10,7 @@ import  java.io.Serializable;
  * 量のHibernateマッピングベースクラス
 **/
 
-public abstract class BaseAmount  implements Serializable {
+public abstract class BaseAmount extends java.lang.Number implements Serializable {
     public BaseAmount() {
     }
 

@@ -24,7 +24,7 @@ DTDは、
       　sizeが指定されている文字列系のカラムについては自動的にサイズチェックが付与される
   -->
 
-  <table name="AMOUNT"  description="量" skipSql="true">
+  <table name="AMOUNT"  description="量" baseClass="java.lang.Number" skipSql="true">
     <!-- 単位無しを見越してUNIT_IDはnull許可 -->
     <column name="UNIT_ID"                        required="false"  type="BIGINT"               description="数量尺度ID" />
     <column name="Q"  javaName="quantity"         required="true"   type="SCALABLE_NUMBER"      description="量" />
