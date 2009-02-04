@@ -161,13 +161,9 @@ abstract public class NumberingService implements Service {
 //		return ret;
 	}
 	
-    private final static String DEFAULT_BASIC_SERVICE_CLASS_NAME = "jp.rough_diamond.commons.service.hibernate.HibernateNumberingService";
-    private final static NumberingService INSTANCE;
-    static {
-    	INSTANCE = ServiceLocator.getService(NumberingService.class, DEFAULT_BASIC_SERVICE_CLASS_NAME);
-    }
+    private final static String DEFAULT_NUMBERING_SERVICE_CLASS_NAME = "jp.rough_diamond.commons.service.hibernate.HibernateNumberingService";
 
     public static NumberingService getService() {
-		return INSTANCE;
+		return ServiceLocator.getService(NumberingService.class, DEFAULT_NUMBERING_SERVICE_CLASS_NAME);
 	}
 }

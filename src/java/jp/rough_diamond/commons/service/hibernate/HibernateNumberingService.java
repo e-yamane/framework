@@ -1,7 +1,9 @@
 package jp.rough_diamond.commons.service.hibernate;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.hibernate.EntityMode;
 import org.hibernate.Session;
@@ -29,12 +31,33 @@ public class HibernateNumberingService extends NumberingService {
      * @return  ナンバー
      */
 	@Override
-	@SuppressWarnings("unchecked")
     @TransactionAttribute(TransactionAttributeType.REQUIRED_NEW)
     public synchronized <T> Serializable getNumber(Class<T> entityClass) {
+		NumberGenerateInfo info = getGenerateInfo(entityClass);
+        long ret = getNumber(info.entityName);
+        long stop = ret - 1;
+        BasicService bs = BasicService.getService();
+        while(ret != stop) {
+            Serializable ser = info.supplimenter.suppliment(ret, info.length);
+        	Extractor ex = new Extractor(entityClass);
+        	ex.add(Condition.eq(info.identifierName, ser));
+        	if(bs.getCountByExtractor(ex) == 0) {
+        		return ser;
+        	}
+            ret = getNumber(info.entityName);
+        }
+        throw new RuntimeException("いっぱいいっぱいです");
+    }
+	
+	@SuppressWarnings("unchecked")
+	NumberGenerateInfo getGenerateInfo(Class<?> cl) {
+		NumberGenerateInfo ret = genMap.get(cl);
+		if(ret != null) {
+			return ret;
+		}
         Session session = HibernateUtils.getSession();
         SessionFactory sf = session.getSessionFactory();
-        ClassMetadata cm = sf.getClassMetadata(entityClass);
+        ClassMetadata cm = sf.getClassMetadata(cl);
         Supplimenter supplimenter = NUMBERING_ALLOWED_CLASSES.get(cm.getIdentifierType().getReturnedClass());
         if(supplimenter == null) {
             throw new RuntimeException("主キーが自動採番対象オブジェクトではありません");
@@ -42,26 +65,31 @@ public class HibernateNumberingService extends NumberingService {
         Configuration config = HibernateUtils.getConfig();
         PersistentClass pc = config.getClassMapping(cm.getMappedClass(EntityMode.POJO).getName());
         Property prop = pc.getIdentifierProperty();
-        Iterator iter = prop.getColumnIterator();
+        Iterator<Column> iter = prop.getColumnIterator();
         int length = -1;
         if(iter.hasNext()) {
-        	Column col = (Column)iter.next();
+        	Column col = iter.next();
         	length = col.getLength();
         } else {
         	throw new RuntimeException("なんか変");
         }
-        long ret = getNumber(cm.getEntityName());
-        long stop = ret - 1;
-        BasicService bs = BasicService.getService();
-        while(ret != stop) {
-            Serializable ser = supplimenter.suppliment(ret, length);
-        	Extractor ex = new Extractor(entityClass);
-        	ex.add(Condition.eq(prop.getName(), ser));
-        	if(bs.getCountByExtractor(ex) == 0) {
-        		return ser;
-        	}
-            ret = getNumber(cm.getEntityName());
-        }
-        throw new RuntimeException("いっぱいいっぱいです");
-    }
+        ret = new NumberGenerateInfo(cm.getEntityName(), length, supplimenter, prop.getName());
+        genMap.put(cl, ret);
+        return ret;
+	}
+	
+	static class NumberGenerateInfo {
+		final String entityName;
+		final int length;
+		final Supplimenter supplimenter;
+		final String identifierName;
+		NumberGenerateInfo(String entityName, int length, Supplimenter supplimenter, String identifierName) {
+			this.entityName = entityName;
+			this.length = length;
+			this.supplimenter = supplimenter;
+			this.identifierName = identifierName;
+		}
+	}
+	
+	Map<Class<?>, NumberGenerateInfo> genMap = new HashMap<Class<?>, NumberGenerateInfo>();
 }
