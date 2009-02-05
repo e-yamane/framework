@@ -87,6 +87,7 @@ public class ServiceFinder implements
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	static MuleMessage makeMessage(Object[] args) {
 		if(args.length == 0) {
 			return new DefaultMuleMessage(null);
