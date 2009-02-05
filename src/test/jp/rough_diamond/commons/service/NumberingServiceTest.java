@@ -16,7 +16,7 @@ public class NumberingServiceTest extends DataLoadingTestCase {
 	}
 
 	public void testGetNumberInNonCasingStrategy() throws Exception {
-		NumberingService.CashingStrategy strategy = ServiceLocator.getService(NumberingService.CashingStrategy.class, NumberingService.NonCashingStrategy.class);
+		NumberingService.CashingStrategy strategy = ServiceLocator.getService(NonCashingStrategyExt.class, NonCashingStrategyExt.class);
 		
 		assertEquals("返却値が誤っています。", strategy.getNumber("yamane"), 1L);
 		Numbering numbering = BasicService.getService().findByPK(Numbering.class, "yamane");
@@ -53,8 +53,10 @@ public class NumberingServiceTest extends DataLoadingTestCase {
 		assertEquals("返却値が誤っています。", numbering.getNextNumber().longValue(), 11L);
 	}
 	
+	public static class NonCashingStrategyExt extends NumberingService.NonCashingStrategy {}
+	
 	public void testGetNumberInCasingStrategy() throws Exception {
-		NumberingService.NumberCashingStrategy strategy = ServiceLocator.getService(NumberingService.NumberCashingStrategy.class, NumberCashingStrategyExt.class);
+		NumberingService.NumberCashingStrategy strategy = ServiceLocator.getService(NumberCashingStrategyExt.class, NumberCashingStrategyExt.class);
 
 		assertEquals("返却値が誤っています。", strategy.getNumber("yamane"), 1L);
 		Numbering numbering = BasicService.getService().findByPK(Numbering.class, "yamane");

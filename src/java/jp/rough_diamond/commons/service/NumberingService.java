@@ -56,7 +56,9 @@ abstract public class NumberingService implements Service {
 	
 	public NumberingService(int cashSize) {
 		this.cashSize = cashSize;
-		this.cStrategy = ServiceLocator.getService(NonCashingStrategy.class);
+		this.cStrategy = (cashSize == 1)
+				? ServiceLocator.getService(NonCashingStrategy.class)
+				: ServiceLocator.getService(NumberCashingStrategy.class);
 	}
 	
     /**
@@ -127,20 +129,31 @@ abstract public class NumberingService implements Service {
 		return ServiceLocator.getService(NumberingService.class, DEFAULT_NUMBERING_SERVICE_CLASS_NAME);
 	}
     
-    abstract public static class CashingStrategy implements Service {
+	//for mock
+	protected int getCashSize() {
+		return cashSize;
+	}
+	
+	//for mock
+	protected CashingStrategy getStrategy() {
+		return cStrategy;
+	}
+
+	abstract public static class CashingStrategy implements Service {
     	abstract public long getNumber(String key);
 
 		@TransactionAttribute(TransactionAttributeType.REQUIRED_NEW)
 		public Info getInfo(String key, boolean isLoadOnly) throws VersionUnmuchException, MessagesIncludingException {
 			BasicService service = BasicService.getService();
 			Numbering numbering = service.findByPK(Numbering.class, key, BasicService.RecordLock.FOR_UPDATE);
+			long cashSize = getCashSize();
 			if(numbering == null) {
 				if(isLoadOnly) {
 					throw new RuntimeException();
 				}
 				numbering = new Numbering();
 				numbering.setId(key);
-				numbering.setNextNumber((long)getCashSize());
+				numbering.setNextNumber(cashSize);
 				service.insert(numbering);
 				Info ret = new Info();
 				ret.currentNumber = 1L;
@@ -148,10 +161,10 @@ abstract public class NumberingService implements Service {
 				return ret;
 			} else {
 		        long currentNumber = numbering.getNextNumber();
-		        long nextValue = currentNumber + getCashSize();
+		        long nextValue = currentNumber + cashSize;
 		        //Œ…‚ ‚Ó‚ê‚µ‚½‚Æ‚«
 		        if(nextValue <= 0) {
-		        	nextValue = getCashSize();
+		        	nextValue = cashSize;
 		        }
 		        if(currentNumber == Long.MAX_VALUE) {
 		        	currentNumber = 1;
@@ -167,19 +180,17 @@ abstract public class NumberingService implements Service {
 			}
 		}
 
-		//for mock
-		protected int getCashSize() {
-			return NumberingService.getService().cashSize;
-		}
-		
-		//for mock
-		protected CashingStrategy getStrategy() {
-			return NumberingService.getService().cStrategy;
-		}
-		
 		static class Info {
 			long currentNumber;
 			Numbering numbering; 
+		}
+		//for mock
+		protected int getCashSize() {
+			return NumberingService.getService().getCashSize();
+		}
+		//for mock
+		protected CashingStrategy getStrategy() {
+			return NumberingService.getService().getStrategy();
 		}
     }
     
@@ -206,6 +217,7 @@ abstract public class NumberingService implements Service {
     	
 		@Override
 		public long getNumber(String key) {
+			log.warn("NumberCashingStrategy#getNumber()");
 			Info info = map.get(key);
 			if(info != null && info.currentNumber < info.numbering.getNextNumber()) {
 				return ++info.currentNumber;
