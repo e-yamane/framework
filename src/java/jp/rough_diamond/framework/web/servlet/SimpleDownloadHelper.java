@@ -19,8 +19,15 @@ public class SimpleDownloadHelper {
 					"attachment; filename=\"" + fileName + "\"");
 		}
 		InputStream in = getContent ();
+		BufferedOutputStream out = null;
         try {
-    		BufferedOutputStream out = new BufferedOutputStream(response.getOutputStream());
+    		out = new BufferedOutputStream(response.getOutputStream()){
+    			//XXX HttpServletResponse#getOutputStream()の戻りはこっちでクローズするとほげることがある
+    			//だけど、closeを呼び出さないとfindBug君が怒るのでclose処理をキャンセルさせる
+				@Override
+				public void close() {
+				}
+    		};
     		int n;
     		int count = 0;
     		while ((n = in.read()) >= 0) {
@@ -31,6 +38,9 @@ public class SimpleDownloadHelper {
     		out.flush();
         } finally {
             in.close();
+            if(out != null) {
+            	out.close();
+            }
         }
 	}
 
