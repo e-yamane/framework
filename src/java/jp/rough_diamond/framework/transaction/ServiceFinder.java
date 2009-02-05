@@ -44,7 +44,6 @@ public class ServiceFinder extends SimpleServiceFinder {
 		try {
 			T base = super.getService(cl, defaultClass);
 			ProxyFactory pf = new ProxyFactory(base);
-//			pf.addAdvice(mi);
 			pf.addAdvisor(interceptor);
 			pf.setOptimize(true);
 			return (T)pf.getProxy();
