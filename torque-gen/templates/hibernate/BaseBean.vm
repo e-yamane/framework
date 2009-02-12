@@ -95,7 +95,13 @@ import  java.math.BigDecimal;
         $grpDelimiter @${frameworkPrefix}.commons.service.annotation.Check(properties={
 #set ($propDelimiter = " ")
 #foreach($column in $unique.columns)
+#if("BOOLEANCHAR" == $table.getColumn($column).torqueType )
+#set($propName = "${table.getColumn($column).uncapitalisedJavaName}InDB")
+#elseif("BOOLEANINT" == $table.getColumn($column).torqueType )
+#set($propName = "${table.getColumn($column).uncapitalisedJavaName}InDB")
+#else
 #set($propName = $table.getColumn($column).uncapitalisedJavaName)
+#end
 #foreach ($fk in $table.ForeignKeys)
 #foreach($localColumn in $fk.LocalColumns)
 #if($localColumn == $column)
@@ -192,11 +198,10 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #end
 
 #set($suffix = "")
-#set($suffix = "")
 #if("BOOLEANCHAR" == $col.torqueType )
 #set($suffix = "InDB")
 #end
-#if("BOOLEANCHAR" == $col.torqueType)
+#if("BOOLEANINT" == $col.torqueType)
 #set($suffix = "InDB")
 #end
     public final static String ${colPK.Name.toUpperCase()} = "$cloPK.trim()$suffix";
