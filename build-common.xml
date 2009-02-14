@@ -263,25 +263,21 @@
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="sql" />
     </antcall>
-
     <echo message="テーブルレイアウトを作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="doc" />
     </antcall>
-
     <echo message="DAOクラスを作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="hibernate-java" />
     </antcall>
-
     <echo message="スキーマプロパティを作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="schema-properties" />
     </antcall>
-
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/build.xml" />
       <param name="exec.target" value="hibernatedoclet" />

@@ -16,6 +16,7 @@
             name="id"
             column="ID"
             type="java.lang.Long"
+            length="20"
         >
             <generator class="assigned">
               <!--  
@@ -63,6 +64,7 @@
             update="true"
             insert="true"
             column="RATE_VALUE"
+            length="20"
             not-null="true"
         />
 
@@ -72,6 +74,7 @@
             update="true"
             insert="true"
             column="RATE_SCALE"
+            length="10"
             not-null="true"
         />
 
@@ -83,6 +86,7 @@
             update="true"
             insert="true"
             column="SCALE"
+            length="10"
             not-null="true"
         />
 

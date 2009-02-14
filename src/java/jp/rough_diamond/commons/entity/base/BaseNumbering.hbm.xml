@@ -33,6 +33,7 @@
             update="true"
             insert="true"
             column="NEXT_NUMBER"
+            length="20"
             not-null="true"
         />
 

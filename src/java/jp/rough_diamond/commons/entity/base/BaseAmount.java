@@ -43,7 +43,7 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
     }
 
 
-                                                                    
+    
     private jp.rough_diamond.commons.entity.Unit unit;
     public final static String UNIT = "unit";
 
@@ -78,6 +78,6 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
             );
         }
     }
-      
+
     private static final long serialVersionUID = 1L;
 }

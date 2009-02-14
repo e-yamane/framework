@@ -29,6 +29,7 @@ public abstract class BaseUnit  implements Serializable {
      *    generator-class="assigned"
      *    column="ID"
      *    not-null="true"
+     *    length="20"
      * @return OID
     **/
 
@@ -160,6 +161,7 @@ public abstract class BaseUnit  implements Serializable {
      * @hibernate.property
      *    column="SCALE"
      *    not-null="true"
+     *    length="10"
      * @return •ÏŠ·‚É•Û‚·‚é­”¸“xB•‰”‚ğw’è‚·‚é‚Æ®”‚ÌØÌ‚Ä”»’f‚·‚é
     **/
     @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.scale")
@@ -202,7 +204,7 @@ public abstract class BaseUnit  implements Serializable {
 
 
 
-                                                                                        
+    
     private jp.rough_diamond.commons.entity.Unit base;
     public final static String BASE = "base";
 
@@ -240,6 +242,6 @@ public abstract class BaseUnit  implements Serializable {
             }
         }
     }
-      
+
     private static final long serialVersionUID = 1L;
 }

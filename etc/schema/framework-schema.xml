@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="Shift_JIS" standalone="no"?>
-<!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database_3_1.dtd">
 
 <!--
 DTDは、
 
- DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database_3_1.dtd"
+ DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database_3_3.dtd"
 です。
  /database/table/columnタグにencrypt属性（デフォルトfalse）を追加しています。
 -->

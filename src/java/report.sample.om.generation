@@ -51,31 +51,31 @@ maxColumnNameLength = 30
 
 idMethod = sequence
 
-  
+DAOÇÃê∂ê¨ÇäJénÇµÇ‹Ç∑
+
+
+
+  jp.rough_diamond.commons.entity
+  jp.rough_diamond.commons.entity
+
+  Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\
+
+  Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\
+  Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\base
+
+        AMOUNT
+          
         
-    
-    jp.rough_diamond.commons.entity
-    jp.rough_diamond.commons.entity
 
-        Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\
+        UNIT
+          
+        
 
-        Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\
-    Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\base
+        SCALABLE_NUMBER
+          
+        
 
-                            AMOUNT
-                    
-                    
+        numbering
+          
+        
 
-                                                                      UNIT
-                    
-                    
-
-                                                                      SCALABLE_NUMBER
-                    
-                    
-
-                                                                      numbering
-                    
-                    
-
-                                                

@@ -1,43 +1,39 @@
 <html>
-<header>
-  <title>framework-schema</title>
-  <style>
-  .normalFont {
-    font-family: Verdana; font-size: 10pt;
-  }
-  </style>
-</header>
+<head>
+  <title>framework tables</title>
+  <link rel="stylesheet" type="text/css" href="dataModel.css">
+</head>
 
 <body class="normalFont">
-  <table border="1" cellspacing="0" cellpadding="0">
-    <tr bgcolor="#CCCCCC">
-      <th class="normalFont">Table Name</th>
-      <th class="normalFont">OM Class</th>
-      <th class="normalFont">Description</th>
+  <table class="summarytable">
+    <tr class=summaryhead">
+      <th class="summaryheadbackground summaryborder summaryheadtablename">Table Name</th>
+      <th class="summaryheadbackground summaryborder summaryheadjavaname">OM Class</th>
+      <th class="summaryheadbackground summaryborder summaryheaddescription">Description</th>
     </tr>
-      <tr>
-      <td class="normalFont"><a href="#AMOUNT">AMOUNT</a></td>
-      <td class="normalFont">Amount</td>
-      <td class="normalFont"> 量</td>
+    <tr class=summaryrow">
+      <td class="summarybackground summaryborder summarytablename"><a href="#AMOUNT" class="link summarytablenamelink">AMOUNT</a></td>
+      <td class="summarybackground summaryborder summaryjavaname">Amount</td>
+      <td class="summarybackground summaryborder summarydescription"> 量</td>
     </tr>
-      <tr>
-      <td class="normalFont"><a href="#UNIT">UNIT</a></td>
-      <td class="normalFont">Unit</td>
-      <td class="normalFont"> 数量尺度</td>
+    <tr class=summaryrow">
+      <td class="summarybackground summaryborder summarytablename"><a href="#UNIT" class="link summarytablenamelink">UNIT</a></td>
+      <td class="summarybackground summaryborder summaryjavaname">Unit</td>
+      <td class="summarybackground summaryborder summarydescription"> 数量尺度</td>
     </tr>
-      <tr>
-      <td class="normalFont"><a href="#SCALABLE_NUMBER">SCALABLE_NUMBER</a></td>
-      <td class="normalFont">ScalableNumber</td>
-      <td class="normalFont"> 小数点位置指定数値</td>
+    <tr class=summaryrow">
+      <td class="summarybackground summaryborder summarytablename"><a href="#SCALABLE_NUMBER" class="link summarytablenamelink">SCALABLE_NUMBER</a></td>
+      <td class="summarybackground summaryborder summaryjavaname">ScalableNumber</td>
+      <td class="summarybackground summaryborder summarydescription"> 小数点位置指定数値</td>
     </tr>
-      <tr>
-      <td class="normalFont"><a href="#numbering">numbering</a></td>
-      <td class="normalFont">Numbering</td>
-      <td class="normalFont"> ナンバリングテーブル</td>
+    <tr class=summaryrow">
+      <td class="summarybackground summaryborder summarytablename"><a href="#numbering" class="link summarytablenamelink">numbering</a></td>
+      <td class="summarybackground summaryborder summaryjavaname">Numbering</td>
+      <td class="summarybackground summaryborder summarydescription"> ナンバリングテーブル</td>
     </tr>
-    </table>
+  </table>
 
-      <a name="AMOUNT"/>
+    <a name="AMOUNT"/>
 <h2>AMOUNT （クラスのみ）</h2>
 量
 <p/>
@@ -92,7 +88,7 @@
 <script>
 </script>
 
-      <a name="UNIT"/>
+    <a name="UNIT"/>
 <h2>UNIT </h2>
 数量尺度
 <p/>
@@ -202,7 +198,7 @@
 <script>
 </script>
 
-      <a name="SCALABLE_NUMBER"/>
+    <a name="SCALABLE_NUMBER"/>
 <h2>SCALABLE_NUMBER （クラスのみ）</h2>
 小数点位置指定数値
 <p/>
@@ -245,7 +241,7 @@
 <script>
 </script>
 
-      <a name="numbering"/>
+    <a name="numbering"/>
 <h2>numbering </h2>
 ナンバリングテーブル
 <p/>
@@ -288,6 +284,6 @@
 <script>
 </script>
 
-  
+
 </body>
 </html>
