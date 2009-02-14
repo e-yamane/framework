@@ -1,0 +1,183 @@
+package ${package};
+
+import  java.io.Serializable;
+#foreach ($col in $table.PrimaryKey)
+#if($col.JavaNative == "Date")
+import  java.util.Date;
+#end
+#end
+
+#set ($description = "$!table.description")
+#if ($description == "")
+#set ($description = $table.Name.toUpperCase())
+#end
+/**
+ * $descriptionのプライマリーキー
+**/
+public class ${table.JavaName}PK implements Serializable {
+## 生成子の定義
+    public ${table.JavaName}PK() {
+    }
+#set ($processedFK = "")
+#foreach ($col in $table.PrimaryKey)
+#*
+  #if($col.foreignKey)
+//FKです。
+    ##外部キーの参照なのでエンティティに対するアクセサを作成します。
+    #set ($fk = $col.foreignKey)
+    #if ($processedFK.indexOf("[$fk.foreignTableName]") > 0)
+      ##既に処理済の外部キーです。スキップします。
+    #else
+      #set ( $tblFK = $table.Database.getTable($fk.foreignTableName) )
+      #set ( $className = $tblFK.JavaName )
+      #set ( $relCol = "" )
+      #foreach ($columnName in $fk.LocalColumns)
+        #set ( $column = $table.getColumn($columnName) )
+        #if ($column.isMultipleFK() || $fk.ForeignTableName.equals($table.Name))
+          #set ( $relCol = "$relCol$column.JavaName" )
+        #end
+      #end
+      #if ($relCol != "")
+        #set ( $relCol = "RelatedBy$relCol" )
+      #end
+      #set ( $pVarName = "$className$relCol" )
+      #set ( $varName = "a$pVarName" )
+      #set ( $retVal = $pVars.add($pVarName) )
+      #set ( $retVal = $aVars.add($varName) )
+
+    private $className $varName;
+
+    /**
+     * Get the associated $className object
+     * @hibernate.many-to-one
+#foreach ($columnName in $fk.LocalColumns)
+     *   column = "$columnName.toUpperCase()"
+#end
+     *   outer-join = "true"
+     *
+     * @return the associated $className object
+     */
+    public $className get${pVarName}() {
+        return this.$varName;
+    }
+
+    /**
+     * Declares an association between this object and a $className object
+     *
+     * @param v $className
+     */
+    public void set${pVarName}($className v) {
+        this.$varName = v;
+    }
+      #set ($processedFK = "$processedFK[$fk.foreignTableName]")
+    #end
+  #else
+*#
+    #set ( $cfc=$col.JavaName )
+    #set ( $clo=$col.UncapitalisedJavaName )
+    #set ( $cjtype = $col.JavaNative )
+    #set ($description = "$!col.description")
+    #if ($description == "")
+      #set ($description = $col.name.toUpperCase())
+    #end
+
+    /**
+     * $description
+    **/ 
+    private $cjtype $clo;
+
+    /**
+     * $descriptionを取得する
+     * @hibernate.property
+     *    column="$col.name.toUpperCase()"
+     *    not-null="$col.notNull"
+#if ($col.size != "")
+     *    length="$col.size"
+#end
+#if ($col.autoIncrement)
+	 * @hibernate.version
+	 *    column="$col.name.toUpperCase()"
+#end
+     * @return $col.description
+    **/
+#if("BOOLEANCHAR" == $col.torqueType)
+	public String get${cfc}InDB() {
+		return ($clo) ? "Y" : "N";
+	}
+
+    /**
+     * $descriptionを取得する
+     * @return $col.description
+    **/
+    public $cjtype is${cfc}() {
+        return $clo;
+    }
+
+#elseif("BOOLEANINT" == $col.torqueType)
+	public int get${cfc}InDB() {
+		return ($clo) ? 1 : 0;
+	}
+    /**
+     * $descriptionを取得する
+     * @return $col.description
+    **/
+    public $cjtype is${cfc}() {
+        return $clo;
+    }
+#else	
+    public $cjtype get${cfc}() {
+        return $clo;
+    }
+#end
+
+#if("BOOLEANCHAR" == $col.torqueType)
+    /**
+     * $descriptionを設定する
+     * @param $clo  $col.description
+    **/
+    public void set${cfc}InDB(String $clo) {
+		this.$clo = ("Y".equalsIgnoreCase($clo));
+    }
+#elseif("BOOLEANINT" == $col.torqueType)
+    /**
+     * $descriptionを設定する
+     * @param $clo  $col.description
+    **/
+    public void set${cfc}InDB(int $clo) {
+		this.$clo = ($clo != 0);
+    }
+#end
+
+    /**
+     * $descriptionを設定する
+     * @param $clo  $col.description
+    **/
+    public void set${cfc}($cjtype $clo) {
+        this.$clo = $clo;
+    }
+##  #end
+#end
+
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+#foreach ($col in $table.PrimaryKey)
+#set ( $cfc=$col.JavaName )
+        buf.append("$cfc=[" + get$cfc() + "]");
+#end
+        return buf.toString();
+    }
+    public boolean equals(Object o) {
+        if(o instanceof ${table.JavaName}PK) {
+            if(hashCode() == o.hashCode()) {
+                return o.toString().equals(toString());
+            }
+        }
+        return false;
+    }
+    
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+	private static final long serialVersionUID = 1L;
+}

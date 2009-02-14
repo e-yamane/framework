@@ -1,0 +1,52 @@
+##
+## The following will only work for non-circular references
+## if you have a dependancy chain, you will need to use
+## ADD CONSTRAINT syntax (with INITIALLY DEFERRED)
+## which is sticky and version dependant
+##
+#set($cnt = $currentIndex)
+#foreach ($fk in $table.ForeignKeys)
+#set ($cnt = $velocityCount + $currentIndex)
+ALTER TABLE ${baseTable.name}
+    ADD CONSTRAINT fk_${baseTable.name}__$cnt FOREIGN KEY (
+#set( $keyDelimitter = "" )
+#foreach($fkLocal in $fk.localColumns)
+      ${keyDelimitter}$!{columnPrefix}$fkLocal
+#set( $keyDelimitter = "," )
+#end
+    )
+    REFERENCES $fk.ForeignTableName ($fk.ForeignColumnNames)
+#if ($fk.hasOnUpdate())
+    ON UPDATE $fk.OnUpdate
+#end
+#if ($fk.hasOnDelete())
+    ON DELETE $fk.OnDelete 
+#end
+;
+#end
+##参照テーブル展開
+#foreach ($col in $table.Columns)
+#if($table.database.getTable($col.torqueType))
+#if($currentIndex != $cnt)
+#set($currentIndex = $cnt)
+#end
+#set ( $columnPrefix = "$!{columnPrefix}${col.Name}_" )
+#set ( $tableNamePrefix = "$!{tableNamePrefix}${table.name}," )
+#set ( $fk = $generator.parse("$basepath/foreignkey.vm", "", "table", $table.database.getTable($col.torqueType)))
+#set ( $currentTableName = $tableNamePrefix.substring(0, $tableNamePrefix.lastIndexOf(',')))
+#set ( $tableNameIndex = $currentTableName.lastIndexOf(',') + 1)
+#set ( $currentTableName = $currentTableName.substring($tableNameIndex))
+#set ( $table = $table.database.getTable($currentTableName))
+#set ( $tableNamePrefix = $tableNamePrefix.replaceAll("${currentTableName},", "") )
+#set ( $columnPrefix = $columnPrefix.replaceAll("${col.Name}_$", "") )
+${fk}#end
+#end
+#if($table.database.isTableByJavaName("$table.baseClass"))
+#set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
+#if($foreignTable)
+#if($foreignTable.isSkipSqlOrg())
+##外部テーブル展開
+#if($currentIndex != $cnt)
+#set($currentIndex = $cnt)
+#end
+$generator.parse("$basepath/foreignkey.vm", "", "table", $foreignTable)#end#end#end

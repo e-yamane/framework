@@ -1,0 +1,185 @@
+## Licensed to the Apache Software Foundation (ASF) under one
+## or more contributor license agreements.  See the NOTICE file
+## distributed with this work for additional information
+## regarding copyright ownership.  The ASF licenses this file
+## to you under the Apache License, Version 2.0 (the
+## "License"); you may not use this file except in compliance
+## with the License.  You may obtain a copy of the License at
+##
+##   http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing,
+## software distributed under the License is distributed on an
+## "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+## KIND, either express or implied.  See the License for the
+## specific language governing permissions and limitations
+## under the License.
+#set ($basePath = $generator.OutputPath)
+
+targetdatabase = $targetDatabase
+
+correctGetters = $!correctGetters
+
+#set ( $mapDBNames = [] )       ## Collect unique DB names across all external-schemas
+#set ( $mapDatabases = [] )     ## Collect the first database object across all external-schemas
+#set ( $mapDBMapBuilders = [] ) ## Collect all table map builders across all external-schemas
+
+#foreach ($database in $dataModels)
+
+    #if ($database.Package)
+      #set ($package = $database.Package)
+    #else
+      #set ($package = $targetPackage)
+    #end
+
+    #if ($subpackagePeer)
+      #set ($packagePeer = "${package}.${subpackagePeer}")
+    #else
+      #set ($packagePeer = "${package}")
+    #end
+
+    #if ($subpackageObject)
+      #set ($packageObject = "${package}.${subpackageObject}")
+    #else
+      #set ($packageObject = "${package}")
+    #end
+
+    #if ($subpackageMap)
+      #set ($packageMap = "${package}.${subpackageMap}")
+    #else
+      #set ($packageMap = "${package}")
+    #end
+
+    #if ($subpackageManager)
+      #set ($packageManager = "${package}.${subpackageManager}")
+    #else
+      #set ($packageManager = "${package}")
+    #end
+
+    #if ($subpackageBean)
+      #set ($packageBean = "${package}.${subpackageBean}")
+    #else
+      #set ($packageBean = "${package}")
+    #end
+
+    #if ($subpackageBase)
+      #set ($packageBasePeer = "${package}.${subpackageBase}")
+      #set ($packageBaseObject = "${package}.${subpackageBase}")
+      #set ($packageBaseManager = "${package}.${subpackageBase}")
+    #else
+      #set ($packageBasePeer = "${package}")
+      #set ($packageBaseObject = "${package}")
+      #set ($packageBaseManager = "${package}")
+    #end
+
+    #if ($subpackageBaseBean)
+      #set ($packageBaseBean = "${package}.${subpackageBaseBean}")
+    #else
+      #set ($packageBaseBean = "${package}")
+    #end
+
+    Peers generated in package $packagePeer
+    Objects generated in package $packageObject
+    Managers generated in package $packageManager
+    Beans generated in package $packageBean
+
+    #set ( $path = $strings.getPackageAsPath($packagePeer) )
+    $files.mkdir("$outputDirectory/$path")
+
+    #set ( $path = $strings.getPackageAsPath($packageObject) )
+    $files.mkdir("$outputDirectory/$path")
+
+    #if ($useManagers)
+      #set ( $path = $strings.getPackageAsPath($packageManager) )
+      $files.mkdir("$outputDirectory/$path")
+    #end
+
+    #if ($generateBeans)
+      #set ( $path = $strings.getPackageAsPath($packageBean) )
+      $files.mkdir("$outputDirectory/$path")
+    #end
+
+	#foreach ($tbl in $database.Tables)
+	  #if ( !$tbl.isAlias() && !$tbl.isForReferenceOnly() )
+## Adding new table Peer = "${packagePeer}.${tbl.JavaName}Peer"
+	    #set ($retVar = $builderArray.add("${packagePeer}.${tbl.JavaName}Peer") )
+	  #end
+	#end
+
+    #foreach ($tbl in $database.Tables)
+      #if (!$tbl.isForReferenceOnly())
+        $tbl.Name
+
+        $!tbl.setCorrectGetters($!correctGetters)
+        #set ( $firstcap=$tbl.JavaName )
+
+        #if ($useManagers && $tbl.PrimaryKey.size() > 0)
+          #set ($interfaceName = $tbl.JavaName)
+          #if ($tbl.Interface)
+            #set($lastdotpos = $tbl.Interface.lastIndexOf('.'))
+            #if($lastdotpos != -1)
+              #set ($lastdotpos = $lastdotpos + 1)
+              #set ($interfaceName = $tbl.Interface.substring($lastdotpos))
+            #else
+              #set ($interfaceName = $tbl.Interface)
+            #end
+          #end
+
+          #set ( $fname = "${interfaceName}Manager.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageManager)}$fname" )
+          #if (!$files.file($basePath,$path).exists())
+            $generator.parse("om/ExtensionManager.vm",$path,"table",$tbl)
+          #end
+        #end
+
+        #set ( $fname = "${firstcap}.java" )
+        #set ( $path = "${strings.getPackageAsPath($packageObject)}$fname" )
+        #if (!$files.file($basePath,$path).exists())
+          $generator.parse("om/ExtensionObject.vm",$path,"table",$tbl)
+        #end
+
+        #set ( $fname = "${firstcap}Peer.java" )
+        #set ( $path = "${strings.getPackageAsPath($packagePeer)}$fname" )
+        #if (!$files.file($basePath,$path).exists())
+          $generator.parse("om/ExtensionPeer.vm",$path,"table",$tbl)
+        #end
+
+        #if ($tbl.Interface && $tbl.Interface.indexOf('.') == -1)
+          #set ( $fname = "${tbl.Interface}.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageObject)}$fname" )
+          #if (!$files.file($basePath,$path).exists())
+            $generator.parse("om/Interface.vm",$path,"table",$tbl)
+          #end
+        #end
+
+        #if ($generateBeans)
+          #set ( $fname = "${firstcap}${beanSuffix}.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageBean)}$fname" )
+          #if (!$files.file($basePath,$path).exists())
+            $generator.parse("om/bean/ExtensionBean.vm",$path,"table",$tbl)
+          #end
+        #end
+
+        #if ($tbl.ChildrenColumn)
+          #set ($col = $tbl.ChildrenColumn)
+          #if ($col.isEnumeratedClasses())
+            #foreach ($child in $col.Children)
+              #set ( $fname = "${child.ClassName}.java" )
+              #set ( $path = "${strings.getPackageAsPath($packageObject)}$fname" )
+              #if (!$files.file($basePath,$path).exists())
+                $generator.parse("om/MultiExtendObject.vm",$path,"child",$child)
+              #end
+
+              #if ($generateBeans)
+                #set ( $fname = "${child.ClassName}${beanSuffix}.java" )
+                #set ( $path = "${strings.getPackageAsPath($packageBean)}$fname" )
+                #if (!$files.file($basePath,$path).exists())
+                  $generator.parse("om/bean/MultiExtendBean.vm",$path,"child",$child)
+                #end
+              #end
+            #end
+          #end
+        #end
+      #end
+    #end
+#end

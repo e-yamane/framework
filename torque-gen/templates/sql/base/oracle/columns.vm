@@ -1,0 +1,32 @@
+#foreach ($col in $table.Columns)
+#if($table.database.getTable($col.torqueType))
+#set ( $columnPrefix = "$!{columnPrefix}${col.Name}_" )
+#set ( $tableNamePrefix = "$!{tableNamePrefix}${table.name}," )
+#set ( $cols = $generator.parse("$basepath/columns.vm", "", "table", $table.database.getTable($col.torqueType)))
+#set ( $currentTableName = $tableNamePrefix.substring(0, $tableNamePrefix.lastIndexOf(',')))
+#set ( $tableNameIndex = $currentTableName.lastIndexOf(',') + 1)
+#set ( $currentTableName = $currentTableName.substring($tableNameIndex))
+#set ( $table = $table.database.getTable($currentTableName))
+#set ( $tableNamePrefix = $tableNamePrefix.replaceAll("${currentTableName},", "") )
+#set ( $columnPrefix = $columnPrefix.replaceAll("${col.Name}_$", "") )
+  ${cols}#else
+#if(!$col.skipColumn)
+#set ( $type = $dbprops.get($col.Type) )
+#if($type.indexOf('(')==-1)
+#set ( $size = $col.printSize() )
+#else
+#set ( $size = "" )
+#end
+#set ( $default = $col.DefaultSetting )
+#set ( $nullString = $strings.select($col.isNotNull(), $dbprops.get("NOTNULL"),"") )
+#set ( $entry = "$!{columnPrefix}$col.Name $type $size $default $nullString," )
+  $strings.sub($strings.collapseSpaces($entry)," ,",",")
+#end
+#end
+#end
+#if($table.database.isTableByJavaName("$table.baseClass"))
+#set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
+#if($foreignTable)
+#if($foreignTable.isSkipSqlOrg())
+##外部テーブル展開
+$generator.parse("$basepath/columns.vm", "", "table", $foreignTable)#end#end#end

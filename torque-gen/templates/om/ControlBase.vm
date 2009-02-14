@@ -1,0 +1,211 @@
+## Licensed to the Apache Software Foundation (ASF) under one
+## or more contributor license agreements.  See the NOTICE file
+## distributed with this work for additional information
+## regarding copyright ownership.  The ASF licenses this file
+## to you under the Apache License, Version 2.0 (the
+## "License"); you may not use this file except in compliance
+## with the License.  You may obtain a copy of the License at
+##
+##   http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing,
+## software distributed under the License is distributed on an
+## "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+## KIND, either express or implied.  See the License for the
+## specific language governing permissions and limitations
+## under the License.
+#set ($basePath = $generator.OutputPath)
+
+targetdatabase = $targetDatabase
+
+correctGetters = $!correctGetters
+
+#set ( $mapDBNames = [] )       ## Collect unique DB names across all external-schemas
+#set ( $mapDatabases = [] )     ## Collect the first database object across all external-schemas
+#set ( $mapDBMapBuilders = [] ) ## Collect all table map builders across all external-schemas
+
+#foreach ($database in $dataModels)
+
+    #if ($database.Package)
+      #set ($package = $database.Package)
+    #else
+      #set ($package = $targetPackage)
+    #end
+
+    #if ($subpackagePeer)
+      #set ($packagePeer = "${package}.${subpackagePeer}")
+    #else
+      #set ($packagePeer = "${package}")
+    #end
+
+    #if ($subpackageObject)
+      #set ($packageObject = "${package}.${subpackageObject}")
+    #else
+      #set ($packageObject = "${package}")
+    #end
+
+    #if ($subpackageMap)
+      #set ($packageMap = "${package}.${subpackageMap}")
+    #else
+      #set ($packageMap = "${package}")
+    #end
+
+    #if ($subpackageManager)
+      #set ($packageManager = "${package}.${subpackageManager}")
+    #else
+      #set ($packageManager = "${package}")
+    #end
+
+    #if ($subpackageBean)
+      #set ($packageBean = "${package}.${subpackageBean}")
+    #else
+      #set ($packageBean = "${package}")
+    #end
+
+    #if ($subpackageBase)
+      #set ($packageBasePeer = "${package}.${subpackageBase}")
+      #set ($packageBaseObject = "${package}.${subpackageBase}")
+      #set ($packageBaseManager = "${package}.${subpackageBase}")
+    #else
+      #set ($packageBasePeer = "${package}")
+      #set ($packageBaseObject = "${package}")
+      #set ($packageBaseManager = "${package}")
+    #end
+
+    #if ($subpackageBaseBean)
+      #set ($packageBaseBean = "${package}.${subpackageBaseBean}")
+    #else
+      #set ($packageBaseBean = "${package}")
+    #end
+
+    BasePeers generated in package $packageBasePeer
+    BaseObjects generated in package $packageBaseObject
+    BaseManagers generated in package $packageBaseManager
+    BaseBeans generated in package $packageBaseBean
+    Maps generated in package $packageMap
+
+    #set ( $path = $strings.getPackageAsPath($packageBasePeer) )
+    $files.mkdir("$outputDirectory/$path")
+
+    #set ( $path = $strings.getPackageAsPath($packageBaseObject) )
+    $files.mkdir("$outputDirectory/$path")
+
+    #set ( $path = $strings.getPackageAsPath($packageMap) )
+    $files.mkdir("$outputDirectory/$path")
+
+    #if ($useManagers)
+      #set ( $path = $strings.getPackageAsPath($packageBaseManager) )
+      $files.mkdir("$outputDirectory/$path")
+    #end
+
+    #if ($generateBeans)
+      #set ( $path = $strings.getPackageAsPath($packageBaseBean) )
+      $files.mkdir("$outputDirectory/$path")
+    #end
+
+	#if ( !$mapDBNames.contains( $database.Name ) )
+## Adding new database entry for $database.Name	
+	  #set ( $retVal = $mapDBNames.add( $database.Name ) )
+	  #set ( $retVal = $mapDatabases.add( $database ) )
+	  #set ( $builderArray = [] ) 
+	  #set ( $retVal = $mapDBMapBuilders.add( $builderArray ) )
+	#else
+## Using existing database entry for $database.Name
+	  #set ( $dbIndex = $mapDBinfo.indexOf( $database.Name ) )
+	  #set ( $builderArray = $mapDBMapBuilders.get( $dbIndex ) )
+	#end
+	
+	#foreach ($tbl in $database.Tables)
+	  #if ( !$tbl.isAlias() && !$tbl.isForReferenceOnly() )
+## Adding new table Peer = "${packagePeer}.${tbl.JavaName}Peer"
+	    #set ($retVar = $builderArray.add("${packagePeer}.${tbl.JavaName}Peer") )
+	  #end
+	#end
+
+    #foreach ($tbl in $database.Tables)
+      #if (!$tbl.isForReferenceOnly())
+        $tbl.Name
+
+        $!tbl.setCorrectGetters($!correctGetters)
+        #set ( $firstcap=$tbl.JavaName )
+
+        #set ( $fname = "$basePrefix${firstcap}Peer.java" )
+        #set ( $path = "${strings.getPackageAsPath($packageBasePeer)}$fname" )
+        $generator.parse("om/Peer.vm",$path,"table",$tbl)
+
+        #if (!$tbl.isAlias())
+          #set ( $fname = "${firstcap}MapBuilder.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageMap)}$fname" )
+          $generator.parse("om/MapBuilder.vm",$path,"table",$tbl)
+        #end
+
+        #if ($useManagers && $tbl.PrimaryKey.size() > 0)
+          #set ($interfaceName = $tbl.JavaName)
+          #if ($tbl.Interface)
+            #set($lastdotpos = $tbl.Interface.lastIndexOf('.'))
+            #if($lastdotpos != -1)
+              #set ($lastdotpos = $lastdotpos + 1)
+              #set ($interfaceName = $tbl.Interface.substring($lastdotpos))
+            #else
+              #set ($interfaceName = $tbl.Interface)
+            #end
+          #end
+
+          #set ( $fname = "${basePrefix}${interfaceName}Manager.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageBaseManager)}$fname" )
+          $generator.parse("om/BaseManager.vm",$path,"table",$tbl)
+        #end
+
+        #if ($useManagers)
+          #set ( $fname = "${basePrefix}${firstcap}.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageBaseObject)}$fname" )
+          $generator.parse("om/ObjectWithManager.vm",$path,"table",$tbl)
+        #else
+          #set ( $fname = "${basePrefix}${firstcap}.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageBaseObject)}$fname" )
+          $generator.parse("om/Object.vm",$path,"table",$tbl)
+        #end
+
+        #if ($generateBeans)
+          #set ( $fname = "${basePrefix}${firstcap}${beanSuffix}.java" )
+          #set ( $path = "${strings.getPackageAsPath($packageBaseBean)}$fname" )
+          $generator.parse("om/bean/Bean.vm",$path,"table",$tbl)
+        #end
+
+      #end
+    #end
+#end
+
+#foreach ( $dbName in $mapDBNames )
+	#set ( $dbIndex = $mapDBNames.indexOf( $dbName ) )
+	#set ( $peerNames = $mapDBMapBuilders.get( $dbIndex ) )
+	#set ( $database = $mapDatabases.get( $dbIndex ) )
+
+    #if ($database.Package)
+      #set ($package = $database.Package)
+    #else
+      #set ($package = $targetPackage)
+    #end
+
+    #if ($subpackageMap)
+      #set ($packageMap = "${package}.${subpackageMap}")
+    #else
+      #set ($packageMap = "${package}")
+    #end
+
+    #set ( $fname = "${database.JavaName}MapInit.java" )
+    #set ( $path = "${strings.getPackageAsPath($packageMap)}$fname" )
+    $generator.parse("om/DatabaseMapInit.vm", $path, "database", $database)
+
+## Hard coded linkage package that must match one used by runtime DatabaseMap.initialize()
+	#set ( $packageLinkage = "org.apache.torque.linkage" );
+	#set ( $path = $strings.getPackageAsPath($packageLinkage) )
+    $files.mkdir("$outputDirectory/$path")
+	
+    #set ( $fname = "${database.StandardJavaName}MapInit.java" )
+    #set ( $path = "$strings.getPackageAsPath($packageLinkage)$fname" )
+    #if (!$files.file($basePath,$path).exists())
+      $generator.parse("om/DatabaseMapInitLinkageObject.vm", $path, "database", $database)
+    #end
+
+#end

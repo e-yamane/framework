@@ -1,0 +1,36 @@
+## Licensed to the Apache Software Foundation (ASF) under one
+## or more contributor license agreements.  See the NOTICE file
+## distributed with this work for additional information
+## regarding copyright ownership.  The ASF licenses this file
+## to you under the Apache License, Version 2.0 (the
+## "License"); you may not use this file except in compliance
+## with the License.  You may obtain a copy of the License at
+##
+##   http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing,
+## software distributed under the License is distributed on an
+## "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+## KIND, either express or implied.  See the License for the
+## specific language governing permissions and limitations
+## under the License.
+
+-----------------------------------------------------------------------------
+-- $table.Name
+-----------------------------------------------------------------------------
+$generator.parse("$basepath/drop.vm", "", "table", $tbl)
+CREATE TABLE $table.Name
+(
+#set ( $cols = $generator.parse("$basepath/columns.vm", "", "table", $tbl) )
+#set ( $pk = $generator.parse("$basepath/primarykey.vm", "", "table", $tbl) )
+## set ( $fk = $generator.parse("$basepath/foreignkey.vm", "", "table", $tbl) )
+#set ( $unique = $generator.parse("$basepath/unique.vm", "", "table", $tbl) )
+#set ( $index = $generator.parse("$basepath/index.vm", "", "table", $tbl) )
+#if($strings.allEmpty([$pk,$fk,$unique]))$strings.chop($cols,2)#else$cols#end
+#if($strings.allEmpty([$fk,$unique]) && $pk.length()>0)$strings.chop($pk,2)#else$pk#end
+## if($strings.allEmpty([$unique,$index]) && $fk.length() >0)$strings.chop($fk,2)#else$fk#end
+#if($unique.length()>0)$strings.chop($unique,2)#else$unique#end
+
+);
+
+#if($index.length() > 0)$strings.chop($index,1)#end

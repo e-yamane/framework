@@ -178,7 +178,6 @@
   <target name="sql-classpath" if="torque.internal.useClasspath">
     <echo message="loading templates from classpath"/>
     <torque-sql
-      basePathToDbProps="sql/base/"
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.sql}"
       idTableXMLFile="${torque.idTableXMLFile}"
@@ -197,7 +196,6 @@
   <target name="sql-template" unless="torque.internal.useClasspath">
     <echo message="loading templates from ${torque.templatePath}"/>
     <torque-sql
-      basePathToDbProps="sql/base/"
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.sql}"
       idTableXMLFile="${torque.idTableXMLFile}"
@@ -541,9 +539,27 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-    <antcall target="om-classpath"/>
+    <antcall target="hibernate-classpath"/>
     <antcall target="hibernate-template"/>
     <!-- antcall target="zip-base-om"/ -->
+  </target>
+
+  <target name="hibernate-classpath" if="torque.internal.useClasspath">
+    <torque-data-model
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="hibernate/Control.vm"
+      outputDirectory="${torque.java.dir}"
+      outputFile="report.${torque.project}.om.generation"
+      targetDatabase="${torque.database}"
+      targetPackage="${torque.targetPackage}"
+      useClasspath="${torque.useClasspath}"
+      inputEncoding="Shift_JIS"
+      outputEncoding="Shift_JIS">
+      <fileset dir="${torque.schema.dir}"
+        includes="${torque.schema.om.includes}"
+        excludes="${torque.schema.om.excludes}"
+      />
+    </torque-data-model>
   </target>
 
   <target name="hibernate-template" unless="torque.internal.useClasspath">
@@ -577,8 +593,26 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-    <antcall target="om-classpath"/>
+    <antcall target="schema-properties-classpath"/>
     <antcall target="schema-properties-template"/>
+  </target>
+
+  <target name="schema-properties-classpath" if="torque.internal.useClasspath">
+    <torque-data-model
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="hibernate/Control.vm"
+      outputDirectory="${torque.java.dir}"
+      outputFile="report.${torque.project}.om.generation"
+      targetDatabase="${torque.database}"
+      targetPackage="${torque.targetPackage}"
+      useClasspath="${torque.useClasspath}"
+      inputEncoding="Shift_JIS"
+      outputEncoding="Shift_JIS">
+      <fileset dir="${torque.schema.dir}"
+        includes="${torque.schema.om.includes}"
+        excludes="${torque.schema.om.excludes}"
+      />
+    </torque-data-model>
   </target>
 
   <target name="schema-properties-template" unless="torque.internal.useClasspath">

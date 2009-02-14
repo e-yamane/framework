@@ -1,0 +1,14 @@
+#set ($length = $baseTable.name.length())
+#if ($length > 27)#set ($length=27)#end
+#if ($table.hasPrimaryKey())
+ALTER TABLE $baseTable.name
+    ADD CONSTRAINT ${baseTable.name.substring(0,$length)}_PK
+PRIMARY KEY ($table.printPrimaryKey());
+#else
+#if($table.database.isTableByJavaName("$table.baseClass"))
+#set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
+#if($foreignTable)
+#if($foreignTable.isSkipSqlOrg() && $foreignTable.isAbstract())
+##外部テーブル展開
+$generator.parse("$basepath/primarykey.vm", "", "table", $foreignTable)#end#end#end
+#end

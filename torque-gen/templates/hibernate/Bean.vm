@@ -1,0 +1,54 @@
+package ${package};
+
+#set ($abstract = "")
+#if($table.description && $table.description.trim() != "")
+#set ($description = $table.description)
+#else
+#set ($description = $table.Name.toUpperCase())
+#end
+/**
+ * $descriptionのHibernateマッピングクラス
+#*
+#if(!$tbl.isSkipSql())
+    #if($table.baseClass == "BaseObject")
+         * @hibernate.class
+         *    table="$table.Name.toUpperCase()"
+    #else
+        #set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
+        #if(!$foreignTable)
+             * @hibernate.class
+             *    table="$table.Name.toUpperCase()"
+        #else
+            #if($foreignTable.isSkipSql())
+                 * @hibernate.class
+                 *    table="$table.Name.toUpperCase()"
+            #else
+                 * @hibernate.joined-subclass
+                 *    table="$table.Name.toUpperCase()"
+                 * @hibernate.joined-subclass-key
+                #foreach($fk in $table.foreignKeys)
+                    #if($fk.foreignTableName.toUpperCase() == $foreignTable.name.toUpperCase())
+                        #foreach($fkc in $fk.localColumns)
+                             *    column="$fkc.toUpperCase()"
+                        #end
+                    #end
+                #end
+            #end
+        #end
+    #end
+#end
+*###
+#if ($table.ChildrenColumn)
+## *  @hibernate.discriminator
+## *    column="$table.ChildrenColumn.name.toUpperCase()"    
+#set($abstract = "abstract ")
+#else
+#set($abstract = "")
+#end
+#if ($table.isAbstract())
+#set($abstract = "abstract ")
+#end
+**/
+${abstract}public class ${table.JavaName}$!{table.baseSignature} extends ${package}.base.$basePrefix${table.JavaName} {
+    private static final long serialVersionUID = 1L;
+}
