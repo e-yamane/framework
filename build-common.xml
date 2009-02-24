@@ -580,7 +580,7 @@
   </target>
 
   <target name="copyRealResources">
-    <copy todir="${resource.dest.dir}">
+    <copy todir="${resource.dest.dir}" overwrite="true">
       <fileset dir="${src.dir}">
         <exclude name="**/_svn/**" />
         <exclude name="**/.svn/**" />
@@ -594,11 +594,11 @@
     </copy>
   </target>
 
-  <target name="copyAllResources">
+  <target name="copyAllResources" >
     <antcall target="copyRealResources">
       <param name="resource.dest.dir" value="${resource.dest.dir}" />
     </antcall>
-    <copy todir="${resource.dest.dir}">
+    <copy todir="${resource.dest.dir}" overwrite="true">
       <fileset dir="${test.src.dir}">
         <exclude name="**/_svn/**" />
         <exclude name="**/.svn/**" />
