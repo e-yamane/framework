@@ -215,7 +215,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #if ($colPK.size != "")
      *    length="$colPK.size"
 #end
-#if($colPK.autoIncrement)
+#if($colPK.autoIncrement || $colPK.domain.name == 'optimistickLockKey')
      * @hibernate.version
 #end
      * @return $description
@@ -223,7 +223,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #if("BOOLEANCHAR" == $col.torqueType)
 ## トレサオリジナル
 #if($table.JavaName != "BasicInformation" && $table.JavaName != "LogicalDeleteEntity")
-#if(!$colPK.autoIncrement)
+#if(!($colPK.autoIncrement || $colPK.domain.name == 'optimistickLockKey'))
     @${frameworkPrefix}.commons.service.annotation.MaxLength(length=1, property="${table.JavaName}.${cfcPK}")
     @${frameworkPrefix}.commons.service.annotation.NotNull(property="${table.JavaName}.${cfcPK}")
 #end
@@ -252,7 +252,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 ## トレサオリジナル
 ## トレサオリジナル
 #if($table.JavaName != "BasicInformation" && $table.JavaName != "LogicalDeleteEntity")
-#if(!$colPK.autoIncrement)
+#if(!($colPK.autoIncrement || $colPK.domain.name == 'optimistickLockKey'))
     @${frameworkPrefix}.commons.service.annotation.NotNull(property="${table.JavaName}.${cfcPK}")
 #end
 #end
@@ -417,7 +417,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 
     /**
      * $descriptionを取得する
-#if ($col.autoIncrement)
+#if($col.autoIncrement || $col.domain.name == 'optimistickLockKey')
      * @hibernate.version
      *    column="$col.name.toUpperCase()"
 #else
@@ -435,7 +435,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #if("BOOLEANCHAR" == $col.torqueType)
 ## トレサオリジナル
 #if($table.JavaName != "BasicInformation" && $table.JavaName != "LogicalDeleteEntity")
-#if (!$col.autoIncrement)
+#if(!($col.autoIncrement || $col.domain.name == 'optimistickLockKey'))
     @${frameworkPrefix}.commons.service.annotation.MaxLength(length=1, property="${table.JavaName}.${clo}")
     @${frameworkPrefix}.commons.service.annotation.NotNull(property="${table.JavaName}.${clo}")
 #end
@@ -464,7 +464,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #elseif("BOOLEANINT" == $col.torqueType)
 ## トレサオリジナル
 #if($table.JavaName != "BasicInformation" && $table.JavaName != "LogicalDeleteEntity")
-#if(!$col.autoIncrement)
+#if(!($col.autoIncrement || $col.domain.name == 'optimistickLockKey'))
     @${frameworkPrefix}.commons.service.annotation.NotNull(property="${table.JavaName}.${clo}")
 #end
 #end
@@ -491,7 +491,7 @@ $generator.parse("hibernate/PK.vm", $path,"table",$table)
 #else 
 ## トレサオリジナル
 #if($table.JavaName != "BasicInformation" && $table.JavaName != "LogicalDeleteEntity")
-#if(!$col.autoIncrement)
+#if(!($col.autoIncrement || $col.domain.name == 'optimistickLockKey'))
 #if($col.textType)
 #if($col.size)
     @${frameworkPrefix}.commons.service.annotation.MaxLength(length=${col.size}, property="${table.JavaName}.${clo}")

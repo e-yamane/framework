@@ -22,10 +22,12 @@ DTDは、
       その４．
       　sizeが指定されている文字列系のカラムについては自動的にサイズチェックが付与される
   -->
+  <domain name="oid"                type="BIGINT" description="オブジェクトID" />
+  <domain name="optimistickLockKey" type="BIGINT" description="楽観的ロッキングキー" />
 
   <table name="AMOUNT"  description="量" baseClass="java.lang.Number" skipSql="true">
     <!-- 単位無しを見越してUNIT_IDはnull許可 -->
-    <column name="UNIT_ID"                        required="false"  type="BIGINT"               description="数量尺度ID" />
+    <column name="UNIT_ID"                        required="false"  domain="oid"                description="数量尺度ID" />
     <column name="Q"  javaName="quantity"         required="true"   type="SCALABLE_NUMBER"      description="量" />
     <foreign-key foreignTable="UNIT" name="unit" onUpdate="restrict" onDelete="restrict">
       <reference local="UNIT_ID" foreign="ID" />
@@ -33,13 +35,13 @@ DTDは、
   </table>
 
   <table name="UNIT" description="数量尺度">
-    <column name="ID"           primaryKey="true" required="true"   type="BIGINT"               description="OID" />
+    <column name="ID"           primaryKey="true" required="true"   domain="oid"                description="OID" />
     <column name="NAME"                           required="true"   type="VARCHAR"  size="32"   description="数量尺度名" />
     <column name="DESCRIPTION"                    required="false"  type="VARCHAR"  size="64"   description="単位説明" />
     <column name="BASE_UNIT_ID"                   required="true"   type="BIGINT"               description="ベース数量尺度" />
     <column name="RATE"                           required="true"   type="SCALABLE_NUMBER"      description="変換係数" />
     <column name="SCALE"                          required="true"   type="INTEGER"              description="変換時に保持する少数精度。負数を指定すると整数の切捨て判断する" />
-    <column name="VERSION"  autoIncrement="true"  required="true"   type="BIGINT"               description="楽観的ロッキングキー" />
+    <column name="VERSION"                        required="true"   domain="optimistickLockKey" description="楽観的ロッキングキー" />
     <foreign-key foreignTable="UNIT" name="base" onUpdate="restrict" onDelete="restrict">
       <reference local="BASE_UNIT_ID" foreign="ID" />
     </foreign-key>

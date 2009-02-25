@@ -16,7 +16,6 @@
             name="id"
             column="ID"
             type="java.lang.Long"
-            length="20"
         >
             <generator class="assigned">
               <!--  

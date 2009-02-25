@@ -29,7 +29,6 @@ public abstract class BaseUnit  implements Serializable {
      *    generator-class="assigned"
      *    column="ID"
      *    not-null="true"
-     *    length="20"
      * @return OID
     **/
 

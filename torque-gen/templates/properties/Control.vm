@@ -10,5 +10,9 @@ ${baseTable.javaName}.${col.uncapitalisedJavaName}InDB=${col.description}
 ${baseTable.javaName}.${col.uncapitalisedJavaName}InDB=${col.description}
 #end
 #end
+#foreach ($fk in $tbl.ForeignKeys)
+#set ( $tblFK = $tbl.database.getTable($fk.foreignTableName) )
+${baseTable.javaName}.$fk.name=$tblFK.description
+#end
 #end
 #end
