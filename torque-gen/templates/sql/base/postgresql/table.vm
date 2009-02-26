@@ -19,3 +19,7 @@ CREATE TABLE $table.Name
 );
 #if($index.length() > 0)$strings.chop($index,1)#end
 
+#if ($table.description.length() > 0)
+COMMENT ON TABLE $table.Name IS '$table.description';
+#end
+$generator.parse("$basepath/comment.vm", "", "table", $tbl)

@@ -19,3 +19,8 @@ CREATE TABLE $table.Name
 
 #set ( $sequence = $generator.parse("$basepath/sequence.vm", "", "table", $tbl) )
 #if ($sequence.length()>0)$sequence#end
+
+#if ($table.description.length() > 0)
+COMMENT ON TABLE $table.Name IS '$table.description';
+#end
+$generator.parse("$basepath/comment.vm", "", "table", $tbl)
