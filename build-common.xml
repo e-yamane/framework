@@ -105,6 +105,7 @@
   </path>
 
   <path id="classpath.all">
+    <path refid="framework.path" />
     <pathelement location="${classes.dir}" />
     <path refid="classpath.real"/>
     <fileset dir="${other.lib.dir}">
@@ -517,9 +518,6 @@
         <fileset dir="${test.src.dir}">
           <include name="${junit.src.pattern}" />
         </fileset>
-        <fileset dir="${test.aspect.src.dir}">
-          <include name="${junit.src.pattern}" />
-        </fileset>
       </batchtest>
     </junit>
     <tstamp>
@@ -594,7 +592,7 @@
     </copy>
   </target>
 
-  <target name="copyAllResources" >
+  <target name="copyAllResources">
     <antcall target="copyRealResources">
       <param name="resource.dest.dir" value="${resource.dest.dir}" />
     </antcall>
