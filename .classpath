@@ -16,7 +16,6 @@
 	<classpathentry kind="lib" path="libs/velocity/velocity-tools-1.3.jar"/>
 	<classpathentry kind="lib" path="libs/asm/asm-2.2.1.jar"/>
 	<classpathentry kind="lib" path="libs/cglib/cglib-2.1.3.jar"/>
-	<classpathentry kind="lib" path="libs/aopaliance/aopalliance.jar"/>
 	<classpathentry kind="lib" path="libs/spring/spring-aop.jar"/>
 	<classpathentry kind="lib" path="libs/spring/spring-core.jar"/>
 	<classpathentry kind="lib" path="libs/javamail/mail.jar"/>
@@ -45,6 +44,7 @@
 	<classpathentry kind="lib" path="libs/mule/mule-core-2.1.1.jar"/>
 	<classpathentry kind="lib" path="libs/mule/mule-module-client-2.1.1.jar"/>
 	<classpathentry kind="lib" path="libs/hibernate/c3p0-0.9.1.jar"/>
+	<classpathentry kind="lib" path="libs/aopalliance/aopalliance.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
