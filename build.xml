@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="Shift_JIS"?>
 
 <project name="Framework" basedir="." default="dummy">
-  <import file="../framework/build-common.xml" />
+  <property name="lib.dir"                    value="./libs" />
+  <property name="other.lib.dir"              value="${lib.dir}" />
+  <property name="copy.cobertura.target.name" value="copyCoberturaTargetClasses" />
 
   <import file="../framework/build-common.xml" />
+
+  <target name="copyCoberturaTargetClasses">
+    <copy todir="${test.classes.dir}_tmp">
+      <fileset dir="${test.classes.dir}">
+        <include name="**/*.class" />
+        <exclude name="**/*Test.class" />
+        <exclude name="**/Resetter.class" />
+        <exclude name="**/base/*.class" />
+      </fileset>
+    </copy>
+  </target>
+
   <target name="makeOkumuraConfig" description="奥村開発環境用のbeans.xmlを作成する">
     <property name="filtering.filename" value="${conf.dir}/filtering.okumura.properties" />
     <antcall target="makeConfig" />

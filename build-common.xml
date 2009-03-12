@@ -7,8 +7,6 @@
   <property name="release.dir"            value="release" />
   <property name="framework.root"         value="${my.build.dir}/../framework" />
   <property name="src.dir"                value="${my.build.dir}/src/java" />
-  <property name="framework.src.dir"      value="${my.build.dir}/src/framework" />
-  <property name="rule.dir"               value="${my.build.dir}/src/rule" />
   <property name="web.root.dir"           value="${my.build.dir}/webapp" />
   <property name="lib.dir"                value="${web.root.dir}/WEB-INF/lib" />
   <property name="classes.dir"            value="${web.root.dir}/WEB-INF/classes" />
@@ -51,6 +49,7 @@
   <property name="compile.debug" value="on"/>
   <property name="compile.optimize" value="off"/>
   <property name="compile.deprecation" value="off"/>
+  <property name="compile.java.version" value="1.6" />
 
   <!-- ライブラリ取得先 -->
   <property name="lib.publisher" value="http://www.ibiblio.org/maven" />
@@ -74,6 +73,10 @@
   </path>
 -->
 
+  <path id="test.src.path.default">
+    <pathelement location="${src.dir}" />
+    <pathelement location="${test.src.dir}" />
+  </path>
   <!-- servletAPIのバージョンで異なる -->
   <path id="servletapi.path">
     <fileset dir="${other.lib.dir}">
@@ -120,6 +123,27 @@
     </fileset>
     <path refid="framework.path"/>
   </path>
+
+  <macrodef name="findBaseAntFile">
+    <sequential>
+      <script language="javascript">
+          <![CDATA[
+            var map = project.getProperties();
+            var antFile = map.get("ant.file");
+            var ite = map.entrySet().iterator();
+            while(ite.hasNext()) {
+              var entry = ite.next();
+              if(entry.getKey().startsWith("ant.file.") && !entry.getKey().equals("ant.file.common-project")) {
+                antFile = entry.getValue();
+                break;
+              }
+            }
+            project.setProperty("baseAntFile", antFile);
+          ]]>
+      </script>
+      <echo message="${baseAntFile}" />
+    </sequential>
+  </macrodef>
 
   <target name="init-task">
     <taskdef name="propertyChecker" classpathref="framework.path"
@@ -304,23 +328,21 @@
       <param name="build.file"  value="${basedir}/build.xml" />
       <param name="exec.target" value="hibernatedoclet" />
     </antcall>
-    <script language="javascript">
-        <![CDATA[
-          var map = project.getProperties();
-          var antFile = map.get("ant.file");
-          var ite = map.entrySet().iterator();
-          while(ite.hasNext()) {
-            var entry = ite.next();
-            if(entry.getKey().startsWith("ant.file.") && !entry.getKey().equals("ant.file.common-project")) {
-              antFile = entry.getValue();
-              break;
-            }
-          }
-          project.setProperty("antFile", antFile);
-        ]]>
-    </script>
-    <ant antfile="${antFile}" target="makeConfig" />
+    <echo message="${filtering.filename}" />
+    <antcall target="refreshPropertiesWithConfig" />
+    <antcall target="refreshPropertiesWithoutConfig" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
+  </target>
+
+  <target name="refreshPropertiesWithConfig" if="filtering.filename">
+    <findBaseAntFile />
+    <ant antfile="${baseAntFile}" target="makeConfig">
+      <property name="filtering.filename" value="${filtering.filename}" />
+    </ant>
+  </target>
+  <target name="refreshPropertiesWithoutConfig" unless="filtering.filename">
+    <findBaseAntFile />
+    <ant antfile="${baseAntFile}" target="makeConfig" />
   </target>
 
   <!-- JavaのソースコードからHibernateのマッピングファイルを作成する -->
@@ -431,7 +453,76 @@
     <antcall target="DB-clear-2" />
   </target>
 
+  <target name="doContinuousIntegration" description="継続的インテグレーションを行う">
+    <property name="filtering.filename" value="${conf.dir}/filtering.ci.properties" />
+    <antcall target="ci-preprocess" />
+    <antcall target="makeCIConfig" />
+    <antcall target="makeSchemaAccessor" />
+    <antcall target="DB-init" />
+    <antcall target="test" />
+  </target>
+
+  <target name="ci-preprocess" if="ci.preprocess.name">
+    <antcall target="${ci.preprocess.name}" />
+  </target>
+
+  <target name="makeCIConfig" unless="ci.skip.ei">
+    <antcall target="makeConfig" />
+  </target>
+
+  <target name="test.prepare">
+    <delete file="${cobertura.ser}" />
+    <mkdir dir="${test.work.dir}" />
+    <mkdir dir="${test.classes.dir}" />
+    <delete>
+      <fileset dir="${test.classes.dir}" includes="**/*" />
+    </delete>
+    <mkdir dir="${result.dir}" />
+    <delete>
+      <fileset dir="${result.dir}" includes="**/*" />
+    </delete>
+    <condition property="test.src.path.name" value="test.src.path.default">
+      <not>
+        <isreference refid="test.src.path" />
+      </not>
+    </condition>
+    <condition property="test.src.path.name" value="test.src.path">
+      <isreference refid="test.src.path" />
+    </condition>
+  </target>
   
+  <target name="test.compile" depends="test.prepare">
+    <echo message="${test.src.path.name}" />
+    <echo message="${lib.dir}" />
+    <antcall target="do.compile">
+      <param name="compile.src.roots"     value="${test.src.path.name}" />
+      <param name="compile.classpath"     value="classpath.all" />
+      <param name="compile.dest.dir"      value="${test.classes.dir}" />
+      <param name="copy.resource.target"  value="copyAllResources" />
+    </antcall>
+  </target>
+
+  <target name="do.compile" depends="initAspectJTask">
+    <iajc
+        destDir="${compile.dest.dir}"
+        deprecation="yes"
+        debug="true"
+        source="${compile.java.version}"
+        target="${compile.java.version}"
+        encoding="${src.encoding}"
+    >
+      <sourceroots>
+        <path refid="${compile.src.roots}"/>
+      </sourceroots>
+      <classpath>
+        <path refid="${compile.classpath}"/>
+      </classpath>
+    </iajc>
+    <antcall target="${copy.resource.target}">
+      <param name="resource.dest.dir" value="${compile.dest.dir}" />
+    </antcall>
+  </target>
+
   <target name="makeReleaseModule" description="リリースモジュールを作成する">
     <property file="./dairy-build.properties" />
     <antcall target="makeReleaseConfig" />
@@ -512,7 +603,7 @@
     </java>
   </target>
 
-  <target name="test" description="DJUnitでテストを実行する" depends="test.prepare, test.compile">
+  <target name="test" description="JUnit+coberturaでテストを実行する" depends="test.prepare, test.compile">
     <taskdef classpath="${other.lib.dir}/cobertura.jar" resource="tasks.properties">
       <classpath refid="classpath.all" />
     </taskdef>
@@ -520,24 +611,27 @@
     <delete>
       <fileset dir="${test.classes.dir}_tmp" includes="**/*"/>
     </delete>
-    <copy todir="${test.classes.dir}_tmp">
-      <fileset dir="${test.classes.dir}">
-        <include name="jp/rough_diamond/**/*.class" />
-        <exclude name="**/*Test.class" />
-        <exclude name="**/*Loader.class" />
-        <exclude name="**/*Resetter.class" />
-        <exclude name="**/framework/**/*.class" />
-        <exclude name="**/commons/**/*.class" />
-        <exclude name="**/base/*.class" />
-        <exclude name="**/velocity/**/*.class" />
-      </fileset>
-    </copy>
+    <antcall target="copyCoberturaTargetDefault" />
+    <antcall target="copyCoberturaTarget" />
     <cobertura-instrument todir="${test.classes.dir}">
       <fileset dir="${test.classes.dir}_tmp">
         <include name="**/*.class"/>
       </fileset>
     </cobertura-instrument>
     <antcall target="doJUnit" />
+  </target>
+
+  <target name="copyCoberturaTargetDefault" unless="copy.cobertura.target.name" >
+    <copy todir="${test.classes.dir}_tmp">
+      <fileset dir="${test.classes.dir}">
+        <include name="**/*.class" />
+        <exclude name="**/*Test.class" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="copyCoberturaTarget" if="copy.cobertura.target.name">
+    <antcall target="${copy.cobertura.target.name}" />
   </target>
 
   <target name="doJUnit">
@@ -570,6 +664,7 @@
     <cobertura-report srcdir="${src.dir}" sourceEncoding="Windows-31J" destdir="${test.root.dir}/${ts}/${coverage.dir}"/>
   </target>
 
+<!--
   <target name="test.prepare">
     <delete file="${cobertura.ser}" />
     <mkdir dir="${test.work.dir}" />
@@ -582,7 +677,9 @@
       <fileset dir="${result.dir}" includes="**/*" />
     </delete>
   </target>
+-->
 
+<!--
   <target name="test.compile" depends="test.prepare" >
     <antcall target="do.compile">
       <param name="compile.src.roots"     value="src.all" />
@@ -591,37 +688,11 @@
       <param name="copy.resource.target"  value="copyAllResources" />
     </antcall>
   </target>
-
-
-  <target name="do.compile" depends="initAspectJTask">
-    <iajc
-        destDir="${compile.dest.dir}"
-        deprecation="yes"
-        debug="true"
-        source="1.5"
-        target="1.5"
-        encoding="${src.encoding}"
-    >
-      <sourceroots>
-        <path refid="${compile.src.roots}"/>
-      </sourceroots>
-      <classpath>
-        <path refid="${compile.classpath}"/>
-      </classpath>
-    </iajc>
-    <antcall target="${copy.resource.target}">
-      <param name="resource.dest.dir" value="${compile.dest.dir}" />
-    </antcall>
-  </target>
+-->
 
   <target name="copyRealResources">
     <copy todir="${resource.dest.dir}" overwrite="true">
       <fileset dir="${src.dir}">
-        <exclude name="**/_svn/**" />
-        <exclude name="**/.svn/**" />
-        <exclude name="**/*.java" />
-      </fileset>
-      <fileset dir="${framework.src.dir}">
         <exclude name="**/_svn/**" />
         <exclude name="**/.svn/**" />
         <exclude name="**/*.java" />
@@ -658,9 +729,6 @@
           use="true"
           windowtitle="料金所サーバプロトタイプ">
       <packageset  dir="${src.dir}" defaultexcludes="yes">
-        <include name="jp/rough_diamond/**/*"/>
-      </packageset >
-      <packageset  dir="${framework.src.dir}" defaultexcludes="yes">
         <include name="jp/rough_diamond/**/*"/>
       </packageset >
       <classpath>

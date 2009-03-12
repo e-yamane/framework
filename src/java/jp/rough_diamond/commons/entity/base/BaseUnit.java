@@ -160,7 +160,6 @@ public abstract class BaseUnit  implements Serializable {
      * @hibernate.property
      *    column="SCALE"
      *    not-null="true"
-     *    length="10"
      * @return •ÏŠ·‚É•Û‚·‚é­”¸“xB•‰”‚ğw’è‚·‚é‚Æ®”‚ÌØÌ‚Ä”»’f‚·‚é
     **/
     @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.scale")
