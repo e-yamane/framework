@@ -146,6 +146,25 @@
     <antcall target="wsdl2java" />
   </target>
 
+  <target name="filter-check" unless="filtering.filename" >
+    <property name="tmpName" value="${user.name}" />
+    <property name="confDir" value="${conf.dir}" />
+    <script language="javascript">
+        <![CDATA[
+          project.setProperty("filtering.filename", confDir + "/filtering." + tmpName.replace("-", "_") + ".properties");
+        ]]>
+    </script>
+  </target>
+
+  <target name="filter-exists" if="filtering.filename" >
+    <available file="${filtering.filename}" property="filtering.filename.present" />
+    <antcall target="filter-nonexists-msg" />
+  </target>
+
+  <target name="filter-nonexists-msg" unless="filtering.filename.present" >
+    <echo message="${filtering.filename}が存在しません。" />
+  </target>
+
   <target name="getWSDL">
     <condition property="wsdl.dir" value="${my.build.dir}/etc/wsdl" >
       <not>
@@ -283,6 +302,22 @@
       <param name="build.file"  value="${basedir}/build.xml" />
       <param name="exec.target" value="hibernatedoclet" />
     </antcall>
+    <script language="javascript">
+        <![CDATA[
+          var map = project.getProperties();
+          var antFile = map.get("ant.file");
+          var ite = map.entrySet().iterator();
+          while(ite.hasNext()) {
+            var entry = ite.next();
+            if(entry.getKey().startsWith("ant.file.") && !entry.getKey().equals("ant.file.common-project")) {
+              antFile = entry.getValue();
+              break;
+            }
+          }
+          project.setProperty("antFile", antFile);
+        ]]>
+    </script>
+    <ant antfile="${antFile}" target="makeConfig" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 

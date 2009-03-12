@@ -2,10 +2,6 @@
 
 <project name="Framework" basedir="." default="dummy">
   <import file="../framework/build-common.xml" />
-  <target name="makeYamaneConfig" description="山根開発環境用のbeans.xmlを作成する">
-    <property name="filtering.filename" value="${conf.dir}/filtering.yamane.properties" />
-    <antcall target="makeConfig" />
-  </target>
 
   <import file="../framework/build-common.xml" />
   <target name="makeOkumuraConfig" description="奥村開発環境用のbeans.xmlを作成する">
@@ -20,9 +16,8 @@
   </target>
 -->
 
-  <target name="makeConfig" depends="init-task">
+  <target name="makeConfig" depends="init-task, filter-check, filter-exists" if="filtering.filename.present" description="EIを実行する">
     <antcall target="makeConfigBase" />
-
     <basename property="conf.target.name" file="${filtering.filename}" />
     <dirname property="conf.target.dir" file="${filtering.filename}" />
     <mkdir dir="${conf.dir}/tmp" />
