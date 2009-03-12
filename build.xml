@@ -4,8 +4,23 @@
   <property name="lib.dir"                    value="./libs" />
   <property name="other.lib.dir"              value="${lib.dir}" />
   <property name="copy.cobertura.target.name" value="copyCoberturaTargetClasses" />
+  <property name="classes.dir"                value="./bin" />
+  <property name="ci.preprocess.name"         value="compilePropertyChecker" />
 
   <import file="../framework/build-common.xml" />
+
+  <target name="compilePropertyChecker">
+    <mkdir dir="${classes.dir}" />
+    <delete>
+      <fileset dir="${classes.dir}" includes="**/*" />
+    </delete>
+    <antcall target="do.compile">
+      <param name="compile.src.roots"     value="test.src.path.default" />
+      <param name="compile.classpath"     value="classpath.all" />
+      <param name="compile.dest.dir"      value="${classes.dir}" />
+      <param name="copy.resource.target"  value="copyAllResources" />
+    </antcall>
+  </target>
 
   <target name="copyCoberturaTargetClasses">
     <copy todir="${test.classes.dir}_tmp">
