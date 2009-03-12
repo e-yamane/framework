@@ -149,6 +149,7 @@
   <target name="filter-check" unless="filtering.filename" >
     <property name="tmpName" value="${user.name}" />
     <property name="confDir" value="${conf.dir}" />
+    <echo message="tmpName" />
     <script language="javascript">
         <![CDATA[
           project.setProperty("filtering.filename", confDir + "/filtering." + tmpName.replace("-", "_") + ".properties");
