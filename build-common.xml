@@ -460,10 +460,15 @@
     <antcall target="makeSchemaAccessor" />
     <antcall target="DB-init" />
     <antcall target="test" />
+    <antcall target="ci-postprocess" />
   </target>
 
   <target name="ci-preprocess" if="ci.preprocess.name">
     <antcall target="${ci.preprocess.name}" />
+  </target>
+
+  <target name="ci-postprocess" if="ci.postprocess.name">
+    <antcall target="${ci.postprocess.name}" />
   </target>
 
   <target name="makeCIConfig" unless="ci.skip.ei">
@@ -662,6 +667,18 @@
       <report todir="${test.root.dir}/${ts}/${report.dir}" format="frames" /> 
     </junitreport>
     <cobertura-report srcdir="${src.dir}" sourceEncoding="Windows-31J" destdir="${test.root.dir}/${ts}/${coverage.dir}"/>
+    <mkdir dir="${test.root.dir}/leatest" />
+    <delete>
+      <fileset dir="${test.root.dir}/leatest" includes="**/*" />
+    </delete>
+    <mkdir dir="${test.root.dir}/leatest/junit" />
+    <copy todir="${test.root.dir}/leatest/junit">
+      <fileset dir="${test.root.dir}/${ts}/${report.dir}" includes="**/*" />
+    </copy>
+    <mkdir dir="${test.root.dir}/leatest/coverage" />
+    <copy todir="${test.root.dir}/leatest/coverage">
+      <fileset dir="${test.root.dir}/${ts}/${coverage.dir}" includes="**/*" />
+    </copy>
   </target>
 
 <!--

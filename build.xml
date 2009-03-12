@@ -9,7 +9,7 @@
 
   <import file="../framework/build-common.xml" />
 
-<!--
+  <!-- ‚±‚Á‚¿‚ðŽg‚¢‚½‚¢c -->
   <target name="compilePropertyChecker">
     <mkdir dir="${classes.dir}" />
     <delete>
@@ -22,7 +22,6 @@
       <param name="copy.resource.target"  value="copyAllResources" />
     </antcall>
   </target>
--->
 
   <target name="copyCoberturaTargetClasses">
     <copy todir="${test.classes.dir}_tmp">
