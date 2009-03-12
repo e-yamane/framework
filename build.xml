@@ -4,11 +4,12 @@
   <property name="lib.dir"                    value="./libs" />
   <property name="other.lib.dir"              value="${lib.dir}" />
   <property name="copy.cobertura.target.name" value="copyCoberturaTargetClasses" />
-  <property name="classes.dir"                value="./bin" />
-  <property name="ci.preprocess.name"         value="compilePropertyChecker" />
+  <property name="classes.dir"                value="./target/classes" />
+  <property name="ci.preprocess.name"         value="compile" />
 
   <import file="../framework/build-common.xml" />
 
+<!--
   <target name="compilePropertyChecker">
     <mkdir dir="${classes.dir}" />
     <delete>
@@ -21,6 +22,7 @@
       <param name="copy.resource.target"  value="copyAllResources" />
     </antcall>
   </target>
+-->
 
   <target name="copyCoberturaTargetClasses">
     <copy todir="${test.classes.dir}_tmp">
@@ -105,6 +107,7 @@
         target="1.6"
         destdir="./target/classes"
         debug="true"
+        encoding="${src.encoding}"
     >
       <src path="src/java" />
       <src path="src/testingFramework" />

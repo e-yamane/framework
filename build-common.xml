@@ -282,7 +282,7 @@
   <target name="execAnt">
     <echo message="${ant.home}" />
     <echo message="${basedir}" />
-    <exec executable="${sun.boot.library.path}/java">
+    <exec executable="${java.home}/bin/java">
       <arg value="-classpath" />
       <arg value="${java.class.path}" />
       <arg value="org.apache.tools.ant.launch.Launcher" />
