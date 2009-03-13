@@ -10,7 +10,7 @@
   <import file="../framework/build-common.xml" />
 
   <!-- ‚±‚Á‚¿‚ðŽg‚¢‚½‚¢c -->
-  <target name="compile">
+  <target name="compileReal">
     <echo message="${classes.dir}" />
     <echo message="${lib.dir}" />
     <mkdir dir="${classes.dir}" />
