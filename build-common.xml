@@ -73,8 +73,12 @@
   </path>
 -->
 
-  <path id="test.src.path.default">
+  <path id="real.src.path.default">
     <pathelement location="${src.dir}" />
+  </path>
+
+  <path id="test.src.path.default">
+    <path refid="real.src.path.default"/>
     <pathelement location="${test.src.dir}" />
   </path>
   <!-- servletAPI‚Ìƒo[ƒWƒ‡ƒ“‚ÅˆÙ‚È‚é -->
