@@ -5,12 +5,12 @@
   <property name="other.lib.dir"              value="${lib.dir}" />
   <property name="copy.cobertura.target.name" value="copyCoberturaTargetClasses" />
   <property name="classes.dir"                value="./target/classes" />
-  <property name="ci.preprocess.name"         value="compileReal" />
+  <property name="ci.preprocess.name"         value="compile" />
 
   <import file="../framework/build-common.xml" />
 
   <!-- こっちを使いたい… -->
-  <target name="compileReal">
+  <target name="compile">
     <echo message="${classes.dir}" />
     <echo message="${lib.dir}" />
     <mkdir dir="${classes.dir}" />
@@ -95,10 +95,45 @@
     </antcall>
   </target>
 
+<!--
   <target name="makeJar" depends="compileReal" description="Jarファイルを作成する">
     <jar destfile="${classes.dir}/../rd-framework.jar" basedir="${classes.dir}" excludes="net/**/*.class" />
     <copy file="${lib.dir}/cglib/cglib-2.1.3.jar" tofile="${classes.dir}/../cglib-2.1.3.jar" />
     <jar destfile="${classes.dir}/../cglib-2.1.3.jar" basedir="${classes.dir}" includes="net/**/*.class" update="true" />
+-->
+  <target name="makeJar" depends="compile" description="Jarファイルを作成する">
+    <jar destfile="./target/rd-framework.jar" basedir="./target/classes" excludes="net/**/*.class" />
+    <copy file="libs/cglib/cglib-2.1.3.jar" tofile="./target/cglib-2.1.3.jar" />
+    <jar destfile="./target/cglib-2.1.3.jar" basedir="./target/classes" includes="net/**/*.class" update="true" />
+  </target>
+
+  <target name="compile">
+    <mkdir dir="./target" />
+    <delete>
+      <fileset dir="./target" includes="**/*"/>
+    </delete>
+    <mkdir dir="./target/classes" />
+    <javac
+        srcdir="src/java"
+        source="1.6"
+        target="1.6"
+        destdir="./target/classes"
+        debug="true"
+        encoding="${src.encoding}"
+    >
+      <src path="src/java" />
+      <src path="src/testingFramework" />
+      <classpath>
+        <fileset dir="./libs">
+          <include name="**/*.jar" />
+        </fileset>
+      </classpath>
+    </javac>
+    <copy todir="./target/classes">
+      <fileset dir="src/java">
+        <include name="org/dbunit/ant/*.dtd" />
+      </fileset>
+    </copy>
   </target>
 
   <target name="dummy">
