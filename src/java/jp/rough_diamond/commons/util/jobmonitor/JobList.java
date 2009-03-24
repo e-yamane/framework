@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.commons.util.jobmonitor;
 
 import java.util.ArrayList;
@@ -5,7 +11,6 @@ import java.util.List;
 
 /**
  * •¡”‚ÌJob‚ğW‡‚µ‚½‚à‚Ì 
- * @author e-yamane
  */
 public class JobList implements Job {
 	private final List<Job> jobList;

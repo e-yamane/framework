@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.commons.util.codec;
 
 import java.util.HashMap;
@@ -12,8 +18,6 @@ import edu.emory.mathcs.backport.java.util.Collections;
 /**
  * ¶¬q‚Å“n‚³‚ê‚½Map‚É“o˜^‚³‚ê‚½•¶š•ÏŠ·‚ğ‚¨‚±‚È‚¤StringEncoder
  * Map‚É‘¶İ‚µ‚È‚¢ê‡‚Í“n‚³‚ê‚½•¶š‚ğ•Ô‹p‚·‚é
- * @author e-yamane
- *
  */
 public class SimpleStringEncoder implements StringEncoder {
 	private final Map<String, String> encodeMap;

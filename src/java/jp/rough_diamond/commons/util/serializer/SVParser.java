@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.commons.util.serializer;
 
 import java.io.*;
@@ -8,9 +14,7 @@ import  java.util.*;
 import org.apache.commons.logging.*;
 
 /**
- * $Id: SVParser.java 443 2006-03-07 08:46:20Z Yamane_Eiji@bp.ogis-ri.co.jp $<br />
  * ‰½‚ç‚©‚Ì•¶Žš‚Å’l‚ª•ªŠ„‚³‚ê‚Ä‚¢‚é•¶Žš—ñ‚ð“ñŽŸŒ³”z—ñ‚É“WŠJ‚·‚é
- * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
 **/
 public class SVParser implements Iterable<String[]> {
     public final static Log log = LogFactory.getLog(SVParser.class); 

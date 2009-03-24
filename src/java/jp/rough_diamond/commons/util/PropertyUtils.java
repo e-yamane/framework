@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.commons.util;
 
 import java.lang.reflect.Array;
@@ -14,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * プロパティユーティリティ
- * @author P0775643
  */
 public class PropertyUtils {
 	private final static Log log = LogFactory.getLog(PropertyUtils.class);
