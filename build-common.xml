@@ -156,7 +156,7 @@
       <include name="jp/rough_diamond/tools/**/*.java" />
       <include name="org/dbunit/**/*.java" />
       <classpath>
-        <fileset dir="./libs">
+        <fileset dir="${framework.lib.root}">
           <include name="**/*.jar" />
         </fileset>
       </classpath>
