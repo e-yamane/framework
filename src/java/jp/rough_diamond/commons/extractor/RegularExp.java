@@ -9,7 +9,6 @@ package jp.rough_diamond.commons.extractor;
 /**
  * ³‹K•\Œ»(POSIX) Condition.
  * PostgreSQL‚É‚Ì‚Ý‘Î‰ž‚µ‚Ä‚¢‚Ü‚·B{char_length(substring(propartyName , value)) > 0}
- * @author yokota
  */
 @SuppressWarnings("unchecked")
 public class RegularExp extends ValueHoldingCondition {

@@ -10,8 +10,6 @@ import java.util.Collection;
 
 /**
  * AndğŒ‚ğ•\‚·Condition
- * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
- * @date $Date: 2006-02-08 10:33:45 +0900 (æ°´, 08 2 2006) $
  */
 public class And extends CombineCondition {
 	private static final long serialVersionUID = 1L;

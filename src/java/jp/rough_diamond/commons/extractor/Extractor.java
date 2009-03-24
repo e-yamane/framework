@@ -13,8 +13,6 @@ import java.util.List;
 
 /**
  * 抽出条件格納オブジェクト
- * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
- * @date $Date: 2006-02-14 17:11:42 +0900 (轣ｫ, 14 2 2006) $
  */
 @SuppressWarnings("unchecked")
 public class Extractor implements Serializable {

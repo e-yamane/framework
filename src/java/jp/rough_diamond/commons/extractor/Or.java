@@ -10,15 +10,13 @@ import java.util.Collection;
 
 /**
  * And条件を表すCondition
- * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
- * @Date $Date: 2006-02-08 10:33:45 +0900 (豌ｴ, 08 2 2006) $
  */
 public class Or extends CombineCondition {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Orオブジェクトを生成する
-	 * 結合される中身は殻とする
+	 * 結合される中身は空とする
 	 */
 	public Or() {
 		super();

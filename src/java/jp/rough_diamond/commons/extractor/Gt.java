@@ -8,8 +8,6 @@ package jp.rough_diamond.commons.extractor;
 
 /**
  * Gt(ÅÑÅjCondition
- * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
- * @date $Date: 2006-02-14 17:11:42 +0900 (ÁÅ´, 14 2 2006) $
  */
 @SuppressWarnings("unchecked")
 public class Gt extends ValueHoldingCondition {

@@ -10,8 +10,6 @@ package jp.rough_diamond.commons.extractor;
  * 外部エンティティと結合するための条件
  * 外部エンティティのプロパティを抽出条件に加える場合は、
  * 本オブジェクトに条件を追加していくこと 
- * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
- * @date $Date: 2006-02-08 10:33:45 +0900 (豌ｴ, 08 2 2006) $
  */
 public class Join extends CombineCondition {
 	private static final long serialVersionUID = 1L;

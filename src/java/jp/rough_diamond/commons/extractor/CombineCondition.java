@@ -11,8 +11,6 @@ import java.util.Collection;
 
 /**
  * •¡”‚ÌCondition‚ğŒ‹‡‚·‚éCondition
- * @author $Author: Matsuda_Kazuto@ogis-ri.co.jp $
- * @date $Date: 2006-02-14 19:22:14 +0900 (ç«, 14 2 2006) $
  */
 public abstract class CombineCondition extends Condition {
 	private static final long serialVersionUID = 1L;
