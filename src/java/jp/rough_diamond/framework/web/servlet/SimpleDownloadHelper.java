@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.framework.web.servlet;
 
 import java.io.BufferedOutputStream;
@@ -7,7 +13,6 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @author e-yamane
  * ダウンロードコンテンツの生成と出力を分離するためのヘルパークラス
  */
 public class SimpleDownloadHelper {
