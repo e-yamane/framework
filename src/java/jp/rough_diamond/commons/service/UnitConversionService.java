@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.commons.service;
 
 import java.util.Date;
@@ -9,7 +15,6 @@ import jp.rough_diamond.framework.service.ServiceLocator;
 
 /**
  * 単位変換サービス
- * @author e-yamane
  */
 abstract public class UnitConversionService implements Service {
 	public final static String DEFAULT_SERVICE_CLASS_NAME = 
