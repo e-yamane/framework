@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.commons.resource;
 
 import java.util.ArrayList;
@@ -17,8 +23,6 @@ import jp.rough_diamond.commons.di.DIContainerFactory;
 
 /**
  * ÉäÉ\Å[ÉXä«óù
- * @author $Author$
- * @date $Date$
  */
 public class ResourceManager {
     private static Map<Locale, ResourceBundle> bundleMap = new HashMap<Locale, ResourceBundle>();
