@@ -1,5 +1,8 @@
-/**
- * 
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
  */
 package jp.rough_diamond.commons.mail;
 
@@ -21,7 +24,6 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * 添付ファイルをオブジェクトを作成するためのラッパー
- * @author e-yamane
  */
 public class AttachmentBuilder {
     public static BodyPart buildMultipart(File f) {
