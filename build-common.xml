@@ -3,9 +3,22 @@
 <project name="common-project" basedir="." default="makeBean">
   <dirname property="my.build.dir" file="${ant.file}" />
 
+  <!-- フレームワークディレクトリ関連 -->
+  <property name="framework.vendor"                 value="Rough Diamond Co.,Ltd" />
+  <property name="framework.root"                   value="${my.build.dir}/../framework" />
+  <property name="framework.work.classes.dir"       value="${framework.root}/work/classes" />
+  <property name="framework.src.dir"                value="${framework.root}/src/java" />
+  <property name="framework.lib.root"               value="${framework.root}/libs" />
+  <property name="framework.java.version"           value="1.6" />
+  <property name="framework.compile.debug"          value="on" />
+  <property name="framework.src.encoding"           value="MS932" />
+  <property name="framework.ant.extention.version"  value="1.0" />
+  <property name="framework.dist.dir"               value="../framework/target"/>
+  <property name="framework.classes.dir"            value="${framework.dist.dir}/classes" />
+
+
   <property name="war.name"               value="ROOT" />
   <property name="release.dir"            value="release" />
-  <property name="framework.root"         value="${my.build.dir}/../framework" />
   <property name="src.dir"                value="${my.build.dir}/src/java" />
   <property name="web.root.dir"           value="${my.build.dir}/webapp" />
   <property name="lib.dir"                value="${web.root.dir}/WEB-INF/lib" />
@@ -18,7 +31,7 @@
   <property name="src.encoding"           value="Windows-31J" />
 
   <!-- データベース関連 -->
-  <property name="export.dir"             value="./etc/export" />
+  <property name="export.dir"             value="${my.build.dir}/etc/export" />
   <property name="table.doc.dir"          value="${my.build.dir}/doc/table" />
   <property name="torque.schema.dir"      value="${my.build.dir}/etc/schema" />
   <property name="torque.sql.dir"         value="${my.build.dir}/etc/sql" />
@@ -31,13 +44,11 @@
   <property name="test.work.dir"          value="${test.root.dir}/work" />
   <property name="test.classes.dir"       value="${test.work.dir}/classes" />
   <property name="test.src.dir"           value="${my.build.dir}/src/test" />
-  <property name="test.framework.dir"     value="${my.build.dir}/src/testingFramework" />
-  <property name="test.aspect.src.dir"    value="${my.build.dir}/src/testaspect" />
   <property name="result.dir"             value="${test.root.dir}/result" />
   <property name="report.dir"             value="testRreport" />
   <property name="coverage.dir"           value="coverage" />
   <property name="junit.src.pattern"      value="**/*Test.java" />
-  <property name="cobertura.ser"          value="${my.build.dir}/cobertura.ser" />
+  <property name="cobertura.ser"          value="${test.work.dir}/cobertura.ser" />
 
 
   <property name="test.filed.flag"        value="${test.work.dir}/.testFailed" />
@@ -56,22 +67,6 @@
 
   <!-- JavaDoc出力先 -->
   <property name="javadoc.dir" value="${my.build.dir}/doc/api" />
-  <property name="testdoc.dir" value="${my.build.dir}/doc/testdoc" />
-
-<!--
-  <path id="src.real">
-    <pathelement location="${src.dir}" />
-    <pathelement location="${framework.src.dir}" />
-    <pathelement location="${rule.dir}" />
-  </path>
-
-  <path id="src.all">
-    <path refid="src.real"/>
-    <pathelement location="${test.framework.dir}" />
-    <pathelement location="${test.src.dir}" />
-    <pathelement location="${test.aspect.src.dir}" />
-  </path>
--->
 
   <path id="real.src.path.default">
     <pathelement location="${src.dir}" />
@@ -81,6 +76,7 @@
     <path refid="real.src.path.default"/>
     <pathelement location="${test.src.dir}" />
   </path>
+
   <!-- servletAPIのバージョンで異なる -->
   <path id="servletapi.path">
     <fileset dir="${other.lib.dir}">
@@ -88,14 +84,6 @@
       <include name="jsp-api.jar" />
     </fileset>
   </path>
-
-<!--
-  <path id="classpath.tmp">
-    <fileset dir="${other.lib.dir}">
-      <include name="**/*.jar" />
-    </fileset>
-  </path>
--->
 
   <path id="classpath.real">
     <fileset dir="${lib.dir}">
@@ -105,19 +93,18 @@
   </path>
 
   <path id="framework.path">
-    <pathelement location="../framework/bin" />
-    <fileset dir="../framework/libs">
+    <pathelement location="${framework.work.classes.dir}" />
+    <fileset dir="${framework.lib.root}">
       <include name="**/*.jar" />
     </fileset>
   </path>
 
   <path id="classpath.all">
-    <path refid="framework.path" />
-    <pathelement location="${classes.dir}" />
     <path refid="classpath.real"/>
     <fileset dir="${other.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
+    <path refid="framework.path" />
   </path>
 
   <path id="wsdl2java.path">
@@ -149,18 +136,68 @@
     </sequential>
   </macrodef>
 
-  <target name="init-task">
+  <target name="ant-extention-check">
+    <available file="${framework.lib.root}/common/rd-ant-ext-${framework.ant.extention.version}.jar" property="ant.ext.jar.present" />
+  </target>
+
+  <target name="ant-extention-make" unless="ant.ext.jar.present">
+    <mkdir dir="${framework.work.classes.dir}" />
+    <delete dir="${framework.work.classes.dir}" />
+    <mkdir dir="${framework.work.classes.dir}" />
+    <javac
+        srcdir="${framework.src.dir}"
+        source="${framework.java.version}"
+        target="${framework.java.version}"
+        destdir="${framework.work.classes.dir}"
+        debug="${framework.compile.debug}"
+        encoding="${framework.src.encoding}"
+    >
+      <include name="jp/rough_diamond/ant/**/*.java" />
+      <include name="jp/rough_diamond/tools/**/*.java" />
+      <include name="org/dbunit/**/*.java" />
+      <classpath>
+        <fileset dir="./libs">
+          <include name="**/*.jar" />
+        </fileset>
+      </classpath>
+    </javac>
+    <copy todir="${framework.work.classes.dir}">
+      <fileset dir="${framework.src.dir}">
+        <exclude name="**/.svn" />
+        <exclude name="**/*.java" />
+        <include name="jp/rough_diamond/ant/**/*" />
+        <include name="jp/rough_diamond/tools/**/*" />
+        <include name="org/dbunit/**/*" />
+      </fileset>
+    </copy>
+    <jar destfile="${framework.lib.root}/common/rd-ant-ext-${framework.ant.extention.version}.jar" 
+        basedir="${framework.work.classes.dir}">
+      <manifest>
+        <attribute name="Implementation-Vendor"   value="${framework.vendor}"/>
+        <attribute name="Implementation-Title"    value="Rough Diamond Framework Ant Tasks"/>
+        <attribute name="Implementation-Version"  value="${framework.ant.extention.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="init-task" depends="ant-extention-check, ant-extention-make">
     <taskdef name="propertyChecker" classpathref="framework.path"
               classname="jp.rough_diamond.ant.taskdefs.PropertyCheckerTask" />
     <taskdef name="hibernatedoclet" classpathref="framework.path"
               classname="jp.rough_diamond.ant.taskdefs.HibernateDocletTaskExt" />
     <taskdef name="dbunit" classpathref="framework.path"
                       classname="org.dbunit.ant.DbUnitTask" />
+    <taskdef name="beanGen" classpathref="framework.path"
+                                          classname="jp.rough_diamond.ant.taskdefs.BeanGenerator" />
+    <taskdef name="getWSDL" classpathref="framework.path"
+        classname="jp.rough_diamond.ant.taskdefs.GetAndMakeWSDLTask" />
+    <taskdef name="wsdl2java" classpathref="framework.path"
+        classname="jp.rough_diamond.ant.taskdefs.WSDL2JavaExt" />
+    <taskdef name="makeCXFService" classpathref="framework.path"
+        classname="jp.rough_diamond.ant.taskdefs.ServiceGeneratorTask" />
   </target>
 
   <target name="makeBean" description="JavaBeansを作成する">
-    <taskdef name="beanGen" classpathref="framework.path"
-                                          classname="jp.rough_diamond.ant.taskdefs.BeanGenerator" />
     <beanGen root="${src.dir}" input="beanDef/beanDef.xml" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
@@ -211,8 +248,6 @@
         <isset property="di.config.path" />
       </not>
     </condition>
-    <taskdef name="getWSDL" classpathref="framework.path"
-        classname="jp.rough_diamond.ant.taskdefs.GetAndMakeWSDLTask" />
     <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="wsdl2java.path" diContainerType="${di.container.type}" diConfig="${di.config.path}" />
   </target>
 
@@ -242,8 +277,6 @@
         <isset property="mule.version" />
       </not>
     </condition>
-    <taskdef name="wsdl2java" classpathref="framework.path"
-        classname="jp.rough_diamond.ant.taskdefs.WSDL2JavaExt" />
     <wsdl2java
       wsdldir="${wsdl.dir}"
       srcdir="${cxf.dest.dir}" 
@@ -274,8 +307,6 @@
         <isset property="mule.version" />
       </not>
     </condition>
-    <taskdef name="makeCXFService" classpathref="framework.path"
-        classname="jp.rough_diamond.ant.taskdefs.ServiceGeneratorTask" />
     <makeCXFService
       input="${cxf.service.file}"
       srcdir="${cxf.dest.dir}"
@@ -333,20 +364,15 @@
       <param name="exec.target" value="hibernatedoclet" />
     </antcall>
     <echo message="${filtering.filename}" />
-    <antcall target="refreshPropertiesWithConfig" />
-    <antcall target="refreshPropertiesWithoutConfig" />
+    <antcall target="refreshProperties" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 
-  <target name="refreshPropertiesWithConfig" if="filtering.filename">
+  <target name="refreshProperties" depends="filter-check, filter-exists" if="filtering.filename.present">
     <findBaseAntFile />
     <ant antfile="${baseAntFile}" target="makeConfig">
       <property name="filtering.filename" value="${filtering.filename}" />
     </ant>
-  </target>
-  <target name="refreshPropertiesWithoutConfig" unless="filtering.filename">
-    <findBaseAntFile />
-    <ant antfile="${baseAntFile}" target="makeConfig" />
   </target>
 
   <!-- JavaのソースコードからHibernateのマッピングファイルを作成する -->
@@ -459,12 +485,18 @@
 
   <target name="doContinuousIntegration" description="継続的インテグレーションを行う">
     <property name="filtering.filename" value="${conf.dir}/filtering.ci.properties" />
+    <antcall target="doCopyTorqueGen" />
     <antcall target="ci-preprocess" />
     <antcall target="makeCIConfig" />
     <antcall target="makeSchemaAccessor" />
     <antcall target="DB-init" />
     <antcall target="test" />
     <antcall target="ci-postprocess" />
+  </target>
+
+  <target name="doCopyTorqueGen" unless="ci.skip.torquegen">
+    <ant antfile="../torque-gen-patch/build.xml" target="dist" inheritAll="false"/>
+    <antcall target="copyTorque-gen" />
   </target>
 
   <target name="ci-preprocess" if="ci.preprocess.name">
@@ -480,9 +512,9 @@
   </target>
 
   <target name="test.prepare">
-    <delete file="${cobertura.ser}" />
     <mkdir dir="${test.work.dir}" />
     <mkdir dir="${test.classes.dir}" />
+    <delete file="${cobertura.ser}" />
     <delete>
       <fileset dir="${test.classes.dir}" includes="**/*" />
     </delete>
@@ -532,7 +564,12 @@
     </antcall>
   </target>
 
-  <target name="makeReleaseModule" description="リリースモジュールを作成する">
+  <!--
+    リリースモジュールを作成する
+    一度なくしたいんだけど、コンパイルエラーになるので
+    非公開タスクとして残す
+  -->
+  <target name="makeReleaseModule">
     <property file="./dairy-build.properties" />
     <antcall target="makeReleaseConfig" />
     <mkdir dir="${release.dir}" />
@@ -557,7 +594,8 @@
     <property file="./module.properties" />
     <copy file="${release.dir}/work/${release.dir}/${war.name}.war" tofile="${release.dir}/${war.name}.war" overwrite="true" />
   </target>
-  
+
+<!--
   <target name="makeModule" description="現在の状態でモジュールを作成する">
     <mkdir dir="${release.dir}" />
     <delete>
@@ -584,7 +622,9 @@
       </lib>
     </war>
   </target>
-  
+-->
+
+<!--
   <target name="doIt" description="Javaプログラムを起動する">
     <condition property="parameter" value="" >
       <not>
@@ -611,6 +651,7 @@
       </classpath>
     </java>
   </target>
+-->
 
   <target name="test" description="JUnit+coberturaでテストを実行する" depends="test.prepare, test.compile">
     <taskdef classpath="${other.lib.dir}/cobertura.jar" resource="tasks.properties">
@@ -685,32 +726,6 @@
     </copy>
   </target>
 
-<!--
-  <target name="test.prepare">
-    <delete file="${cobertura.ser}" />
-    <mkdir dir="${test.work.dir}" />
-    <mkdir dir="${test.classes.dir}" />
-    <delete>
-      <fileset dir="${test.classes.dir}" includes="**/*" />
-    </delete>
-    <mkdir dir="${result.dir}" />
-    <delete>
-      <fileset dir="${result.dir}" includes="**/*" />
-    </delete>
-  </target>
--->
-
-<!--
-  <target name="test.compile" depends="test.prepare" >
-    <antcall target="do.compile">
-      <param name="compile.src.roots"     value="src.all" />
-      <param name="compile.classpath"     value="classpath.all" />
-      <param name="compile.dest.dir"      value="${test.classes.dir}" />
-      <param name="copy.resource.target"  value="copyAllResources" />
-    </antcall>
-  </target>
--->
-
   <target name="copyRealResources">
     <copy todir="${resource.dest.dir}" overwrite="true">
       <fileset dir="${src.dir}">
@@ -738,7 +753,7 @@
     <taskdef classpathref="classpath.all" resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" />
   </target>
 
-  <target name="javadoc" description="JavaDocを生成する">
+  <target name="javadoc" description="JavaDocを生成する" if="javadoc.title">
     <delete dir="${javadoc.dir}" />
     <mkdir dir="${javadoc.dir}" />
     <javadoc
@@ -748,7 +763,7 @@
           author="true"
           version="true"
           use="true"
-          windowtitle="料金所サーバプロトタイプ">
+          windowtitle="${javadoc.title}">
       <packageset  dir="${src.dir}" defaultexcludes="yes">
         <include name="jp/rough_diamond/**/*"/>
       </packageset >
@@ -770,136 +785,5 @@
     <filter filtersfile="${conf.dir}/tmp/${conf.target.name}" />
     <copy file="${framework.root}/conf/template/middlegen.properties" tofile="./middlegen.properties" filtering="true" overwrite="true" />
     <delete dir="${conf.dir}/tmp" />
-  </target>
-
-
-<!--
-  <target name="test.prepare" depends="init-task">
-    <available file="${test.initialized.flag}" property="test.initialized"/>
-    <antcall target="test.prepare.do" />
-  </target>
-
-  <target name="test.prepare.do" unless="test.initialized">
-    <delete dir="${result.dir}" />
-    <mkdir dir="${result.dir}" />
-    <touch file="${test.initialized.flag}" />
-  </target>
-
-  <target name="test.compile">
-    <available file="${test.compiled.flag}" property="test.compiled"/>
-    <antcall target="test.compile.do" />
-  </target>
-
-  <target name="test.compile.do" unless="test.compiled" depends="init">
-    <delete dir="${test.classes.dir}" />
-    <mkdir dir="${test.classes.dir}" />
-    <javac destdir="${test.classes.dir}"
-        deprecation="${compile.deprecation}" optimize="${compile.optimize}" debug="${compile.debug}">
-      <src path="${src.dir}" />
-      <src path="${test.src.dir}" />
-      <src path="${other.src.dir}" />
-      <classpath>
-        <path refid="classpath.all"/>
-      </classpath>
-    </javac>
-    <copy todir="${test.classes.dir}">
-      <fileset dir="${src.dir}">
-        <exclude name="**/*.java"/>
-      </fileset>
-    </copy>
-    <copy todir="${test.classes.dir}">
-      <fileset dir="${test.src.dir}">
-        <exclude name="**/*.java"/>
-      </fileset>
-    </copy>
-    <touch file="${test.compiled.flag}" />
-  </target>
-
-  <target name="doJUnit" depends="test.prepare">
-    <property file="${test.work.dir}/test.properties" />
-    <echo message="${junit.doIt}" />
-    <condition property="do.junit">
-      <istrue value="${junit.doIt}" />
-    </condition>
-    <antcall target="doJUnit2" />
-  </target>
-
-  <target name="doJUnit2" if="do.junit">
-    <antcall target="test.compile" />
-    <taskdef name="junit" classpathref="classpath.all"
-                      classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" />
-    <junit printsummary="yes" haltonfailure="no" 
-          fork="yes" showOutput="true" failureproperty="tests.failed">
-      <classpath>
-        <pathelement location="${test.classes.dir}"/>
-        <path refid="classpath.all"/>
-      </classpath>
-      <formatter type="xml" />
-      <batchtest fork="yes" todir="${result.dir}"
-                    failureproperty="tests.failed">
-        <fileset dir="${test.src.dir}">
-          <include name="${junit.src.pattern}" />
-        </fileset>
-      </batchtest>
-    </junit>
-    <antcall target="setErrorFile" />
-  </target>
-
-  <target name="makeReport">
-    <delete dir="${report.dir}" />
-    <mkdir dir="${report.dir}" />
-    <junitreport todir="${report.dir}">
-      <fileset dir="${result.dir}"
-          includes="TEST-*.xml"/>
-      <report todir="${report.dir}" format="frames" /> 
-    </junitreport>
-  </target>
-
-  <target name="setErrorFile" if="tests.failed">
-    <touch file="${test.filed.flag}" />
-  </target>
--->
-
-  <target name="do-dairy-build">
-<!--
-    <echo>
-＊＊＊＊＊注意！！！＊＊＊＊＊
-テストを実施する場合は、以下のjarがantの実行時ライブラリに加わっていないといけません。
-　・javasvn.jar
-　・svnant.jar
-　・svnClientAdapter.jar
-　・svnjavahl.jar
-加わっていない場合は、コマンドラインから実行している場合は、
-$ANT_HOME/lib配下にコピーしてください。
-Eclipseから実行している場合は、antの設定でライブラリを加えてください。
-    </echo>
-    <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
--->
-    <property file="./dairy-build.properties" />
-    <mkdir dir="${dairy.build.dir}" />
-    <tstamp>
-      <format property="today" pattern="yyyy-MM-dd" locale="en"/>
-    </tstamp>
-    <delete dir="${dairy.build.dir}/${today}" />
-    <mkdir dir="${dairy.build.dir}/${today}" />
-<!--
-    <svn username="${svn.user}" password="${svn.password}">
-      <export srcUrl="${svn.url}" destPath="${dairy.build.dir}/${today}" />
-    </svn>
--->
-    <exec dir="${dairy.build.dir}/${today}" executable="svn">
-      <arg line="export --force ${svn.url} ."/>
-    </exec>
-    <ant antfile="${dairy.build.dir}/${today}/build.xml" dir="${dairy.build.dir}/${today}">
-      <target name="make${dairy.property}Config" />
-      <target name="get-deps" />
-      <target name="compile-other" />
-    </ant>
-    <ant antfile="${dairy.build.dir}/${today}/build.xml" dir="${dairy.build.dir}/${today}">
-      <target name="makeSchemaAccessor" />
-      <target name="makeBean" />
-      <target name="make${dairy.property}Config" />
-      <target name="test" />
-    </ant>
   </target>
 </project>

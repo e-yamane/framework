@@ -12,7 +12,7 @@ import java.util.Properties;
  */
 public class PropertyChecker {
     private Properties baseProperty;
-    private Properties targetProperties;
+    private Properties targetProperty;
     public PropertyChecker(
             String basePropertyFileName, String targetPropertyFileName) 
                     throws IOException {
@@ -23,10 +23,10 @@ public class PropertyChecker {
         } finally {
         	is.close();
         }
-        targetProperties = new Properties();
+        targetProperty = new Properties();
         is = new FileInputStream(targetPropertyFileName);
         try {
-        	targetProperties.load(is);
+        	targetProperty.load(is);
         } finally {
         	is.close();
         }
@@ -37,7 +37,7 @@ public class PropertyChecker {
      * @return trueの場合は完全一致している
      */
     public boolean doIt() {
-        return PropertyChecker.doIt(baseProperty, targetProperties);
+        return PropertyChecker.doIt(baseProperty, targetProperty);
     }
 
     /**
@@ -45,19 +45,19 @@ public class PropertyChecker {
      * @return trueの場合は完全一致している
      */
     @SuppressWarnings("unchecked")
-    public static boolean doIt(Properties baseProperty, Properties targetProperties) {
+    public static boolean doIt(Properties baseProperty, Properties targetProperty) {
         System.out.println("プロパティのチェックを開始します。");
         Enumeration<String> keys = (Enumeration<String>) baseProperty.propertyNames();
         boolean ret = true;
         while(keys.hasMoreElements()) {
             String key = keys.nextElement();
-            if(targetProperties.getProperty(key) == null) {
+            if(targetProperty.getProperty(key) == null) {
                 System.out.println(key + "が存在していません");
                 ret = false;
             }
-            targetProperties.remove(key);
+            targetProperty.remove(key);
         }
-        keys = (Enumeration<String>)targetProperties.propertyNames();
+        keys = (Enumeration<String>)targetProperty.propertyNames();
         while(keys.hasMoreElements()) {
             ret = false;
             String key = keys.nextElement();
