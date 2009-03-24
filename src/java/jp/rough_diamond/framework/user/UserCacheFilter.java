@@ -1,23 +1,8 @@
 /*
- * ====================================================================
- * 
- *  Copyright 2007 Eiji Yamane(yamane@super-gs.jp)
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- * ====================================================================
- */
-/**
- * 
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
  */
 package jp.rough_diamond.framework.user;
 
@@ -50,8 +35,6 @@ import org.apache.commons.logging.LogFactory;
  *     <param-name>clearObjectPrefix</param-name>
  *     <param-value>jp.co.webshark</param-value>
  *   </init-param>
- * @author $Author: Yamane_Eiji@bp.ogis-ri.co.jp $
- * @date $Date: 2006-04-13 13:15:23 +0900 (木, 13 4 2006) $
  */
 public class UserCacheFilter implements Filter {
     private final static Log log = LogFactory.getLog(UserCacheFilter.class);
