@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
+ */
 package jp.rough_diamond.framework.service;
 
 import java.util.List;
@@ -5,7 +11,6 @@ import java.util.List;
 /**
  * ServiceFinder‚ÌChain of Responsibility
  * (À‘•‚ÍChain of Responsibilityƒpƒ^[ƒ“‚Å‚Í‚ ‚è‚Ü‚¹‚ñ)
- * @author e-yamane
  */
 public class ServiceFinderChain implements ServiceFinder {
 	private List<ServiceFinder> serviceFinderChain;
