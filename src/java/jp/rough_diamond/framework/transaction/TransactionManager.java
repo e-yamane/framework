@@ -1,20 +1,8 @@
 /*
- * ====================================================================
- * 
- *  Copyright 2007 Eiji Yamane(yamane@super-gs.jp)
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- * ====================================================================
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
  */
 package jp.rough_diamond.framework.transaction;
 
@@ -33,7 +21,6 @@ import org.aopalliance.intercept.MethodInvocation;
  * transactionMapは、キーはクラス名、値はトランザクション属性文字列
  * （REQUIRED or REQUIRED_NEW or NOP)を指定する。
  * 省略された場合は、「REQUIRED」である
- * @author e-yamane
  */
 @SuppressWarnings("unchecked")
 public class TransactionManager implements MethodInterceptor {
