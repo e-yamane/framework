@@ -35,7 +35,6 @@
 	<classpathentry kind="lib" path="libs/spring/spring-context.jar"/>
 	<classpathentry kind="lib" path="libs/hibernate/dom4j-1.4.jar"/>
 	<classpathentry kind="lib" path="libs/common/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="libs/jdbcdrivers/ojdbc14.jar"/>
 	<classpathentry kind="lib" path="libs/jdbcdrivers/postgresql-8.2-505.jdbc3.jar"/>
 	<classpathentry kind="lib" path="libs/hibernate/jta.jar"/>
 	<classpathentry kind="lib" path="libs/antlr/antlr.jar"/>
