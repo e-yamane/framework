@@ -1,5 +1,8 @@
-/**
- * 
+/*
+ * Copyright (c) 2008, 2009
+ *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
+ *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
+ *  All rights reserved.
  */
 package jp.rough_diamond.commons.testing;
 
@@ -22,7 +25,6 @@ import junit.framework.TestCase;
 
 /**
  * DBUnitを利用してデータをローディングしているテストケース
- * @author e-yamane
  */
 public abstract class DataLoadingTestCase extends TestCase {
 
