@@ -185,7 +185,7 @@
               classname="jp.rough_diamond.ant.taskdefs.PropertyCheckerTask" />
     <taskdef name="hibernatedoclet" classpathref="framework.path"
               classname="jp.rough_diamond.ant.taskdefs.HibernateDocletTaskExt" />
-    <taskdef name="dbunit" classpathref="framework.path"
+    <taskdef name="dbunit" classpathref="classpath.all"
                       classname="org.dbunit.ant.DbUnitTask" />
     <taskdef name="beanGen" classpathref="framework.path"
                                           classname="jp.rough_diamond.ant.taskdefs.BeanGenerator" />
