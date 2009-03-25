@@ -750,7 +750,7 @@
   </target>
 
   <target name="initAspectJTask">
-    <taskdef classpathref="classpath.all" resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" />
+    <taskdef classpathref="framework.path" resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" />
   </target>
 
   <target name="javadoc" description="JavaDoc‚ð¶¬‚·‚é" if="javadoc.title">
