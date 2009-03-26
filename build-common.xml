@@ -486,7 +486,7 @@
     <antcall target="DB-clear-2" />
   </target>
 
-  <target name="doContinuousIntegration" description="継続的インテグレーションを行う">
+  <target name="doContinuousIntegration" depends="init-task" description="継続的インテグレーションを行う">
     <property name="filtering.filename" value="${conf.dir}/filtering.ci.properties" />
     <antcall target="doCopyTorqueGen" />
     <antcall target="ci-preprocess" />
