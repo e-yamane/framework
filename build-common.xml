@@ -663,7 +663,7 @@
     </delete>
     <antcall target="copyCoberturaTargetDefault" />
     <antcall target="copyCoberturaTarget" />
-    <cobertura-instrument todir="${test.classes.dir}">
+    <cobertura-instrument todir="${test.classes.dir}" datafile="${cobertura.ser}">
       <fileset dir="${test.classes.dir}_tmp">
         <include name="**/*.class"/>
       </fileset>
@@ -706,12 +706,14 @@
     </tstamp>
     <mkdir dir="${test.root.dir}/${ts}/${report.dir}" />
     <mkdir dir="${test.root.dir}/${ts}/${coverage.dir}" />
+    <mkdir dir="${test.root.dir}/${ts}/${coverage.dir}/xml" />
     <junitreport todir="${test.root.dir}/${ts}/${report.dir}">
       <fileset dir="${result.dir}"
           includes="TEST-*.xml"/>
       <report todir="${test.root.dir}/${ts}/${report.dir}" format="frames" /> 
     </junitreport>
-    <cobertura-report srcdir="${src.dir}" sourceEncoding="Windows-31J" destdir="${test.root.dir}/${ts}/${coverage.dir}"/>
+    <cobertura-report srcdir="${src.dir}" sourceEncoding="Windows-31J"  destdir="${test.root.dir}/${ts}/${coverage.dir}"/>
+    <cobertura-report format="xml" srcdir="${src.dir}"                  destdir="${test.root.dir}/${ts}/${coverage.dir}/xml" />
     <mkdir dir="${test.root.dir}/leatest" />
     <delete>
       <fileset dir="${test.root.dir}/leatest" includes="**/*" />
