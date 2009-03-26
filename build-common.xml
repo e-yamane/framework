@@ -50,6 +50,7 @@
   <property name="junit.src.pattern"      value="**/*Test.java" />
   <property name="cobertura.ser"          value="${test.work.dir}/cobertura.ser" />
   <property name="findbugs.home"          value="${framework.lib.root}/findbugs" />
+  <property name="findbugs.output"        value="${result.dir}/findbugs.xml" />
 
   <property name="test.filed.flag"        value="${test.work.dir}/.testFailed" />
   <property name="test.compiled.flag"     value="${test.work.dir}/.testCompiled" />
@@ -519,10 +520,7 @@
     <findbugs home="${findbugs.home}"
               output="xml"
               jvmargs="-Xmx1024m"
-              outputFile="findbugs.xml" >
-<!--
-      <auxClasspath refid="classpath.all" />
--->
+              outputFile="${findbugs.output}" >
       <sourcePath path="${src.dir}" />
       <class location="${test.classes.dir}" />
     </findbugs>
