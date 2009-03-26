@@ -197,7 +197,7 @@
         classname="jp.rough_diamond.ant.taskdefs.ServiceGeneratorTask" />
   </target>
 
-  <target name="makeBean" description="JavaBeansを作成する">
+  <target name="makeBean" depends="init-task" description="JavaBeansを作成する">
     <beanGen root="${src.dir}" input="beanDef/beanDef.xml" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
