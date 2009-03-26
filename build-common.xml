@@ -49,7 +49,7 @@
   <property name="coverage.dir"           value="coverage" />
   <property name="junit.src.pattern"      value="**/*Test.java" />
   <property name="cobertura.ser"          value="${test.work.dir}/cobertura.ser" />
-
+  <property name="findbugs.home"          value="${framework.lib.root}/findbugs" />
 
   <property name="test.filed.flag"        value="${test.work.dir}/.testFailed" />
   <property name="test.compiled.flag"     value="${test.work.dir}/.testCompiled" />
@@ -195,6 +195,9 @@
         classname="jp.rough_diamond.ant.taskdefs.WSDL2JavaExt" />
     <taskdef name="makeCXFService" classpathref="framework.path"
         classname="jp.rough_diamond.ant.taskdefs.ServiceGeneratorTask" />
+    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+      <classpath refid="classpath.all" />
+    </taskdef>
   </target>
 
   <target name="makeBean" depends="init-task" description="JavaBeans‚ðì¬‚·‚é">
@@ -509,6 +512,19 @@
 
   <target name="makeCIConfig" unless="ci.skip.ei">
     <antcall target="makeConfig" />
+  </target>
+
+  <target name="findbugs" depends="init-task" description="findbugs">
+    <findbugs home="${findbugs.home}"
+              output="xml"
+              jvmargs="-Xmx1024m"
+              outputFile="findbugs.xml" >
+<!--
+      <auxClasspath refid="classpath.all" />
+-->
+      <sourcePath path="${src.dir}" />
+      <class location="${test.classes.dir}" />
+    </findbugs>
   </target>
 
   <target name="test.prepare">
