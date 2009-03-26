@@ -9,6 +9,16 @@ package jp.rough_diamond.commons.di;
 import junit.framework.TestCase;
 
 public class DIContainerFactoryTest extends TestCase {
+	private DIContainer old;
+	@Override
+	protected void setUp() throws Exception {
+		old = DIContainerFactory.getDIContainer();
+	}
+	@Override
+	protected void tearDown() throws Exception {
+		DIContainerFactory.setDIContainer(old);
+	}
+	
 	public void testGetDefaultDIContainer() {
 		DIContainer container = DIContainerFactory.getDIContainer();
 		assertEquals("class unmuch.", container.getClass(), SpringFramework.class);
