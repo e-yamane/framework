@@ -494,6 +494,7 @@
     <antcall target="makeSchemaAccessor" />
     <antcall target="DB-init" />
     <antcall target="test" />
+    <antcall target="findbugs" />
     <antcall target="ci-postprocess" />
   </target>
 
@@ -514,7 +515,7 @@
     <antcall target="makeConfig" />
   </target>
 
-  <target name="findbugs" depends="init-task" description="findbugs">
+  <target name="findbugs" description="findbugs">
     <findbugs home="${findbugs.home}"
               output="xml"
               jvmargs="-Xmx1024m"
