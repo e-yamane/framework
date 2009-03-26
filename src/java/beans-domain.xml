@@ -3,6 +3,12 @@
     "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans default-lazy-init="true">
+  <bean id="dummyText" class="java.lang.String">
+    <description>テスト用</description>
+    <constructor-arg index="0" type="java.lang.String">
+      <value>hogehoge</value>
+    </constructor-arg>
+  </bean>
 <!--
   <bean id="jp.rough_diamond.commons.service.NumberingService" class="jp.rough_diamond.commons.service.hibernate.HibernateNumberingService">
     <description>NumberingService</description>
