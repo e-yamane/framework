@@ -1,55 +1,56 @@
 
-targetdatabase = oracle
+targetdatabase = postgresql
 dbprops.idMethod = sequence
 # Taken from java.sql.Types in the IBM 1.3 JDK
-# JDBC to Oracle mappings.
+# JDBC to PostgreSQL mappings.
 #
-# Good Oracle resources for determining these mappings include:
-# http://technet.oracle.com/doc/oracle8i_816/java.816/a81354/basic3.htm
-# http://technet.oracle.com/docs/tech/migration/workbench/doc_library/MSAccess/ch3.htm
+# See http://www.postgresql.org/idocs/index.php?datatype.html for more
+# information on PostgreSQL data types.
 
-BIT = NUMBER (1, 0)
-TINYINT = NUMBER (3, 0)
-SMALLINT = NUMBER (5, 0)
-INTEGER = NUMBER
-BIGINT = NUMBER (20, 0)
-FLOAT = FLOAT
-REAL = NUMBER
-DOUBLE = FLOAT
-NUMERIC = NUMBER
-DECIMAL = NUMBER
-CHAR = CHAR
-VARCHAR = VARCHAR2
-LONGVARCHAR = VARCHAR2 (2000)
-DATE = DATE
-TIME = DATE
-TIMESTAMP = DATE
-BINARY = LONG RAW
-VARBINARY = BLOB
-LONGVARBINARY = LONG RAW
+BIT = boolean
+TINYINT = int2
+SMALLINT = int2
+INTEGER = integer
+BIGINT = int8
+FLOAT = float
+REAL = float
+BOOLEANCHAR = char
+BOOLEANINT = int2
+
+DOUBLE = double precision
+# numeric(precision, scale) / decimal(precision, scale)
+NUMERIC = numeric
+DECIMAL = decimal
+CHAR = char
+VARCHAR = varchar
+LONGVARCHAR = bytea
+DATE = date
+TIME = time
+TIMESTAMP = timestamp
+BINARY = bytea
+VARBINARY = bytea
+LONGVARBINARY = bytea
 NULL =
 OTHER =
 JAVA_OBJECT =
 DISTINCT =
 STRUCT =
 ARRAY =
-BLOB = BLOB
-CLOB = CLOB
+BLOB =
+CLOB = text
 REF =
 
+AUTOINCREMENT = serial
 NOTNULL = NOT NULL
 
 primaryKeyInsideTableDirective = true
-foreignKeyInsideTableDirective = true
 indexInsideTableDirective = false
 
-removeNotNullWithAutoIncrement = false
+removeNotNullWithAutoIncrement = true
 
 suppressDefaults = false
+idMethod=sequence
 
-maxColumnNameLength = 30
-
-idMethod = sequence
 
 DAOÇÃê∂ê¨ÇäJénÇµÇ‹Ç∑
 
