@@ -2,24 +2,22 @@
 -----------------------------------------------------------------------------
 -- UNIT
 -----------------------------------------------------------------------------
-DROP TABLE UNIT CASCADE CONSTRAINTS PURGE;
+DROP TABLE UNIT;
+
 
 CREATE TABLE UNIT
 (
-  ID NUMBER (20, 0) NOT NULL,
-  NAME VARCHAR2 (32) NOT NULL,
-  DESCRIPTION VARCHAR2 (64),
-  BASE_UNIT_ID NUMBER (20, 0) NOT NULL,
-    RATE_VALUE NUMBER (20, 0) NOT NULL,
-  RATE_SCALE NUMBER (10,0) NOT NULL,
-  SCALE NUMBER (10,0) NOT NULL,
-  VERSION NUMBER (20, 0) NOT NULL
+    ID int8 NOT NULL,
+    NAME varchar (32) NOT NULL,
+    DESCRIPTION varchar (64),
+      -- REFERENCES UNIT (ID)
+    BASE_UNIT_ID int8 NOT NULL,
+        RATE_VALUE int8 NOT NULL,
+    RATE_SCALE integer NOT NULL,
+    SCALE integer NOT NULL,
+    VERSION int8 NOT NULL,
+    PRIMARY KEY (ID)
 );
-ALTER TABLE UNIT
-    ADD CONSTRAINT UNIT_PK
-PRIMARY KEY (ID);
-
-
 
 COMMENT ON TABLE UNIT IS '数量尺度';
 COMMENT ON COLUMN UNIT.ID IS 'OID';
@@ -36,18 +34,15 @@ COMMENT ON COLUMN UNIT.VERSION IS '楽観的ロッキングキー';
 -----------------------------------------------------------------------------
 -- numbering
 -----------------------------------------------------------------------------
-DROP TABLE numbering CASCADE CONSTRAINTS PURGE;
+DROP TABLE numbering;
+
 
 CREATE TABLE numbering
 (
-  id VARCHAR2 (128) NOT NULL,
-  next_number NUMBER (20, 0) NOT NULL
+    id varchar (128) NOT NULL,
+    next_number int8 NOT NULL,
+    PRIMARY KEY (id)
 );
-ALTER TABLE numbering
-    ADD CONSTRAINT numbering_PK
-PRIMARY KEY (id);
-
-
 
 COMMENT ON TABLE numbering IS 'ナンバリングテーブル';
 COMMENT ON COLUMN numbering.id IS 'ＩＤ';
