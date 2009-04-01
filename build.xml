@@ -87,7 +87,6 @@
   <target name="makeJar" depends="compile" description="Jarƒtƒ@ƒCƒ‹‚ðì¬‚·‚é">
     <jar destfile="${framework.dist.dir}/rd-framework.jar" basedir="${framework.classes.dir}" excludes="net/**/*.class" />
     <copy file="${framework.lib.root}/cglib/cglib-2.1.3.jar" tofile="${framework.dist.dir}/cglib-2.1.3.jar" />
-    <jar destfile="${framework.dist.dir}/cglib-2.1.3.jar" basedir="${framework.classes.dir}" includes="net/**/*.class" update="true" />
   </target>
 
   <target name="compile">

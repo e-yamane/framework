@@ -4,6 +4,6 @@
 てください。
 
 
-ライブラリ          バージョン    格納ディレクトリ  URL
+ライブラリ(名前）   バージョン    格納ディレクトリ  URL
+cglib-2.1.3.jar     2.1.3_p01     libs/cglib        http://dev.rough-diamond.jp/svn/framework/patches/cglib/tags/2.1.3_p01/cglib/cglib-2.1.3_p01.jar
 dbunit.jar          2.1_p01       libs/dbunit/      http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar
-
