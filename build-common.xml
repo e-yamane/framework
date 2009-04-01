@@ -187,7 +187,7 @@
       <fileset dir="${framework.lib.root}/dbunit" includes="**/*.jar" excludes="dbunit-2.1_p01.jar" />
     </delete>
 -->
-    <mkdir dir="${framework.lib.root}/dbunit" />
+    <mkdir dir="${framework.lib.root}/dbUnit" />
     <get dest="${framework.lib.root}/dbUnit/dbunit.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar" />
   </target>
 
