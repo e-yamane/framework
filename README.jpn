@@ -6,4 +6,8 @@
 
 ライブラリ(名前）   バージョン    格納ディレクトリ  URL
 cglib-2.1.3.jar     2.1.3_p01     libs/cglib        http://dev.rough-diamond.jp/svn/framework/patches/cglib/tags/2.1.3_p01/cglib/cglib-2.1.3_p01.jar
+                                                    ファイル名を「cglib-2.1.3.jar」に変更してください
+cobertula.jar       1.9.1         libs/cobertula    http://downloads.sourceforge.net/cobertura/cobertura-1.9.1-bin.zip
+                                                    jarのみの配布はされていないようなのでzipからjarを取り出してください
 dbunit.jar          2.1_p01       libs/dbunit/      http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar
+                                                    ファイル名を「dbunit.jar」に変更してください
