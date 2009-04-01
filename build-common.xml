@@ -739,8 +739,8 @@
           includes="TEST-*.xml"/>
       <report todir="${test.root.dir}/${ts}/${report.dir}" format="frames" /> 
     </junitreport>
-    <cobertura-report srcdir="${src.dir}" sourceEncoding="Windows-31J"  destdir="${test.root.dir}/${ts}/${coverage.dir}"/>
-    <cobertura-report format="xml" srcdir="${src.dir}"                  destdir="${test.root.dir}/${ts}/${coverage.dir}/xml" />
+    <cobertura-report               srcdir="${src.dir}" dataFile="${cobertura.ser}" encoding="${src.encoding}"  destdir="${test.root.dir}/${ts}/${coverage.dir}"/>
+    <cobertura-report format="xml"  srcdir="${src.dir}" dataFile="${cobertura.ser}" encoding="${src.encoding}"  destdir="${test.root.dir}/${ts}/${coverage.dir}/xml" />
     <mkdir dir="${test.root.dir}/leatest" />
     <delete>
       <fileset dir="${test.root.dir}/leatest" includes="**/*" />
