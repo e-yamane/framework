@@ -199,6 +199,9 @@
     </unzip>
     <mkdir dir="${framework.lib.root}/dbUnit" />
     <get dest="${framework.lib.root}/dbUnit/dbunit.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar" />
+    <mkdir dir="${framework.lib.root}/servletapi" />
+    <get dest="${framework.lib.root}/servletapi/servlet-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/servlet-api-2.5/6.1H.14/servlet-api-2.5-6.1H.14.jar" />
+    <get dest="${framework.lib.root}/servletapi/jsp-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/jsp-api-2.1/6.1H.14/jsp-api-2.1-6.1H.14.jar" />
   </target>
 
   <target name="init-task" depends="get-deps, ant-extention-check, ant-extention-make">
