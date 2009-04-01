@@ -1,0 +1,9 @@
+本リポジトリにはライセンスの関係上、以下のファイルを同梱していませんので
+メイク時にはインターネット経由で取得します。インターネットに接続できない
+環境ではお手数ではありますが手動にて所定のディレクトリにファイルを配置し
+てください。
+
+
+ライブラリ          バージョン    格納ディレクトリ  URL
+dbunit.jar          2.1_p01       libs/dbunit/      http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar
+
