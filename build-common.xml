@@ -202,6 +202,7 @@
     <mkdir dir="${framework.lib.root}/servletapi" />
     <get dest="${framework.lib.root}/servletapi/servlet-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/servlet-api-2.5/6.1H.14/servlet-api-2.5-6.1H.14.jar" />
     <get dest="${framework.lib.root}/servletapi/jsp-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/jsp-api-2.1/6.1H.14/jsp-api-2.1-6.1H.14.jar" />
+    <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p01/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p01.jar" />
   </target>
 
   <target name="init-task" depends="get-deps, ant-extention-check, ant-extention-make">
