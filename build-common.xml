@@ -345,10 +345,40 @@
   <target name="execAnt">
     <echo message="${ant.home}" />
     <echo message="${basedir}" />
+    <condition property="param1" value="">
+      <not>
+        <isset property="param1" />
+      </not>
+    </condition>
+    <condition property="param2" value="">
+      <not>
+        <isset property="param2" />
+      </not>
+    </condition>
+    <condition property="param3" value="">
+      <not>
+        <isset property="param3" />
+      </not>
+    </condition>
+    <condition property="param4" value="">
+      <not>
+        <isset property="param4" />
+      </not>
+    </condition>
+    <condition property="param5" value="">
+      <not>
+        <isset property="param5" />
+      </not>
+    </condition>
     <exec executable="${java.home}/bin/java">
       <arg value="-classpath" />
       <arg value="${java.class.path}" />
       <arg value="org.apache.tools.ant.launch.Launcher" />
+      <arg value="${param1}" />
+      <arg value="${param2}" />
+      <arg value="${param3}" />
+      <arg value="${param4}" />
+      <arg value="${param5}" />
       <arg value="-f" />
       <arg value="${build.file}" />
       <arg value="${exec.target}" />
@@ -364,28 +394,31 @@
     <filter token="torque.sql.dir"              value="${torque.sql.dir}" />
     <filter filtersfile="${my.build.dir}/middlegen.properties" />
 
-    <copy file="${framework.root}/build-torque.properties" tofile="torque-gen/build.properties" filtering="true" overwrite="true" />
-    <replace file="torque-gen/build.properties" token="\" value="/" />
-
+    <copy file="${framework.root}/build-torque.properties" tofile="${torque.schema.dir}/build.properties" filtering="true" overwrite="true" />
+    <replace file="${torque.schema.dir}/build.properties" token="\" value="/" />
     <echo message="Create Table文を作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="sql" />
+      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
     <echo message="テーブルレイアウトを作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="doc" />
+      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
     <echo message="DAOクラスを作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="hibernate-java" />
+      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
     <echo message="スキーマプロパティを作成します。" />
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="schema-properties" />
+      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
     <antcall target="execAnt">
       <param name="build.file"  value="${basedir}/build.xml" />
@@ -513,7 +546,6 @@
 
   <target name="doContinuousIntegration" depends="init-task" description="継続的インテグレーションを行う">
     <property name="filtering.filename" value="${conf.dir}/filtering.ci.properties" />
-    <antcall target="doCopyTorqueGen" />
     <antcall target="ci-preprocess" />
     <antcall target="makeCIConfig" />
     <antcall target="makeSchemaAccessor" />
@@ -521,11 +553,6 @@
     <antcall target="test" />
     <antcall target="findbugs" />
     <antcall target="ci-postprocess" />
-  </target>
-
-  <target name="doCopyTorqueGen" unless="ci.skip.torquegen">
-    <ant antfile="../torque-gen-patch/build.xml" target="dist" inheritAll="false"/>
-    <antcall target="copyTorque-gen" />
   </target>
 
   <target name="ci-preprocess" if="ci.preprocess.name">

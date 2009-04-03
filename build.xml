@@ -4,8 +4,14 @@
   <property name="lib.dir"                    value="./libs" />
   <property name="other.lib.dir"              value="${lib.dir}" />
   <property name="copy.cobertura.target.name" value="copyCoberturaTargetClasses" />
-
+  <property name="ci.preprocess.name"         value="doCopyTorqueGen" />
   <import file="../framework/build-common.xml" />
+
+  <!-- Torque関係 -->
+  <property name="torque.gen.patch.root"      value="${framework.root}/../torque-gen-patch" />
+  <property name="torque.patch.base.lib.dir"  value="${torque.gen.patch.root}/base/lib" />
+  <property name="torque.patch.patch.lib.dir" value="${torque.gen.patch.root}/patch/lib" />
+  <property name="torque.patch.dist.dir"      value="${torque.gen.patch.root}/dist" />
 
   <property name="test.framework.dir"         value="./src/testingFramework" />
 
@@ -18,6 +24,11 @@
     <path refid="real.src.path" />
     <pathelement location="${test.src.dir}" />
   </path>
+
+  <target name="doCopyTorqueGen">
+    <ant antfile="${torque.gen.patch.root}/build.xml" target="dist" inheritAll="false"/>
+    <antcall target="copyTorque-gen" />
+  </target>
 
   <target name="copyCoberturaTargetClasses">
     <copy todir="${test.classes.dir}_tmp">
@@ -56,10 +67,12 @@
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 
+<!--
   <target name="makeSchemaAccessor" description="テーブルレイアウト、create table文、Javaソース、マッピングファイル、hibernateConfigを作成する">
     <ant antfile="../framework/build-common.xml" target="makeSchemaAccessor" dir="${my.build.dir}" />
     <antcall target="makeMultipleSQL" />
   </target>
+-->
 
   <target name="makeMultipleSQL">
     <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
@@ -100,6 +113,32 @@
       <param name="compile.dest.dir"      value="${framework.classes.dir}" />
       <param name="copy.resource.target"  value="copyRealResources" />
     </antcall>
+  </target>
+
+  <target name="copyTorque-gen" description="Torque-Genのパッチを当てたものを当該プロジェクトへコピーする">
+    <ant antfile="${torque.gen.patch.root}/build.xml" target="dist" inheritAll="false"/>
+    <mkdir dir="${framework.root}/torque-gen/lib" />
+    <delete>
+      <fileset dir="${framework.root}/torque-gen/lib">
+        <include name="*.jar" />
+      </fileset>
+    </delete>
+    <copy todir="${framework.root}/torque-gen/lib">
+      <fileset dir="${torque.patch.base.lib.dir}">
+        <include name="*.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${framework.root}/torque-gen/lib/" overwrite="true">
+      <fileset dir="${torque.patch.patch.lib.dir}">
+        <include name="*.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${framework.root}/torque-gen/lib/" overwrite="true">
+      <fileset dir="${torque.patch.dist.dir}">
+        <include name="*.jar" />
+      </fileset>
+    </copy>
+    <copy file="${torque.patch.dist.dir}/build-torque.xml" tofile="${framework.root}/torque-gen/build-torque.xml" overwrite="true" />
   </target>
 
   <target name="dummy">

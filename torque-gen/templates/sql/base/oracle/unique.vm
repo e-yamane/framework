@@ -1,9 +1,0 @@
-#foreach ($unique in $table.Unices)
-    CONSTRAINT unq_${baseTable.name}_$unique.Name UNIQUE ($unique.ColumnList),
-#end
-#if($table.database.isTableByJavaName("$table.baseClass"))
-#set($foreignTable = $table.database.getTableByJavaName("$table.baseClass"))
-#if($foreignTable)
-#if($foreignTable.isSkipSqlOrg())
-##外部テーブル展開
-$generator.parse("$basepath/unique.vm", "", "table", $foreignTable)#end#end#end

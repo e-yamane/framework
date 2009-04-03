@@ -4,6 +4,7 @@
  *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
  *  All rights reserved.
  */
+
 package jp.rough_diamond.commons.entity.base;
 
 
@@ -18,7 +19,6 @@ import  java.io.Serializable;
  *    table="UNIT"
  *    realClass="jp.rough_diamond.commons.entity.Unit"
 **/
-
 public abstract class BaseUnit  implements Serializable {
     public BaseUnit() {
     }
@@ -166,9 +166,9 @@ public abstract class BaseUnit  implements Serializable {
      * @hibernate.property
      *    column="SCALE"
      *    not-null="true"
+     *    length="10"
      * @return •ÏŠ·‚É•Û‚·‚é­”¸“xB•‰”‚ğw’è‚·‚é‚Æ®”‚ÌØÌ‚Ä”»’f‚·‚é
     **/
-    @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.scale")
     public Integer getScale() {
         return scale;
     }

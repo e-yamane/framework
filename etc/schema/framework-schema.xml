@@ -8,6 +8,7 @@ DTDは、
  /database/table/columnタグにencrypt属性（デフォルトfalse）を追加しています。
 -->
 <database defaultIdMethod="none" name="framework tables" package="jp.rough_diamond.commons.entity" defaultJavaType="object">
+  <option key="sourceHeader" value="license.vm" />
   <!-- 
       Hibernate強引対応拡張ルール
       その１．

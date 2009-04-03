@@ -4,6 +4,7 @@
  *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
  *  All rights reserved.
  */
+
 package jp.rough_diamond.commons.entity.base;
 
 
@@ -15,7 +16,6 @@ import  java.io.Serializable;
 /**
  * 量のHibernateマッピングベースクラス
 **/
-
 public abstract class BaseAmount extends java.lang.Number implements Serializable {
     public BaseAmount() {
     }

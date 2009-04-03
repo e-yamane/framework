@@ -63,6 +63,7 @@
             update="true"
             insert="true"
             column="RATE_VALUE"
+            length="20"
             not-null="true"
         />
 
@@ -72,6 +73,7 @@
             update="true"
             insert="true"
             column="RATE_SCALE"
+            length="10"
             not-null="true"
         />
 
@@ -83,6 +85,7 @@
             update="true"
             insert="true"
             column="SCALE"
+            length="10"
             not-null="true"
         />
 

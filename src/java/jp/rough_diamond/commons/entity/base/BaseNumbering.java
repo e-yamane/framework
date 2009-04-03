@@ -4,6 +4,7 @@
  *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
  *  All rights reserved.
  */
+
 package jp.rough_diamond.commons.entity.base;
 
 
@@ -18,7 +19,6 @@ import  java.io.Serializable;
  *    table="NUMBERING"
  *    realClass="jp.rough_diamond.commons.entity.Numbering"
 **/
-
 public abstract class BaseNumbering  implements Serializable {
     public BaseNumbering() {
     }
@@ -83,9 +83,9 @@ public abstract class BaseNumbering  implements Serializable {
      * @hibernate.property
      *    column="NEXT_NUMBER"
      *    not-null="true"
+     *    length="20"
      * @return Œ»İŠ„‚è“–‚Ä‚Ä‚¢‚é”Ô†
     **/
-    @jp.rough_diamond.commons.service.annotation.NotNull(property="Numbering.nextNumber")
     public Long getNextNumber() {
         return nextNumber;
     }

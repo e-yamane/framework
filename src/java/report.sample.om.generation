@@ -1,82 +1,19 @@
-
-targetdatabase = postgresql
-dbprops.idMethod = sequence
-# Taken from java.sql.Types in the IBM 1.3 JDK
-# JDBC to PostgreSQL mappings.
-#
-# See http://www.postgresql.org/idocs/index.php?datatype.html for more
-# information on PostgreSQL data types.
-
-BIT = boolean
-TINYINT = int2
-SMALLINT = int2
-INTEGER = integer
-BIGINT = int8
-FLOAT = float
-REAL = float
-BOOLEANCHAR = char
-BOOLEANINT = int2
-
-DOUBLE = double precision
-# numeric(precision, scale) / decimal(precision, scale)
-NUMERIC = numeric
-DECIMAL = decimal
-CHAR = char
-VARCHAR = varchar
-LONGVARCHAR = bytea
-DATE = date
-TIME = time
-TIMESTAMP = timestamp
-BINARY = bytea
-VARBINARY = bytea
-LONGVARBINARY = bytea
-NULL =
-OTHER =
-JAVA_OBJECT =
-DISTINCT =
-STRUCT =
-ARRAY =
-BLOB =
-CLOB = text
-REF =
-
-AUTOINCREMENT = serial
-NOTNULL = NOT NULL
-
-primaryKeyInsideTableDirective = true
-indexInsideTableDirective = false
-
-removeNotNullWithAutoIncrement = true
-
-suppressDefaults = false
-idMethod=sequence
-
-
-DAOの生成を開始します
-
-
-
-  jp.rough_diamond.commons.entity
-  jp.rough_diamond.commons.entity
-
-  Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\
-
-  Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\
-  Failed to create dir or dir already exists: D:\products\isken\account\workspace\framework\src\java/jp\rough_diamond\commons\entity\base
-
-        AMOUNT
-          
-        
-
-        UNIT
-          
-        
-
-        SCALABLE_NUMBER
-          
-        
-
-        numbering
-          
-        
-
+Amount=量
+Amount.unitId=数量尺度ID
+Amount.quantity=量
+Amount.unit=数量尺度
+Unit=数量尺度
+Unit.id=OID
+Unit.name=数量尺度名
+Unit.description=単位説明
+Unit.baseUnitId=ベース数量尺度
+Unit.rate=変換係数
+Unit.scale=変換時に保持する少数精度。負数を指定すると整数の切捨て判断する
+Unit.version=楽観的ロッキングキー
+Unit.base=数量尺度
+ScalableNumber=小数点位置指定数値
+ScalableNumber.value=量(整数)
+ScalableNumber.scale=小数点位置。正の数なら左へ、負の数なら右へ移動させる
+Numbering=ナンバリングテーブル
+Numbering.id=ＩＤ
+Numbering.nextNumber=現在割り当てている番号
