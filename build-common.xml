@@ -200,8 +200,18 @@
     <mkdir dir="${framework.lib.root}/dbUnit" />
     <get dest="${framework.lib.root}/dbUnit/dbunit.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar" />
     <mkdir dir="${framework.lib.root}/servletapi" />
+    <get dest="${framework.lib.root}/servletapi/tomcat-6.0.18.zip" usetimestamp="true" ignoreerrors="true" src="http://www.meisei-u.ac.jp/mirror/apache/dist/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.zip" />
+    <unzip src="${framework.lib.root}/servletapi/tomcat-6.0.18.zip" dest="${framework.lib.root}/servletapi">
+      <patternset>
+          <include name="apache-tomcat-6.0.18/lib/servlet-api.jar"/>
+          <include name="apache-tomcat-6.0.18/lib/jsp-api.jar"/>
+      </patternset>
+      <mapper type="flatten"/>
+    </unzip>
+<!--
     <get dest="${framework.lib.root}/servletapi/servlet-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/servlet-api-2.5/6.1H.14/servlet-api-2.5-6.1H.14.jar" />
     <get dest="${framework.lib.root}/servletapi/jsp-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/jsp-api-2.1/6.1H.14/jsp-api-2.1-6.1H.14.jar" />
+-->
     <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p01/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p01.jar" />
   </target>
 

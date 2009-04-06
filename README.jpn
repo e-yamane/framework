@@ -11,9 +11,9 @@ cobertula.jar                 1.9.1         libs/cobertula    http://downloads.s
                                                               jarのみの配布はされていないようなのでzipからjarを取り出してください
 dbunit.jar                    2.1_p01       libs/dbunit/      http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar
                                                               ファイル名を「dbunit.jar」に変更してください
-servlet-api.jar               2.5           libs/servletapi   http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/servlet-api-2.5/6.1H.14/servlet-api-2.5-6.1H.14.jar
-                                                              ファイル名を「dbunit.jar」に変更してください
-jsp-api.jar                   2.1           libs/servletapi   http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/jsp-api-2.1/6.1H.14/jsp-api-2.1-6.1H.14.jar
-                                                              ファイル名を「dbunit.jar」に変更してください
+servlet-api.jar               2.5           libs/servletapi   http://www.meisei-u.ac.jp/mirror/apache/dist/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.zip
+                                                              jarのみの配布はされていないようなのでzipからjarを取り出してください
+jsp-api.jar                   2.1           libs/servletapi   http://www.meisei-u.ac.jp/mirror/apache/dist/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.zip
+                                                              jarのみの配布はされていないようなのでzipからjarを取り出してください
 xdoclet-hibernate-module.jar  1.2.3_p01     libs/xdoclet      http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p01/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p01.jar
                                                               ファイル名を「xdoclet-hibernate-module.jar」に変更してください
