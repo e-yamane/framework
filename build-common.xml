@@ -181,22 +181,11 @@
     </jar>
   </target>
 
-  <target name="get-deps" description="必要なライブラリを取得する">
-<!--
-    <delete>
-      <fileset dir="${framework.lib.root}/dbunit" includes="**/*.jar" excludes="dbunit-2.1_p01.jar" />
-    </delete>
--->
+  <target name="get-deps" unless="noget" description="必要なライブラリを取得する">
     <mkdir dir="${framework.lib.root}/cglib" />
     <get dest="${framework.lib.root}/cglib/cglib-2.1.3.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/cglib/tags/2.1.3_p01/cglib/cglib-2.1.3_p01.jar" />
     <mkdir dir="${framework.lib.root}/cobertura" />
-    <get dest="${framework.lib.root}/cobertura/cobertura.1.9.1.zip" usetimestamp="true" ignoreerrors="true" src="http://downloads.sourceforge.net/cobertura/cobertura-1.9.1-bin.zip" />
-    <unzip src="${framework.lib.root}/cobertura/cobertura.1.9.1.zip" dest="${framework.lib.root}/cobertura">
-      <patternset>
-          <include name="cobertura-1.9.1/cobertura.jar"/>
-      </patternset>
-      <mapper type="flatten"/>
-    </unzip>
+    <get dest="${framework.lib.root}/cobertura/cobertura.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/cobertura/tags/1.9.0_p01/cobertura/cobertura-1.9.0_p01.jar" />
     <mkdir dir="${framework.lib.root}/dbUnit" />
     <get dest="${framework.lib.root}/dbUnit/dbunit.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p01/dbunit/dbunit-2.1_p01.jar" />
     <mkdir dir="${framework.lib.root}/servletapi" />
@@ -208,11 +197,8 @@
       </patternset>
       <mapper type="flatten"/>
     </unzip>
-<!--
-    <get dest="${framework.lib.root}/servletapi/servlet-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/servlet-api-2.5/6.1H.14/servlet-api-2.5-6.1H.14.jar" />
-    <get dest="${framework.lib.root}/servletapi/jsp-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/mortbay/jetty/jsp-api-2.1/6.1H.14/jsp-api-2.1-6.1H.14.jar" />
--->
     <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p01/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p01.jar" />
+    <property name="noget" value="xxx" />
   </target>
 
   <target name="init-task" depends="get-deps, ant-extention-check, ant-extention-make">
@@ -792,6 +778,9 @@
   </target>
 
   <target name="doJUnit">
+    <taskdef classpath="${other.lib.dir}/cobertura.jar" resource="tasks.properties">
+      <classpath refid="classpath.all" />
+    </taskdef>
     <taskdef name="junit" classpathref="classpath.all"
                       classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" />
     <junit printsummary="yes" haltonfailure="no" 
