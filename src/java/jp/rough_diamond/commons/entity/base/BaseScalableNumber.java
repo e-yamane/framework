@@ -32,7 +32,6 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
      * @hibernate.property
      *    column="VALUE"
      *    not-null="true"
-     *    length="20"
      * @return 量(整数)
     **/
     public Long getValue() {
@@ -59,7 +58,6 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
      * @hibernate.property
      *    column="SCALE"
      *    not-null="true"
-     *    length="10"
      * @return 小数点位置。正の数なら左へ、負の数なら右へ移動させる
     **/
     public Integer getScale() {

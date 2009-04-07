@@ -83,7 +83,6 @@ public abstract class BaseNumbering  implements Serializable {
      * @hibernate.property
      *    column="NEXT_NUMBER"
      *    not-null="true"
-     *    length="20"
      * @return Œ»İŠ„‚è“–‚Ä‚Ä‚¢‚é”Ô†
     **/
     public Long getNextNumber() {
