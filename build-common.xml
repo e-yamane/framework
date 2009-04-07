@@ -87,6 +87,7 @@
   </path>
 
   <path id="classpath.real">
+    <pathelement location="${classes.dir}" />
     <fileset dir="${lib.dir}">
       <include name="**/*.jar" />
     </fileset>
@@ -230,7 +231,7 @@
     <ant antfile="../torque-gen-patch/build.xml" target="copyTorque-gen" />
   </target>
 
-  <target name="makeClientStub" description="WSDLをサーバから取得しスタブモジュールを作成する">
+  <target name="makeClientStub" depends="init-task" description="WSDLをサーバから取得しスタブモジュールを作成する">
     <antcall target="getWSDL" />
     <antcall target="wsdl2java" />
   </target>
@@ -256,7 +257,7 @@
     <echo message="${filtering.filename}が存在しません。" />
   </target>
 
-  <target name="getWSDL">
+  <target name="getWSDL" >
     <condition property="wsdl.dir" value="${my.build.dir}/etc/wsdl" >
       <not>
         <isset property="wsdl.dir" />
@@ -272,7 +273,7 @@
         <isset property="di.config.path" />
       </not>
     </condition>
-    <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="wsdl2java.path" diContainerType="${di.container.type}" diConfig="${di.config.path}" />
+    <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="classpath.all" diContainerType="${di.container.type}" diConfig="${di.config.path}" />
   </target>
 
   <target name="wsdl2java">
@@ -310,7 +311,7 @@
       version="${mule.version}" />
   </target>
 
-  <target name="makeCXFService" description="サービスの定義に基づいてサーバ側で必要なリソースを作成する">
+  <target name="makeCXFService" depends="init-task" description="サービスの定義に基づいてサーバ側で必要なリソースを作成する">
     <condition property="cxf.service.file" value="${my.build.dir}/etc/serviceDef/services.xml" >
       <not>
         <isset property="cxf.service.file" />
@@ -778,9 +779,6 @@
   </target>
 
   <target name="doJUnit">
-    <taskdef classpath="${other.lib.dir}/cobertura.jar" resource="tasks.properties">
-      <classpath refid="classpath.all" />
-    </taskdef>
     <taskdef name="junit" classpathref="classpath.all"
                       classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" />
     <junit printsummary="yes" haltonfailure="no" 
