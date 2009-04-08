@@ -54,6 +54,25 @@
   <property name="torque.jar" value="torque-gen-3.3.jar"/>
   <property name="village.jar" value="village-3.3.jar"/>
 
+  <condition property="output.src.encoding" value="MS932" else="${torque.output.src.encoding}">
+    <or>
+      <not>
+        <isset property="torque.output.src.encoding" />
+      </not>
+      <equals arg1="${torque.output.src.encoding}" arg2="@torque.output.src.encoding@" />
+      <equals arg1="${torque.output.src.encoding}" arg2="$${torque.output.src.encoding}" />
+    </or>
+  </condition>
+  <condition property="output.sql.encoding" value="MS932" else="${torque.output.sql.encoding}">
+    <or>
+      <not>
+        <isset property="torque.output.sql.encoding" />
+      </not>
+      <equals arg1="${torque.output.sql.encoding}" arg2="@torque.output.sql.encoding@" />
+      <equals arg1="${torque.output.sql.encoding}" arg2="$${torque.output.sql.encoding}" />
+    </or>
+  </condition>
+
   <!--
     Build the classpath used by all torque ant tasks.
 
@@ -236,6 +255,8 @@
       outputFile="report.${torque.project}.sql.generation"
       sqldbmap="${torque.sql.dir}/sqldb.map"
       targetDatabase="${torque.database}"
+      inputEncoding="Shift_JIS"
+      outputEncoding="${output.sql.encoding}"
       useClasspath="${torque.useClasspath}"
       templatePath="${torque.templatePath}">
       <fileset dir="${torque.schema.dir}"
@@ -243,50 +264,7 @@
         excludes="${torque.schema.sql.excludes}"
       />
     </torque-sql>
-
-<!--
-    <antcall target="sql-classpath"/>
-    <antcall target="sql-template"/>
--->
   </target>
-
-<!--
-  <target name="sql-classpath" if="torque.internal.useClasspath">
-    <echo message="loading templates from classpath"/>
-    <torque-sql
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.sql}"
-      idTableXMLFile="${torque.idTableXMLFile}"
-      outputDirectory="${torque.sql.dir}"
-      outputFile="report.${torque.project}.sql.generation"
-      sqldbmap="${torque.sql.dir}/sqldb.map"
-      targetDatabase="${torque.database}"
-      useClasspath="${torque.useClasspath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.sql.includes}"
-        excludes="${torque.schema.sql.excludes}"
-      />
-    </torque-sql>
-  </target>
-
-  <target name="sql-template" unless="torque.internal.useClasspath">
-    <echo message="loading templates from ${torque.templatePath}"/>
-    <torque-sql
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.sql}"
-      idTableXMLFile="${torque.idTableXMLFile}"
-      outputDirectory="${torque.sql.dir}"
-      outputFile="report.${torque.project}.sql.generation"
-      sqldbmap="${torque.sql.dir}/sqldb.map"
-      targetDatabase="${torque.database}"
-      templatePath="${torque.templatePath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.sql.includes}"
-        excludes="${torque.schema.sql.excludes}"
-      />
-    </torque-sql>
-  </target>
--->
 
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D O C S                                        -->
@@ -313,8 +291,8 @@
       outputFile="report.${torque.project}.doc.generation"
       outputFormat="${torque.doc.format}"
       sqldbmap="${torque.sql.dir}/sqldb.map"
-      inputEncoding="Shift_JIS"
-      outputEncoding="Shift_JIS"
+      inputEncoding="MS932"
+      outputEncoding="UTF-8"
       templatePath="${torque.templatePath}"
       useClasspath="${torque.useClasspath}">
       <fileset dir="${torque.schema.dir}"
@@ -574,6 +552,8 @@
       outputFile="report.${torque.project}.om.generation"
       targetDatabase="${torque.database}"
       targetPackage="${torque.targetPackage}"
+      inputEncoding="MS932"
+      outputEncoding="${output.src.encoding}">
       useClasspath="${torque.useClasspath}"
       templatePath="${torque.templatePath}">
       <fileset dir="${torque.schema.dir}"
@@ -595,73 +575,9 @@
         excludes="${torque.schema.om.excludes}"
       />
     </torque-data-model>
-
-<!--
-    <antcall target="om-classpath"/>
-    <antcall target="om-template"/>
--->
     <!-- antcall target="zip-base-om"/ -->
   </target>
 
-<!--
-  <target name="om-classpath" if="torque.internal.useClasspath">
-    <torque-data-model
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.om}"
-      outputDirectory="${torque.java.dir}"
-      outputFile="report.${torque.project}.om.generation"
-      targetDatabase="${torque.database}"
-      targetPackage="${torque.targetPackage}"
-      useClasspath="${torque.useClasspath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.om.includes}"
-        excludes="${torque.schema.om.excludes}"
-      />
-    </torque-data-model>
-    <torque-data-model
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.om.base}"
-      outputDirectory="${torque.java.base.dir}"
-      outputFile="report.${torque.project}.om.base.generation"
-      targetDatabase="${torque.database}"
-      targetPackage="${torque.targetPackage}"
-      useClasspath="${torque.useClasspath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.om.includes}"
-        excludes="${torque.schema.om.excludes}"
-      />
-    </torque-data-model>
-  </target>
-
-  <target name="om-template" unless="torque.internal.useClasspath">
-    <torque-data-model
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.om}"
-      outputDirectory="${torque.java.dir}"
-      outputFile="report.${torque.project}.om.generation"
-      targetDatabase="${torque.database}"
-      targetPackage="${torque.targetPackage}"
-      templatePath="${torque.templatePath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.om.includes}"
-        excludes="${torque.schema.om.excludes}"
-      />
-    </torque-data-model>
-    <torque-data-model
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.om.base}"
-      outputDirectory="${torque.java.base.dir}"
-      outputFile="report.${torque.project}.om.base.generation"
-      targetDatabase="${torque.database}"
-      targetPackage="${torque.targetPackage}"
-      templatePath="${torque.templatePath}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.om.includes}"
-        excludes="${torque.schema.om.excludes}"
-      />
-    </torque-data-model>
-  </target>
--->
 
   <target
     name="hibernate-java"
@@ -685,8 +601,8 @@
       targetPackage="${torque.targetPackage}"
       useClasspath="${torque.useClasspath}"
       templatePath="${torque.templatePath}"
-      inputEncoding="Shift_JIS"
-      outputEncoding="Shift_JIS">
+      inputEncoding="MS932"
+      outputEncoding="${output.src.encoding}">
       <fileset dir="${torque.schema.dir}"
         includes="${torque.schema.om.includes}"
         excludes="${torque.schema.om.excludes}"
@@ -717,8 +633,8 @@
       targetPackage="${torque.targetPackage}"
       useClasspath="${torque.useClasspath}"
       templatePath="${torque.templatePath}"
-      inputEncoding="Shift_JIS"
-      outputEncoding="Shift_JIS">
+      inputEncoding="MS932"
+      outputEncoding="${output.src.encoding}">
       <fileset dir="${torque.schema.dir}"
         includes="${torque.schema.om.includes}"
         excludes="${torque.schema.om.excludes}"

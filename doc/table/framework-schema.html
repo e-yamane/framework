@@ -1,5 +1,6 @@
 <html>
 <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>framework tables</title>
   <link rel="stylesheet" type="text/css" href="dataModel.css">
 </head>
@@ -14,28 +15,28 @@
     <tr class=summaryrow">
       <td class="summarybackground summaryborder summarytablename"><a href="#AMOUNT" class="link summarytablenamelink">AMOUNT</a></td>
       <td class="summarybackground summaryborder summaryjavaname">Amount</td>
-      <td class="summarybackground summaryborder summarydescription"> ��</td>
+      <td class="summarybackground summaryborder summarydescription"> 量</td>
     </tr>
     <tr class=summaryrow">
       <td class="summarybackground summaryborder summarytablename"><a href="#UNIT" class="link summarytablenamelink">UNIT</a></td>
       <td class="summarybackground summaryborder summaryjavaname">Unit</td>
-      <td class="summarybackground summaryborder summarydescription"> ���ʎړx</td>
+      <td class="summarybackground summaryborder summarydescription"> 数量尺度</td>
     </tr>
     <tr class=summaryrow">
       <td class="summarybackground summaryborder summarytablename"><a href="#SCALABLE_NUMBER" class="link summarytablenamelink">SCALABLE_NUMBER</a></td>
       <td class="summarybackground summaryborder summaryjavaname">ScalableNumber</td>
-      <td class="summarybackground summaryborder summarydescription"> �����_�ʒu�w�萔�l</td>
+      <td class="summarybackground summaryborder summarydescription"> 小数点位置指定数値</td>
     </tr>
     <tr class=summaryrow">
       <td class="summarybackground summaryborder summarytablename"><a href="#numbering" class="link summarytablenamelink">numbering</a></td>
       <td class="summarybackground summaryborder summaryjavaname">Numbering</td>
-      <td class="summarybackground summaryborder summarydescription"> �i���o�����O�e�[�u��</td>
+      <td class="summarybackground summaryborder summarydescription"> ナンバリングテーブル</td>
     </tr>
   </table>
 
     <a name="AMOUNT"/>
-<h2>AMOUNT �i�N���X�̂݁j</h2>
-��
+<h2>AMOUNT （クラスのみ）</h2>
+量
 <p/>
 <table border="1" cellspacing="0">
   <tr>
@@ -58,7 +59,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
-    <td class="normalFont"> ���ʎړxID</td>
+    <td class="normalFont"> 数量尺度ID</td>
   </tr>
   <tr>
     <td class="normalFont" id="SCALABLE_NUMBERQ_VALUE">Q_VALUE</td>
@@ -69,7 +70,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont">��. ��(����)</td>
+    <td class="normalFont">量. 量(整数)</td>
   </tr>
   <tr>
     <td class="normalFont" id="SCALABLE_NUMBERQ_SCALE">Q_SCALE</td>
@@ -80,7 +81,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont">��. �����_�ʒu�B���̐��Ȃ獶�ցA���̐��Ȃ�E�ֈړ�������</td>
+    <td class="normalFont">量. 小数点位置。正の数なら左へ、負の数なら右へ移動させる</td>
   </tr>
 
 
@@ -90,7 +91,7 @@
 
     <a name="UNIT"/>
 <h2>UNIT </h2>
-���ʎړx
+数量尺度
 <p/>
 <table border="1" cellspacing="0">
   <tr>
@@ -124,7 +125,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> ���ʎړx��</td>
+    <td class="normalFont"> 数量尺度名</td>
   </tr>
   <tr>
     <td class="normalFont" id="UNITDESCRIPTION">DESCRIPTION</td>
@@ -135,7 +136,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
-    <td class="normalFont"> �P�ʐ���</td>
+    <td class="normalFont"> 単位説明</td>
   </tr>
   <tr>
     <td class="normalFont" id="UNITBASE_UNIT_ID">BASE_UNIT_ID</td>
@@ -146,7 +147,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> �x�[�X���ʎړx</td>
+    <td class="normalFont"> ベース数量尺度</td>
   </tr>
   <tr>
     <td class="normalFont" id="SCALABLE_NUMBERRATE_VALUE">RATE_VALUE</td>
@@ -157,7 +158,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont">�ϊ��W��. ��(����)</td>
+    <td class="normalFont">変換係数. 量(整数)</td>
   </tr>
   <tr>
     <td class="normalFont" id="SCALABLE_NUMBERRATE_SCALE">RATE_SCALE</td>
@@ -168,7 +169,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont">�ϊ��W��. �����_�ʒu�B���̐��Ȃ獶�ցA���̐��Ȃ�E�ֈړ�������</td>
+    <td class="normalFont">変換係数. 小数点位置。正の数なら左へ、負の数なら右へ移動させる</td>
   </tr>
 
   <tr>
@@ -180,7 +181,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> �ϊ����ɕێ����鏭�����x�B�������w�肷��Ɛ����̐؎̂Ĕ��f����</td>
+    <td class="normalFont"> 変換時に保持する少数精度。負数を指定すると整数の切捨て判断する</td>
   </tr>
   <tr>
     <td class="normalFont" id="SCALABLE_NUMBERVERSION">VERSION</td>
@@ -191,7 +192,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> �y�ϓI���b�L���O�L�[</td>
+    <td class="normalFont"> 楽観的ロッキングキー</td>
   </tr>
 
 </table>
@@ -199,8 +200,8 @@
 </script>
 
     <a name="SCALABLE_NUMBER"/>
-<h2>SCALABLE_NUMBER �i�N���X�̂݁j</h2>
-�����_�ʒu�w�萔�l
+<h2>SCALABLE_NUMBER （クラスのみ）</h2>
+小数点位置指定数値
 <p/>
 <table border="1" cellspacing="0">
   <tr>
@@ -223,7 +224,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> ��(����)</td>
+    <td class="normalFont"> 量(整数)</td>
   </tr>
   <tr>
     <td class="normalFont" id="SCALABLE_NUMBERSCALE">SCALE</td>
@@ -234,7 +235,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> �����_�ʒu�B���̐��Ȃ獶�ցA���̐��Ȃ�E�ֈړ�������</td>
+    <td class="normalFont"> 小数点位置。正の数なら左へ、負の数なら右へ移動させる</td>
   </tr>
 
 </table>
@@ -243,7 +244,7 @@
 
     <a name="numbering"/>
 <h2>numbering </h2>
-�i���o�����O�e�[�u��
+ナンバリングテーブル
 <p/>
 <table border="1" cellspacing="0">
   <tr>
@@ -266,7 +267,7 @@
     <td class="normalFont"><center> X </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> �h�c</td>
+    <td class="normalFont"> ＩＤ</td>
   </tr>
   <tr>
     <td class="normalFont" id="numberingnext_number">next_number</td>
@@ -277,7 +278,7 @@
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center>  &nbsp; </center></td>
     <td class="normalFont"><center> X </center></td>
-    <td class="normalFont"> ���݊��蓖�ĂĂ���ԍ�</td>
+    <td class="normalFont"> 現在割り当てている番号</td>
   </tr>
 
 </table>

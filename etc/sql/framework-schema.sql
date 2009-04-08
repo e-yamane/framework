@@ -19,16 +19,16 @@ CREATE TABLE UNIT
     PRIMARY KEY (ID)
 );
 
-COMMENT ON TABLE UNIT IS '���ʎړx';
+COMMENT ON TABLE UNIT IS '数量尺度';
 COMMENT ON COLUMN UNIT.ID IS 'OID';
-COMMENT ON COLUMN UNIT.NAME IS '���ʎړx��';
-COMMENT ON COLUMN UNIT.DESCRIPTION IS '�P�ʐ���';
-COMMENT ON COLUMN UNIT.BASE_UNIT_ID IS '�x�[�X���ʎړx';
-COMMENT ON COLUMN UNIT.RATE_VALUE IS '�ϊ��W�� ��(����)';
-COMMENT ON COLUMN UNIT.RATE_SCALE IS '�ϊ��W�� �����_�ʒu�B���̐��Ȃ獶�ցA���̐��Ȃ�E�ֈړ�������';
+COMMENT ON COLUMN UNIT.NAME IS '数量尺度名';
+COMMENT ON COLUMN UNIT.DESCRIPTION IS '単位説明';
+COMMENT ON COLUMN UNIT.BASE_UNIT_ID IS 'ベース数量尺度';
+COMMENT ON COLUMN UNIT.RATE_VALUE IS '変換係数 量(整数)';
+COMMENT ON COLUMN UNIT.RATE_SCALE IS '変換係数 小数点位置。正の数なら左へ、負の数なら右へ移動させる';
 
-COMMENT ON COLUMN UNIT.SCALE IS '�ϊ����ɕێ����鏭�����x�B�������w�肷��Ɛ����̐؎̂Ĕ��f����';
-COMMENT ON COLUMN UNIT.VERSION IS '�y�ϓI���b�L���O�L�[';
+COMMENT ON COLUMN UNIT.SCALE IS '変換時に保持する少数精度。負数を指定すると整数の切捨て判断する';
+COMMENT ON COLUMN UNIT.VERSION IS '楽観的ロッキングキー';
 
 
 -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ CREATE TABLE numbering
     PRIMARY KEY (id)
 );
 
-COMMENT ON TABLE numbering IS '�i���o�����O�e�[�u��';
-COMMENT ON COLUMN numbering.id IS '�h�c';
-COMMENT ON COLUMN numbering.next_number IS '���݊��蓖�ĂĂ���ԍ�';
+COMMENT ON TABLE numbering IS 'ナンバリングテーブル';
+COMMENT ON COLUMN numbering.id IS 'ＩＤ';
+COMMENT ON COLUMN numbering.next_number IS '現在割り当てている番号';
 
