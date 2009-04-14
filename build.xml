@@ -69,12 +69,10 @@
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 
-<!--
   <target name="makeSchemaAccessor" description="テーブルレイアウト、create table文、Javaソース、マッピングファイル、hibernateConfigを作成する">
     <ant antfile="../framework/build-common.xml" target="makeSchemaAccessor" dir="${my.build.dir}" />
     <antcall target="makeMultipleSQL" />
   </target>
--->
 
   <target name="makeMultipleSQL">
     <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
