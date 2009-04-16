@@ -627,8 +627,8 @@
     <torque-data-model
       contextProperties="${torque.contextProperties}"
       controlTemplate="properties/Control.vm"
-      outputDirectory="${torque.java.dir}"
-      outputFile="report.${torque.project}.om.generation"
+      outputDirectory="${torque.schema.property.dir}"
+      outputFile="${torque.schema.property.file}"
       targetDatabase="${torque.database}"
       targetPackage="${torque.targetPackage}"
       useClasspath="${torque.useClasspath}"
