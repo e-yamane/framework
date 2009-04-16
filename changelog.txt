@@ -1,0 +1,5 @@
+RDF Core Change Log
+===================
+
+0.8から0.8.1の変更点(2009.4.16)
+ [BUG]makeSchemaAccessor実行時にスキーマプロパティが作成されない
