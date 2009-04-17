@@ -2,4 +2,10 @@ RDF Core Change Log
 ===================
 
 0.8から0.8.1の変更点(2009.4.16)
- [BUG]makeSchemaAccessor実行時にスキーマプロパティが作成されない
+ [Bug]
+    - makeSchemaAccessor実行時にスキーマプロパティが作成されない
+
+0.8.1から???への変更点(2009.xx.xx)
+ [Improvement]
+    - ExtractorにfetchSizeを指定することでResultSetのフェッチサイズを
+      変更できるようにしました。デフォルトはHibernate依存です
