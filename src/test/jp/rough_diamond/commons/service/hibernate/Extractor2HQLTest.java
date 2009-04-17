@@ -38,6 +38,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		public void getQuery(int fetchSize) {
 			Extractor ex = new Extractor(Numbering.class);
 			ex.setFetchSize(fetchSize);
+			BasicService.getService().findByExtractor(ex);
 		}
 	}
 }
