@@ -163,13 +163,16 @@ public class HibernateBasicService extends BasicService {
 
 	@Override
     @SuppressWarnings("unchecked")
-    public <T> List<T> findAll(Class<T> type, boolean isNoCache) {
+    public <T> List<T> findAll(Class<T> type, boolean isNoCache, int fetchSize) {
     	BasicServiceInterceptor.setNoCache(isNoCache);
         try {
             Criteria criteria = HibernateUtils.getSession().createCriteria(type);
 //            if(LogicalDeleteEntity.class.isAssignableFrom(type)) {
 //                criteria.add(Restrictions.eq("deletedInDB", HibernateUtils.BOOLEAN_CHAR_F));
 //            }
+            if(fetchSize != Extractor.DEFAULT_FETCH_SIZE) {
+            	criteria.setFetchSize(fetchSize);
+            }
             List<T> list = criteria.list();
             fireEvent(CallbackEventType.POST_LOAD, list);
             return list;

@@ -46,9 +46,9 @@ import org.apache.commons.logging.LogFactory;
 abstract public class BasicService implements Service {
     private final static Log log = LogFactory.getLog(BasicService.class);
     
-    public final static String BOOLEAN_CHAR_T = "Y";
-    public final static String BOOLEAN_CHAR_F = "N";
-    
+    public final static String 	BOOLEAN_CHAR_T = "Y";
+    public final static String 	BOOLEAN_CHAR_F = "N";
+
     /**
      * レコードのロックモード
      * @author e-yamane
@@ -68,7 +68,7 @@ abstract public class BasicService implements Service {
     public static BasicService getService() {
     	return ServiceLocator.getService(BasicService.class, DEFAULT_BASIC_SERVICE_CLASS_NAME);
     }
-    
+
     /**
      * 指定された主キーに対応するオブジェクトを取得する
      * 取得したオブジェクトは永続化エンジン（例：Hibernate）がキャッシュするように指示する
@@ -240,13 +240,38 @@ abstract public class BasicService implements Service {
     /**
      * 指定されたクラスの永続化オブジェクトを全て取得する
      * 取得したオブジェクトは永続化エンジン（例：Hibernate）がキャッシュするように指示する
-     * また、取得したレコードに対するロックは行わない
+     * また、取得したレコードに対するロックは行わなず、フェッチサイズは下位ライブラリに依存する
      * @param <T>	取得対象クラスタイプ
      * @param type	取得対象クラスタイプ
      * @return		取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
      */
     public <T> List<T> findAll(Class<T> type) {
-    	return findAll(type, false);
+    	return findAll(type, false, Extractor.DEFAULT_FETCH_SIZE);
+    }
+
+    /**
+     * 指定されたクラスの永続化オブジェクトを全て取得する
+     * 取得したオブジェクトは永続化エンジン（例：Hibernate）がキャッシュするように指示する
+     * また、取得したレコードに対するロックは行わない
+     * @param <T>		取得対象クラスタイプ
+     * @param type		取得対象クラスタイプ
+     * @param fetchSize	フェッチサイズ（内部的な振る舞い）
+     * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
+     */
+    public <T> List<T> findAll(Class<T> type, int fetchSize) {
+    	return findAll(type, false, fetchSize);
+    }
+    
+    /**
+     * 指定されたクラスの永続化オブジェクトを全て取得する
+     * 取得したレコードに対するロックは行わないず、フェッチサイズは下位ライブラリに依存する
+     * @param <T>		取得対象クラスタイプ
+     * @param type		取得対象クラスタイプ
+     * @param isNoCache	true：永続化エンジン（例：Hibernate）がキャッシュしない false:キャッシュする	
+     * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
+     */
+    public <T> List<T> findAll(Class<T> type, boolean isNoCache) {
+    	return findAll(type, isNoCache, Extractor.DEFAULT_FETCH_SIZE);
     }
 
     /**
@@ -255,10 +280,11 @@ abstract public class BasicService implements Service {
      * @param <T>		取得対象クラスタイプ
      * @param type		取得対象クラスタイプ
      * @param isNoCache	true：永続化エンジン（例：Hibernate）がキャッシュしない false:キャッシュする	
+     * @param fetchSize	フェッチサイズ（内部的な振る舞い）
      * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
      */
-    abstract public <T> List<T> findAll(Class<T> type, boolean isNoCache);
-
+    abstract public <T> List<T> findAll(Class<T> type, boolean isNoCache, int fetchSize);
+    
     /**
      * 指定されたオブジェクト（群）を永続化(INSERT)する
      * 主キーがStringもしくはNumberを継承するオブジェクトでかつnullの場合は主キーは自動的に

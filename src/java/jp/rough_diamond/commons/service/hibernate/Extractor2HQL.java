@@ -174,6 +174,9 @@ public class Extractor2HQL {
         if(extractor.getValues().size() == 0) {
         	query.setLockMode(getAlias(extractor.target, extractor.targetAlias), lockMode);
         }
+        if(extractor.getFetchSize() != Extractor.DEFAULT_FETCH_SIZE) {
+        	query.setFetchSize(extractor.getFetchSize());
+        }
         return query;
     }
     

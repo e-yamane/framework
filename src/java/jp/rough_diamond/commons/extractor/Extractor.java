@@ -18,7 +18,9 @@ import java.util.List;
 public class Extractor implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	/**
+    public final static int		DEFAULT_FETCH_SIZE = -1;
+
+    /**
 	 * 抽出対象エンティティクラス
 	 */
 	public final Class target;
@@ -34,7 +36,8 @@ public class Extractor implements Serializable {
     private List<ExtractValue>  values = new ArrayList<ExtractValue>();
     
 	private int 	offset = 0;
-	private int	limit = -1;
+	private int		limit = -1;
+	private int		fetchSize = DEFAULT_FETCH_SIZE;
 	
 	/**
 	 * 抽出条件格納オブジェクトを生成する
@@ -120,7 +123,23 @@ public class Extractor implements Serializable {
 	public void setOffset(int offset) {
 		this.offset = offset;
 	}
-    
+
+	/**
+	 * フェッチサイズを取得する
+	 * @return	フェッチサイズ
+	 */
+	public int getFetchSize() {
+		return fetchSize;
+	}
+
+	/**
+	 * フェッチサイズを設定する
+	 * @param fetchSize
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
+	}
+
     /**
      * 内部結合オブジェクトを追加する
      * @param join
