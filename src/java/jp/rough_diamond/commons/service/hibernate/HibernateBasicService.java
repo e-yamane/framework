@@ -20,15 +20,12 @@ import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.metadata.ClassMetadata;
 
 import jp.rough_diamond.commons.extractor.Extractor;
-import jp.rough_diamond.commons.resource.Message;
 import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.resource.MessagesIncludingException;
-import jp.rough_diamond.commons.resource.ResourceManager;
 import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.service.CallbackEventType;
 import jp.rough_diamond.commons.service.FindResult;
@@ -36,7 +33,6 @@ import jp.rough_diamond.commons.service.NumberingService;
 import jp.rough_diamond.commons.service.RelationalChecker;
 import jp.rough_diamond.commons.service.WhenVerifier;
 import jp.rough_diamond.commons.service.annotation.Check;
-import jp.rough_diamond.commons.service.annotation.Unique;
 import jp.rough_diamond.framework.transaction.VersionUnmuchException;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateConnectionManager;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
@@ -375,61 +371,12 @@ public class HibernateBasicService extends BasicService {
         }
     }
 
-	@Override
-    @SuppressWarnings("unchecked")
-	protected Messages checkUnique(Object o, WhenVerifier when, Unique u) {
-    	Session session = HibernateUtils.getSession();
-    	SessionFactory sf = session.getSessionFactory();
-        ClassMetadata cm = sf.getClassMetadata(o.getClass());
-		Messages ret = new Messages();
-		for(Check check : u.groups()) {
-			String targetProperty = u.entity() + "." + check.properties()[0];
-			List list = getMutchingObjects(o, session, cm, check);
-			if(list.size() == 0) {
-				continue;	//サイズ０なので無条件にＯＫ
-			}
-			if(when == WhenVerifier.INSERT) {
-				//登録時に１件以上あるので無条件にエラー
-				ret.add(targetProperty, new Message("errors.duplicate", 
-						ResourceManager.getResource().getString(targetProperty)));
-			} else {
-				//更新時
-				if(list.size() > 1) {
-					ret.add(targetProperty, new Message("errors.duplicate", 
-							ResourceManager.getResource().getString(targetProperty)));
-				} else if(!isSelfObject(cm, o, list.get(0))){
-	    			ret.add(targetProperty, new Message("errors.duplicate", 
-	    					ResourceManager.getResource().getString(targetProperty)));
-				}
-			}
-		}
-		return ret;
-	}
-
-	private boolean isSelfObject(ClassMetadata cm, Object org, Object target) {
-        Object pk1 = cm.getIdentifier(org, EntityMode.POJO);
-        Object pk2 = cm.getIdentifier(target, EntityMode.POJO);
-		return (pk2.equals(pk1));
-	}
-	
+    @Override
 	@SuppressWarnings("unchecked")
-	private List getMutchingObjects(Object o, Session session, ClassMetadata cm, Check check) {
-		Criteria criteria = session.createCriteria(o.getClass());
-		for(String property : check.properties()) {
-			if(property.equals(cm.getIdentifierPropertyName())) {
-				criteria.add(Restrictions.eq(property, cm.getIdentifier(o, EntityMode.POJO)));
-			} else {
-				Object value = cm.getPropertyValue(o, property, EntityMode.POJO);
-				if(value == null) {
-					criteria.add(Restrictions.isNull(property));
-				} else {
-					criteria.add(Restrictions.eq(property, value));
-				}
-			}
-		}
-	    session.evict(o);
-		criteria.setLockMode(LockMode.UPGRADE);
-		List list = criteria.list();
+	protected List getMutchingObjects(Object o, Check check) {
+    	Session session = HibernateUtils.getSession();
+		session.evict(o);
+		List list = super.getMutchingObjects(o, check);
 		for(Object tmp : list) {
 			session.evict(tmp);	//Hibernateの管理対象オブジェクトから除外（しないとうにゃうにゃする）
 		}

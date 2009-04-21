@@ -155,7 +155,7 @@ public class Extractor2HQL {
 	}
 
     private Query makeQuery(LockMode lockMode) {
-        makeSelectCouse();
+        makeSelectCouse(lockMode);
         makeFromCouse(true);
         makeWhereCouse();
         makeOrderByCouse();
@@ -367,10 +367,12 @@ public class Extractor2HQL {
         builder.append(targetProperty);
     }
     
-    private void makeSelectCouse() {
+    private void makeSelectCouse(LockMode lockMode) {
         builder.append("select ");
         if(extractor.getValues().size() == 0) {
-            builder.append("distinct ");
+        	if(lockMode == LockMode.NONE) {
+        		builder.append("distinct ");
+        	}
             builder.append(getAlias(extractor.target, extractor.targetAlias));
             for(Order order : extractor.getOrderIterator()) {
                 if(order.target == null) {

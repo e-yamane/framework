@@ -21,11 +21,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import jp.rough_diamond.commons.di.DIContainerFactory;
+import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Extractor;
 import jp.rough_diamond.commons.resource.Message;
 import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.resource.MessagesIncludingException;
 import jp.rough_diamond.commons.resource.ResourceManager;
+import jp.rough_diamond.commons.service.annotation.Check;
 import jp.rough_diamond.commons.service.annotation.MaxLength;
 import jp.rough_diamond.commons.service.annotation.NestedComponent;
 import jp.rough_diamond.commons.service.annotation.NotNull;
@@ -638,7 +640,55 @@ abstract public class BasicService implements Service {
     	return ret;
 	}
     
-	abstract protected Messages checkUnique(Object o, WhenVerifier when, Unique u);
+	protected Messages checkUnique(Object o, WhenVerifier when, Unique u) {
+		Messages ret = new Messages();
+		for(Check check : u.groups()) {
+			List list = getMutchingObjects(o, check);
+			if(list.size() == 0) {
+				continue;	//ƒTƒCƒY‚O‚È‚Ì‚Å–³ðŒ‚É‚n‚j
+			}
+			if(when == WhenVerifier.INSERT) {
+				String targetProperty = u.entity() + "." + check.properties()[0];
+				//“o˜^Žž‚É‚PŒˆÈã‚ ‚é‚Ì‚Å–³ðŒ‚ÉƒGƒ‰[
+				ret.add(targetProperty, new Message("errors.duplicate", 
+						ResourceManager.getResource().getString(targetProperty)));
+			} else {
+				//XVŽž
+				if(list.size() > 1) {
+					String targetProperty = u.entity() + "." + check.properties()[0];
+					ret.add(targetProperty, new Message("errors.duplicate", 
+							ResourceManager.getResource().getString(targetProperty)));
+				} else if(!o.equals(list.get(0))){
+					String targetProperty = u.entity() + "." + check.properties()[0];
+	    			ret.add(targetProperty, new Message("errors.duplicate", 
+	    					ResourceManager.getResource().getString(targetProperty)));
+				}
+			}
+		}
+		return ret;
+	}
+
+	protected List getMutchingObjects(Object o, Check check) {
+		try {
+			Extractor ex = new Extractor(o.getClass());
+			for(String property : check.properties()) {
+				Object value;
+					value = PropertyUtils.getProperty(o, property);
+				if(value == null) {
+					ex.add(Condition.isNull(property));
+				} else {
+					ex.add(Condition.eq(property, value));
+				}
+			}		
+			return findByExtractor(ex, RecordLock.FOR_UPDATE);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	private int getLength(Object target) throws Exception {
     	if(target == null) {

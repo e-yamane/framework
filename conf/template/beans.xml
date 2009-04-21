@@ -58,7 +58,7 @@
 
   <bean id="resourceName" class="java.lang.String">
     <description>リソースファイル名</description>
-    <constructor-arg index="0" type="java.lang.String"><value>messageResource, schemaResources</value></constructor-arg>
+    <constructor-arg index="0" type="java.lang.String"><value>messageResource, schemaResources, project-gen</value></constructor-arg>
   </bean>
   
   <bean id="userController" class="jp.rough_diamond.framework.user.UserControllerByThreadLocal">

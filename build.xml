@@ -7,7 +7,7 @@
   <property name="ci.preprocess.name"         value="doCopyTorqueGen" />
   <import file="../framework/build-common.xml" />
 
-  <property name="product.version"            value="0.8" />
+  <property name="product.version"            value="0.8.1" />
 
   <!-- TorqueŠÖŒW -->
   <property name="torque.gen.patch.root"      value="${framework.root}/../torque-gen-patch" />

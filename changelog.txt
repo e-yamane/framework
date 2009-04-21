@@ -9,3 +9,6 @@ RDF Core Change Log
  [Improvement]
     - ExtractorにfetchSizeを指定することでResultSetのフェッチサイズを
       変更できるようにしました。デフォルトはHibernate依存です
+    - ユニークチェックをExtractor+PropertyUtilsで行うように変更しました。
+　　　（性能改善）この変更に伴いHibernateに依存しないコードが大部分に
+　　　なったため、ユニークチェックの処理をBasicServiceへ移動
