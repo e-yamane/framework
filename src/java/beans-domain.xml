@@ -16,4 +16,10 @@
     <constructor-arg index="1"><value>true</value></constructor-arg>
   </bean>
 -->
+  <bean id="hogeMonitor" class="jp.rough_diamond.commons.util.jobmonitor.CronJobMonitor">
+    <constructor-arg index="0">
+      <list>
+      </list>
+    </constructor-arg>
+  </bean>
 </beans>

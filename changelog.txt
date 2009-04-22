@@ -12,3 +12,8 @@ RDF Core Change Log
     - ユニークチェックをExtractor+PropertyUtilsで行うように変更しました。
 　　　（性能改善）この変更に伴いHibernateに依存しないコードが大部分に
 　　　なったため、ユニークチェックの処理をBasicServiceへ移動
+    - jp.rough_diamond.commons.util.jobmonitor.ContextListenerを新規作成
+      Webアプリケーション上からJobMonitorを起動するためのリスナ。
+　　　context-param(name="monitorName")で指定されたJobMonitorをDIコンテナより
+      取得/実行を行う。省略した場合はjobMonitorと言う名前でDIコンテナから
+      取得する

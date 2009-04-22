@@ -44,6 +44,7 @@
 	<classpathentry kind="lib" path="libs/mule/mule-module-client-2.1.1.jar"/>
 	<classpathentry kind="lib" path="libs/hibernate/c3p0-0.9.1.jar"/>
 	<classpathentry kind="lib" path="libs/aopalliance/aopalliance.jar"/>
+	<classpathentry kind="lib" path="libs/easymock/easymock.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
