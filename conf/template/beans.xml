@@ -100,8 +100,8 @@ velocimacro.library = VM_global_library.vm,common.vm
   </bean>
 
 <!--
-  <bean id="roleJudge" class="com.lidic.presentation.RoleJudge">
-    <description>LiDiCアクセス制御</description>
+  <bean id="roleJudge" class="jp.rough_diamond.framework.user.SimpleRoleJudge">
+    <description>アクセス制御</description>
   </bean>
 
   <bean id="containsCountry" class="java.util.HashSet">
