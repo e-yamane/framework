@@ -15,15 +15,15 @@ import java.util.TimerTask;
  * cronちっくなジョブモニター
  */
 public class CronJobMonitor implements JobMonitor {
-	Timer timer = null;
-	final List<CronTask> tasks;
+	Timer timer;
+	final List<CrontabTask> tasks;
 	final long period;
-	public CronJobMonitor(List<CronTask> tasks) {
+	public CronJobMonitor(List<CrontabTask> tasks) {
 		this(tasks, 10000);	//10秒間隔
 	}
 
-	public CronJobMonitor(List<CronTask> tasks, long period) {
-		this.tasks = new ArrayList<CronTask>(tasks);
+	public CronJobMonitor(List<CrontabTask> tasks, long period) {
+		this.tasks = new ArrayList<CrontabTask>(tasks);
 		this.period = period;
 	}
 	
@@ -36,7 +36,7 @@ public class CronJobMonitor implements JobMonitor {
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {
-				for(CronTask task : tasks) {
+				for(CrontabTask task : tasks) {
 					task.executeWhenPastNextTimestamp();
 				}
 			}

@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CronTask {
+public class CronTask implements CrontabTask {
 	final Schedule schedule;
 	Date nextTimestamp;
 	final Job job;

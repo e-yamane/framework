@@ -6,7 +6,7 @@ RDF Core Change Log
     - makeSchemaAccessor実行時にスキーマプロパティが作成されない
 
 0.8.1から???への変更点(2009.xx.xx)
- [Improvement]
+  [Improvement]
     - ExtractorにfetchSizeを指定することでResultSetのフェッチサイズを
       変更できるようにしました。デフォルトはHibernate依存です
     - ユニークチェックをExtractor+PropertyUtilsで行うように変更しました。
@@ -17,3 +17,10 @@ RDF Core Change Log
 　　　context-param(name="monitorName")で指定されたJobMonitorをDIコンテナより
       取得/実行を行う。省略した場合はjobMonitorと言う名前でDIコンテナから
       取得する
+    - JavaVM毎に一意にユーザーを管理するSimpleUserControllerを新規作成
+    - 常にアクセス許可を返すSimpleRoleJudgeを作成
+    - crontabの実行時間指定文字列に完全準拠したHudsonCronTaskを新規作成
+　　　名前とおり、hudsonの内部モジュールを使用しているので、hudson-core、
+　　　localizerが必要となります。
+  [Bug]
+    - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
