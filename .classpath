@@ -4,9 +4,6 @@
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/test"/>
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/testingFramework"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="libs/common/rd-commons-di-1.4.jar"/>
-	<classpathentry kind="lib" path="libs/common/rd-commons-io-1.0.jar"/>
-	<classpathentry kind="lib" path="libs/common/rd-commons-lang-1.2.jar"/>
 	<classpathentry kind="lib" path="libs/common/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="libs/servletapi/jsp-api.jar"/>
 	<classpathentry kind="lib" path="libs/servletapi/servlet-api.jar"/>
