@@ -16,7 +16,7 @@ public class ProjectGeneratorParameterTest extends TestCase {
 		ProjectGeneratorParameter param = new ProjectGeneratorParameter();
 		File f = new File("./");
 		param.setFrameworkRoot(f.getCanonicalPath());
-		param.setProjectRoot("d:/hoge");
+		param.setProjectRoot(new File(File.listRoots()[0], "hoge").getCanonicalPath());
 		assertEquals("Framework‚Ì‘Š‘ÎƒpƒX‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 
 				f.getCanonicalPath().replaceAll("\\\\", "/"), param.getFrameworkPathRelative());
 		param.setProjectRoot("workspace/hoge");
