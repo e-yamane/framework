@@ -718,8 +718,7 @@
   </target>
 -->
 
-<!--
-  <target name="doIt" description="Javaプログラムを起動する">
+  <target name="doIt">
     <condition property="parameter" value="" >
       <not>
         <isset property="parameter" />
@@ -745,7 +744,6 @@
       </classpath>
     </java>
   </target>
--->
 
   <target name="test" description="JUnit+coberturaでテストを実行する" depends="test.prepare, test.compile">
     <taskdef classpath="${other.lib.dir}/cobertura.jar" resource="tasks.properties">

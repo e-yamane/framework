@@ -97,6 +97,14 @@
     </antcall>
   </target>
 
+  <target name="newProject" depends="makeJar" description="新しいプロジェクトを作成する">
+    <copy file="${framework.dist.dir}/rd-framework-${product.version}.jar" todir="${lib.dir}/common/" />
+    <antcall target="doIt">
+      <param name="target" value="jp.rough_diamond.tools.projectgen.ProjectGeneratorGUI" />
+    </antcall>
+    <delete file="${lib.dir}/common/rd-framework-${product.version}.jar"/>
+  </target>
+
   <target name="makeJar" depends="compile" description="Jarファイルを作成する">
     <jar destfile="${framework.dist.dir}/rd-framework-${product.version}.jar" basedir="${framework.classes.dir}">
       <manifest>
@@ -105,8 +113,8 @@
         <attribute name="Implementation-Version"  value="${framework.ant.extention.version}"/>
       </manifest>
     </jar>
-    <!-- 下位互換性 そのうち消す -->
     <copy file="${framework.dist.dir}/rd-framework-${product.version}.jar" tofile="${framework.dist.dir}/rd-framework.jar" />
+    <!-- 下位互換性 そのうち消す -->
     <copy file="${framework.lib.root}/cglib/cglib-2.1.3.jar" tofile="${framework.dist.dir}/cglib-2.1.3.jar" />
   </target>
 

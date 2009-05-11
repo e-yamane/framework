@@ -9,6 +9,7 @@ package jp.rough_diamond.tools.projectgen;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -28,11 +29,11 @@ public class ProjectGeneratorParameter {
 	/**
 	 * プロジェクト名
 	 */
-	private String projectName;
+	private String projectName = "";
 	/**
 	 * ソースエンコーディング
 	 */
-	private String sourceEncoding;
+	private String sourceEncoding = Charset.defaultCharset().toString();
 	/**
 	 * プロジェクトルート
 	 */
