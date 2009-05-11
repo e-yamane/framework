@@ -223,7 +223,12 @@
   </target>
 
   <target name="makeBean" depends="init-task" description="JavaBeansを作成する">
-    <beanGen root="${src.dir}" input="beanDef/beanDef.xml" />
+    <condition property="bean.def.xml" value="beanDef/beanDef.xml" >
+      <not>
+        <isset property="bean.def.xml" />
+      </not>
+    </condition>
+    <beanGen root="${src.dir}" input="${bean.def.xml}" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 
@@ -273,7 +278,8 @@
         <isset property="di.config.path" />
       </not>
     </condition>
-    <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="classpath.all" diContainerType="${di.container.type}" diConfig="${di.config.path}" />
+    <getWSDL wsdlStorageDir="${wsdl.dir}" classPathRef="classpath.all" 
+        diContainerType="${di.container.type}" diConfig="${di.config.path}" />
   </target>
 
   <target name="wsdl2java">
@@ -297,6 +303,11 @@
         <isset property="cxf.mule.client.config" />
       </not>
     </condition>
+    <condition property="server.endpoint.prefix" value="gateway" >
+      <not>
+        <isset property="server.endpoint.prefix" />
+      </not>
+    </condition>
     <condition property="mule.version" value="2.1" >
       <not>
         <isset property="mule.version" />
@@ -307,6 +318,7 @@
       srcdir="${cxf.dest.dir}" 
       rootPackage="${cxf.stub.package}" 
       muleConfigFile="${cxf.mule.client.config}"
+      serverEndpointPrefix="${server.endpoint.prefix}" 
       classPathRef="wsdl2java.path" 
       version="${mule.version}" />
   </target>
@@ -327,6 +339,11 @@
         <isset property="cxf.mule.server.config" />
       </not>
     </condition>
+    <condition property="localhost.endpoint.prefix" value="local" >
+      <not>
+        <isset property="localhost.endpoint.prefix" />
+      </not>
+    </condition>
     <condition property="mule.version" value="2.1" >
       <not>
         <isset property="mule.version" />
@@ -336,6 +353,7 @@
       input="${cxf.service.file}"
       srcdir="${cxf.dest.dir}"
       muleConfigFile="${cxf.mule.server.config}" 
+      localhostEndpointPrefix="${localhost.endpoint.prefix}"
       version="${mule.version}" />
   </target>
 

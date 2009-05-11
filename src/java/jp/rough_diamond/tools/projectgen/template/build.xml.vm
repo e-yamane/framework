@@ -7,6 +7,15 @@
 #else
   <property name="lib.dir"                        value="./webapp/WEB-INF/lib" />
 #end
+#if($param.isContainOption("USING_MAKE_BEAN"))
+  <property name="bean.def.xml"                   value="./etc/beanDef/beanDef.xml" />
+#end
+#if($param.isContainOption("USING_ESB"))
+  <property name="cxf.mule.server.config"         value="./src/java/mule/mule-server-config.xml" />
+  <property name="cxf.mule.client.config"         value="./src/java/mule/mule-client-config.xml" />
+  <property name="server.endpoint.prefix"         value="server" />
+#end
+
 #set($frameworkPath = $param.frameworkPathRelative)
   <import file="${frameworkPath}/build-common.xml" />
 #if($param.isContainOption("USING_DATABASE"))

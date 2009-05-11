@@ -19,7 +19,7 @@ public class ServiceGeneratorTask extends Task {
 	public void execute() throws BuildException {
 		try {
 			//ディレクトリの場合はmuleConfigが省略されたと判断する
-			ServiceGenerator gen = new ServiceGenerator(input, srcDir, (muleConfigFile.isDirectory()) ? null : muleConfigFile, version);
+			ServiceGenerator gen = new ServiceGenerator(input, srcDir, (muleConfigFile.isDirectory()) ? null : muleConfigFile, localhostEndpointPrefix, version);
 			gen.doIt();
 			deletebackupFile();
 		} catch(Exception e) {
@@ -56,6 +56,13 @@ public class ServiceGeneratorTask extends Task {
 	public void setMuleConfigFile(File muleConfigFile) {
 		this.muleConfigFile = muleConfigFile;
 	}
+	public String getLocalhostEndpointPrefix() {
+		return localhostEndpointPrefix;
+	}
+
+	public void setLocalhostEndpointPrefix(String localhostEndpointPrefix) {
+		this.localhostEndpointPrefix = localhostEndpointPrefix;
+	}
 	public String getVersion() {
 		return version;
 	}
@@ -65,5 +72,6 @@ public class ServiceGeneratorTask extends Task {
 	private File input;
 	private File srcDir;
 	private File muleConfigFile;
+	private String localhostEndpointPrefix;
 	private String version;
 }

@@ -22,5 +22,10 @@ RDF Core Change Log
     - crontabの実行時間指定文字列に完全準拠したHudsonCronTaskを新規作成
 　　　名前とおり、hudsonの内部モジュールを使用しているので、hudson-core、
 　　　localizerが必要となります。
+    - プロジェクト作成用のタスクnewProjectを作成しました。
+    - makeBean実行時に参照するファイル名を可変としました。デフォルトは
+　　　「./beanDef/beanDef.xml」です。（プロパティ名は「bean.def.xml」
+    - muleの自動生成時にcfxrouting.propertiesに記述したエントリを可変にしました。
+　　　下位互換性を保つため
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り

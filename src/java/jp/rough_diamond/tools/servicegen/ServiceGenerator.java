@@ -42,12 +42,14 @@ public class ServiceGenerator {
 	private File input;
 	private File srcDir;
 	private File muleConfigFile;
+	private String localhostEndpointPrefix;
 	private String muleVersion;
 	
-	public ServiceGenerator(File input, File srcDir, File muleConfigFile, String muleVersion) {
+	public ServiceGenerator(File input, File srcDir, File muleConfigFile, String localhostEndpointPrefix, String muleVersion) {
 		this.input = input;
 		this.srcDir = srcDir;
 		this.muleConfigFile = muleConfigFile;
+		this.localhostEndpointPrefix = localhostEndpointPrefix;
 		this.muleVersion = muleVersion;
 	}
 	
@@ -126,7 +128,7 @@ public class ServiceGenerator {
 		t = doc.createTextNode("\n      ");
 		inboundEL.appendChild(t);
 		inboundEndpointEL.setAttribute("mtomEnabled", "true");
-		inboundEndpointEL.setAttribute("address", "http://${local.host}:${local.port}/services/" + serviceName);
+		inboundEndpointEL.setAttribute("address", "http://${" + localhostEndpointPrefix + ".host}:${" + localhostEndpointPrefix + ".port}/services/" + serviceName);
 		inboundEndpointEL.setAttribute("serviceClass", service.packageName + "." + service.className);
 		
 		Element componentEL = doc.createElementNS(muleNameSpace, "component");
@@ -432,7 +434,7 @@ public class ServiceGenerator {
 		ServiceGenerator t = new ServiceGenerator(
 				new File("etc/serviceDef/services.xml"),
 				new File("src/other"),
-				new File("src/other/mule-sample-config.xml"), "2.1");
+				new File("src/other/mule-sample-config.xml"), "local", "2.1");
 		t.doIt();
 	}
 }

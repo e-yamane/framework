@@ -129,19 +129,21 @@ public class ProjectBuilderTest extends TestCase {
 			exp = xpath.compile("/project/property[@name='do.not.use.makeSchemaAccessor']");
 			Node node = (Node)exp.evaluate(doc.getDocumentElement(), XPathConstants.NODE);
 			assertNull("makeSchemaAccessorスキップフラグが存在しています。", node);
+			exp = xpath.compile("/project/property[@name='bean.def.xml']");
+			node = (Node)exp.evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+			assertNotNull("beanDef定義ファイルプロパティが存在しません。", node);
 		} finally {
 			IOUtils.deleteDir(rootDir);
 		}
 	}
 
-	public void testMakeBuildScriptTypeIsSimpleWithoutDB() throws Exception {
+	public void testMakeBuildScriptTypeIsSimpleWithDB() throws Exception {
 		String projectRoot = "" + System.currentTimeMillis();
 		File rootDir = new File("../" + projectRoot);
 		try {
 			ProjectGeneratorParameter param = new ProjectGeneratorParameter();
 			param.setAppType(ProjectGeneratorParameter.ApplicationType.SIMPLE);
 			param.setOptions(
-					ApplicationOption.USING_MAKE_BEAN,
 					ApplicationOption.USING_ESB);
 			param.setProjectRoot(projectRoot);
 			param.setSourceEncoding("MS932");
@@ -167,6 +169,9 @@ public class ProjectBuilderTest extends TestCase {
 			exp = xpath.compile("/project/property[@name='do.not.use.makeSchemaAccessor']");
 			node = (Node)exp.evaluate(doc.getDocumentElement(), XPathConstants.NODE);
 			assertNotNull("makeSchemaAccessorスキップフラグが存在しています。", node);
+			exp = xpath.compile("/project/property[@name='bean.def.xml']");
+			node = (Node)exp.evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+			assertNull("beanDef定義ファイルプロパティが存在します。", node);
 		} finally {
 			IOUtils.deleteDir(rootDir);
 		}

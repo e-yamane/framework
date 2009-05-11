@@ -363,6 +363,7 @@ public class ProjectGeneratorGUI {
 		if(ret == JOptionPane.YES_OPTION) {
 			try {
 				ProjectBuilder.generate(param);
+				JOptionPane.showMessageDialog(this.frame, "プロジェクトの作成に成功しました。", "情報", JOptionPane.INFORMATION_MESSAGE);
 				finish();
 			} catch(Exception e) {
 				e.printStackTrace();

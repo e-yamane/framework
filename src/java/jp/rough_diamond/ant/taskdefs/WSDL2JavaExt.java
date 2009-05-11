@@ -164,7 +164,7 @@ public class WSDL2JavaExt extends Task {
 		t = doc.createTextNode("\n        ");
 		outboundRouterEL.appendChild(t);
 		String serviceName = getServiceName(wsdlDoc);
-		outboundEndpointEL.setAttribute("address", "http://${gateway.host}:${gateway.port}/services/" + serviceName);
+		outboundEndpointEL.setAttribute("address", "http://${" + serverEndpointPrefix + ".host}:${" + serverEndpointPrefix + ".port}/services/" + serviceName);
 		outboundEndpointEL.setAttribute("clientClass", packageName + "." + serviceName);
 		outboundEndpointEL.setAttribute("wsdlLocation", "file:///${wsdl.dir}/" + wsdl.getName());
 		outboundEndpointEL.setAttribute("mtomEnabled", "true");
@@ -334,6 +334,7 @@ public class WSDL2JavaExt extends Task {
 	private String rootPackage;
 	private String classPathRef;
 	private File muleConfigFile;
+	private String serverEndpointPrefix;
 	private String muleVersion;
 	
 	public String getVersion() {
@@ -383,6 +384,14 @@ public class WSDL2JavaExt extends Task {
 		this.srcdir = srcdir;
 	}
 	
+	public String getServerEndpointPrefix() {
+		return serverEndpointPrefix;
+	}
+
+	public void setServerEndpointPrefix(String serverEndpointPrefix) {
+		this.serverEndpointPrefix = serverEndpointPrefix;
+	}
+
 	static final String TRANSFORMER_CLASS_NAME = "ObjectToJAXBElement";
 	static final String TRANSFORMER_CLASS_TEMPLATE = 
 		"package %s;\n" +
