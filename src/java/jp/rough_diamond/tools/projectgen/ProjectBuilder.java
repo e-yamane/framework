@@ -347,7 +347,7 @@ public class ProjectBuilder {
 				Collections.unmodifiableList(new ArrayList<String>(Arrays.asList("lib"))));
 		tmpForType.put(ApplicationType.WEBAPP, 
 				Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
-						"webapp/WEB-INF", "webapp/lib"))));
+						"webapp/WEB-INF", "webapp/WEB-INF/lib"))));
 		tmpForType.put(ApplicationType.WEBAPP_WITH_TOMCAT_PI, tmpForType.get(ApplicationType.WEBAPP)); 
 		DIR_MAP_FOR_TYPE = Collections.unmodifiableMap(tmpForType);
 		Map<ApplicationOption, List<String>> tmpForOption= 
