@@ -37,6 +37,7 @@
   <property name="torque.sql.dir"         value="${my.build.dir}/etc/sql" />
   <property name="sql.createtables"       value="${torque.sql.dir}/*-schema.sql" />
   <property name="sql.addalter"           value="${torque.sql.dir}/*-schema-fk.sql" />
+  <property name="sql.dropalter"          value="${torque.sql.dir}/*-schema-dropfk.sql" />
   <property name="sql.schema"             value="${torque.schema.dir}/*-schema.xml" />
 
   <!-- テスト関連 -->
@@ -547,6 +548,7 @@
             userid="${hibernate.connection.username}" password="${hibernate.connection.password}"
             schema="${hibernate.schema}">
       <query file="${torque.sql.dir}/preinit.sql" encoding="Shift_JIS" />
+      <query file="${sql.dropalter}"    encoding="Shift_JIS" />
       <query file="${sql.createtables}" encoding="Shift_JIS" />
     </dbunit>
   </target>
