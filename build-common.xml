@@ -888,14 +888,19 @@
     </javadoc>
   </target>
 
-  <target name="makeConfigBase" depends="init-task" unless="do.not.use.makeSchemaAccessor">
+  <target name="makeConfigBase" depends="init-task">
     <propertyChecker base="${conf.dir}/filtering.default.properties" target="${filtering.filename}" />
     <basename property="conf.target.name" file="${filtering.filename}" />
     <dirname property="conf.target.dir" file="${filtering.filename}" />
     <mkdir dir="${conf.dir}/tmp" />
     <native2ascii src="${conf.target.dir}" dest="${conf.dir}/tmp" includes="${conf.target.name}" />
     <filter filtersfile="${conf.dir}/tmp/${conf.target.name}" />
+    <antcall target="copyMiddlegenProperties" />
     <delete dir="${conf.dir}/tmp" />
+  </target>
+
+  <target name="copyMiddlegenProperties" unless="do.not.use.makeSchemaAccessor">
+    <filter filtersfile="${conf.dir}/tmp/${conf.target.name}" />
     <copy file="${framework.root}/conf/template/middlegen.properties" tofile="./middlegen.properties" filtering="true" overwrite="true" />
   </target>
 </project>
