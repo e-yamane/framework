@@ -86,7 +86,7 @@ public class ProjectBuilderTest extends TestCase {
 			assertTrue("環境定義ファイル格納ディレクトリが存在しません。", new File(rootDir, "conf/template").isDirectory());
 			assertTrue("makeBean定義ファイル格納フォルダが登録されていません。", new File(rootDir, "etc/beanDef").isDirectory());
 			assertTrue("WEB-INFフォルダが登録されていません。", new File(rootDir, "webapp/WEB-INF").isDirectory());
-			assertTrue("jar格納フォルダが登録されていません。", new File(rootDir, "webapp/lib").isDirectory());
+			assertTrue("jar格納フォルダが登録されていません。", new File(rootDir, "webapp/WEB-INF/lib").isDirectory());
 			assertTrue("スキーマ定義ファイル格納フォルダが登録されていません。", new File(rootDir, "etc/schema").isDirectory());
 			assertTrue("スキーマ定義ファイル格納フォルダが登録されていません。", new File(rootDir, "etc/schema").isDirectory());
 			assertTrue("スキーマ定義プロパティ格納フォルダが登録されていません。", new File(rootDir, "src/resource").isDirectory());
