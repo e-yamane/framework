@@ -86,7 +86,6 @@ public class JAXBElementToObject {
 			}
 			Method m = PropertyUtils.getGetterMethod(src, pd.getName()); 
 			Object srcVal = m.invoke(src);
-			System.out.println(pd.getName() + ":" + pdType.getName());
 			if(srcVal == null) {
 				//nullの場合はスキップ
 			} else if (destPD.getWriteMethod() == null) {
@@ -113,7 +112,6 @@ public class JAXBElementToObject {
 	
 	void copyJAXElementOfArray(Class<?> srcType, PropertyDescriptor pd, Object srcVal, Object dest) throws Exception {
 		String propertyName = srcType.getSimpleName().replaceAll("^ArrayOf", "");
-		System.out.println(propertyName);
 		char[] tmp = propertyName.toCharArray();
 		tmp[0] = Character.toLowerCase(tmp[0]);
 		propertyName = new String(tmp);
