@@ -19,6 +19,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
+import jp.rough_diamond.commons.util.mule.transformer.JAXBElementToObject;
 import jp.rough_diamond.framework.service.Service;
 
 public class ServiceFinder implements
@@ -60,7 +61,8 @@ public class ServiceFinder implements
 					throwException(method, exceptionPayload.getException());
 				}
 				if(method.getReturnType() != Void.TYPE) {
-					return result.getPayload();
+					JAXBElementToObject transformer = new JAXBElementToObject();
+					return transformer.transform(result.getPayload(), method.getReturnType());
 				} else {
 					return null;
 				}

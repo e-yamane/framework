@@ -79,7 +79,7 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 				log.warn(pd.getName() + "プロパティが変換前オブジェクトに存在しません。スキップします。");
 				continue;
 			}
-			Object srcVal = PropertyUtils.getProperty(src, pd.getName());
+			Object srcVal = PropertyUtils.getProperty(src, srcPD.getName());
 			if(pdType.equals(XMLGregorianCalendar.class)) {
 				copyDateObject(pd, srcVal, dest);
 			} else if(pdType.equals(JAXBElement.class)) {

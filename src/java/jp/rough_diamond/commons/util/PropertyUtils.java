@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * プロパティユーティリティ
  */
-public class PropertyUtils {
+public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 	private final static Log log = LogFactory.getLog(PropertyUtils.class);
 	private static ThreadLocal<Stack<?>> copyStack = new ThreadLocal<Stack<?>>(){
 		@Override
@@ -147,6 +147,15 @@ public class PropertyUtils {
 		String methodName = "get" + new String(chs);
 		log.debug(methodName);
 		Method[] ms = dest.getClass().getMethods();
+		for(Method m : ms) {
+			if(m.getName().equals(methodName) && m.getReturnType() != Void.TYPE && m.getParameterTypes().length == 0) {
+				log.debug(m);
+				return m;
+			}
+		}
+		methodName = "is" + new String(chs);
+		log.debug(methodName);
+		ms = dest.getClass().getMethods();
 		for(Method m : ms) {
 			if(m.getName().equals(methodName) && m.getReturnType() != Void.TYPE && m.getParameterTypes().length == 0) {
 				log.debug(m);

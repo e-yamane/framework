@@ -1,9 +1,4 @@
-/*
- * Copyright (c) 2008, 2009
- *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
- *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
- *  All rights reserved.
- */
+
 package jp.rough_diamond.commons.util.mule.transformer.test.stub.sampleservice;
 
 import javax.xml.bind.JAXBElement;
@@ -34,15 +29,15 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ChildBean", propOrder = {
+@XmlType(name = "ChildBean", namespace = "http://test.transformer.mule.util.commons.rough_diamond.jp", propOrder = {
     "yyy",
     "zzz"
 })
 public class ChildBean {
 
-    @XmlElementRef(name = "yyy", namespace = "http://sample.rough_diamond.jp", type = JAXBElement.class)
+    @XmlElementRef(name = "yyy", namespace = "http://test.transformer.mule.util.commons.rough_diamond.jp", type = JAXBElement.class)
     protected JAXBElement<String> yyy;
-    @XmlElementRef(name = "zzz", namespace = "http://sample.rough_diamond.jp", type = JAXBElement.class)
+    @XmlElementRef(name = "zzz", namespace = "http://test.transformer.mule.util.commons.rough_diamond.jp", type = JAXBElement.class)
     protected JAXBElement<String> zzz;
 
     /**

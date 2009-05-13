@@ -673,7 +673,8 @@ abstract public class BasicService implements Service {
 			Extractor ex = new Extractor(o.getClass());
 			for(String property : check.properties()) {
 				Object value;
-					value = PropertyUtils.getProperty(o, property);
+					Method m = jp.rough_diamond.commons.util.PropertyUtils.getGetterMethod(o, property);
+					value = m.invoke(o);
 				if(value == null) {
 					ex.add(Condition.isNull(property));
 				} else {
@@ -684,8 +685,6 @@ abstract public class BasicService implements Service {
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
 	}
