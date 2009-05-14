@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jp.rough_diamond.commons.extractor.And;
+import jp.rough_diamond.commons.extractor.Avg;
 import jp.rough_diamond.commons.extractor.CombineCondition;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Desc;
@@ -34,11 +35,17 @@ import jp.rough_diamond.commons.extractor.LabelHoldingCondition;
 import jp.rough_diamond.commons.extractor.Le;
 import jp.rough_diamond.commons.extractor.Like;
 import jp.rough_diamond.commons.extractor.Lt;
+import jp.rough_diamond.commons.extractor.Max;
+import jp.rough_diamond.commons.extractor.Min;
 import jp.rough_diamond.commons.extractor.NotEq;
 import jp.rough_diamond.commons.extractor.NotIn;
 import jp.rough_diamond.commons.extractor.Or;
 import jp.rough_diamond.commons.extractor.Order;
+import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.extractor.RegularExp;
+import jp.rough_diamond.commons.extractor.Sum;
+import jp.rough_diamond.commons.extractor.SummaryFunction;
+import jp.rough_diamond.commons.extractor.Value;
 import jp.rough_diamond.commons.extractor.ValueHoldingCondition;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
@@ -64,6 +71,7 @@ public class Extractor2HQL {
     private StringBuilder builder;
     private Map<Class, ConditionStrategy> combineStrategy;
     private int patemeterIndex;
+    private boolean usingGroupBy = false;
     
     private Extractor2HQL(Extractor extractor) {
         this.extractor = extractor;
@@ -158,6 +166,7 @@ public class Extractor2HQL {
         makeSelectCouse(lockMode);
         makeFromCouse(true);
         makeWhereCouse();
+        makeGroupByCouse();
         makeOrderByCouse();
         String hql = builder.toString();
         log.debug(hql);
@@ -180,7 +189,23 @@ public class Extractor2HQL {
         return query;
     }
     
-    private void makeOrderByCouse() {
+	private void makeGroupByCouse() {
+		if(!usingGroupBy) {
+			return;
+		}
+		String delimitor = " group by ";
+		for(ExtractValue ev : extractor.getValues()) {
+			if(ev.value instanceof Property) {
+				Property prop = (Property)ev.value;
+				builder.append(delimitor);
+				builder.append(getProperty(
+						(prop.target == null) ? extractor.target : prop.target, prop.aliase, prop.property));
+				delimitor = ", ";
+			}
+		}
+	}
+
+	private void makeOrderByCouse() {
         if(extractor.getOrderIterator().size() == 0) {
             return;
         }
@@ -389,12 +414,55 @@ public class Extractor2HQL {
         String delimitor = "";
         for(ExtractValue v : extractor.getValues()) {
             builder.append(delimitor);
-            String property = getProperty(v.target, v.aliase, v.property);
+            String property = VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(extractor.target, v.value);
             builder.append(property);
             delimitor = ",";
+            if(v.value instanceof SummaryFunction) {
+            	usingGroupBy = true;
+            }
         }
     }
 
+    static interface ValueMaker<T extends Value> {
+    	public String makeValue(Class targetCl, T v);
+    }
+    final static Map<Class<? extends Value>, ValueMaker> VALUE_MAKE_STRATEGY_MAP;
+    static {
+    	Map<Class<? extends Value>, ValueMaker> tmp = new HashMap<Class<? extends Value>, ValueMaker>();
+    	tmp.put(Property.class, new ValueMaker<Property>() {
+			@Override
+			public String makeValue(Class targetCl, Property v) {
+				return getProperty(((v.target == null) ? targetCl : v.target), v.aliase, v.property);
+			}
+    	});
+    	tmp.put(Max.class, new ValueMaker<Max>() {
+			@Override
+			public String makeValue(Class targetCl, Max v) {
+				return "max(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			}
+    	});
+    	tmp.put(Min.class, new ValueMaker<Min>() {
+			@Override
+			public String makeValue(Class targetCl, Min v) {
+				return "min(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			}
+    	});
+    	tmp.put(Sum.class, new ValueMaker<Sum>() {
+			@Override
+			public String makeValue(Class targetCl, Sum v) {
+				return "Sum(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			}
+    	});
+    	tmp.put(Avg.class, new ValueMaker<Avg>() {
+			@Override
+			public String makeValue(Class targetCl, Avg v) {
+				return "avg(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			}
+    	});
+    	VALUE_MAKE_STRATEGY_MAP = Collections.unmodifiableMap(tmp);
+    }
+    
+    
 //    private Set<Class> joinedEntity;
     private void makeFromCouse(boolean isFetch) {
         Set<String> aliases = new HashSet<String>();

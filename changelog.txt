@@ -28,5 +28,6 @@ RDF Core Change Log
     - muleの自動生成時にcfxrouting.propertiesに記述したエントリを可変にしました。
 　　　下位互換性を保つため
     - 戻り値があるSOAが正しく動作するようにした
+    - Extractorで集計関数（sum、avg、max、min）をサポート
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
