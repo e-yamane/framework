@@ -11,7 +11,7 @@ package jp.rough_diamond.commons.extractor;
  * 外部エンティティのプロパティを抽出条件に加える場合は、
  * 本オブジェクトに条件を追加していくこと 
  */
-public class Join extends CombineCondition {
+public class Join extends CombineCondition<Property> {
 	private static final long serialVersionUID = 1L;
 
 	/**

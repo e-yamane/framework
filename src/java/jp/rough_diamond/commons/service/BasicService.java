@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import jp.rough_diamond.commons.di.DIContainerFactory;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.resource.Message;
 import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.resource.MessagesIncludingException;
@@ -676,9 +677,9 @@ abstract public class BasicService implements Service {
 					Method m = jp.rough_diamond.commons.util.PropertyUtils.getGetterMethod(o, property);
 					value = m.invoke(o);
 				if(value == null) {
-					ex.add(Condition.isNull(property));
+					ex.add(Condition.isNull(new Property(property)));
 				} else {
-					ex.add(Condition.eq(property, value));
+					ex.add(Condition.eq(new Property(property), value));
 				}
 			}		
 			return findByExtractor(ex, RecordLock.FOR_UPDATE);

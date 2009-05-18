@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * And条件を表すCondition
  */
-public class And extends CombineCondition {
+public class And<T extends Value> extends CombineCondition<T> {
 	private static final long serialVersionUID = 1L;
 
 	/**aaa
@@ -26,7 +26,7 @@ public class And extends CombineCondition {
 	 * Andオブジェクトを生成する
 	 * @param conditions	Condition群 nulllの場合はNullPointerExceptionをスローする
 	 */
-	public And(Collection<Condition> conditions) {
+	public And(Collection<Condition<T>> conditions) {
 		super(conditions);
 	}
 }

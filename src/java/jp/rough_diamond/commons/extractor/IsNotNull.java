@@ -10,7 +10,7 @@ package jp.rough_diamond.commons.extractor;
  * IsNotNull条件を表すCondition 
  */
 @SuppressWarnings("unchecked")
-public class IsNotNull extends LabelHoldingCondition {
+public class IsNotNull<T extends Value> extends LabelHoldingCondition<T> {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -18,8 +18,19 @@ public class IsNotNull extends LabelHoldingCondition {
 	 * @param propertyName プロパティ名 nullの場合はNullPointerExceptionを送出する
      * @param target    プロパティを保持しているエンティティクラス
      * @param aliase    エンティティの別名
+	 * @deprecated		IsNotNull(Value)の使用を推奨します
 	 */
+	@Deprecated
 	public IsNotNull(String propertyName, Class target, String aliase) {
 		super(propertyName, target, aliase);
+	}
+
+	/**
+	 * IsNotNull条件を表すConditionを生成する
+	 * @param label		比較対照ラベル
+	 * @param value		値 nullの場合はNullPointerExceptionを送出する
+	 */
+	public IsNotNull(T label) {
+		super(label);
 	}
 }

@@ -17,6 +17,7 @@ import java.util.Set;
 import jp.rough_diamond.commons.di.DIContainerFactory;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.lang.ArrayUtils;
 import jp.rough_diamond.commons.pager.AbstractNonCachePager;
 import jp.rough_diamond.commons.pager.Pager;
@@ -115,9 +116,9 @@ abstract public class RelationalChecker {
             String[] parentKeys = parent.getKeys();
             for(int i = 0 ; i < newKeys.length ; i++) {
                 if(newKeys[i] == null) {
-                    extractor.add(Condition.isNull(parentKeys[i]));
+                    extractor.add(Condition.isNull(new Property(parentKeys[i])));
                 } else {
-                    extractor.add(Condition.eq(parentKeys[i], newKeys[i]));
+                    extractor.add(Condition.eq(new Property(parentKeys[i]), newKeys[i]));
                 }
             }
             List list = service.findByExtractor(extractor, true);
@@ -162,7 +163,7 @@ abstract public class RelationalChecker {
                 Extractor extractor = new Extractor(getTargetClassByEntityName(c.getEntityName()));
                 String[] childKeys = c.getKeys();
                 for(int i = 0 ; i < oldKeys.length ; i++) {
-                    extractor.add(Condition.eq(childKeys[i], oldKeys[i]));
+                    extractor.add(Condition.eq(new Property(childKeys[i]), oldKeys[i]));
                 }
                 Pager pager = new PagerExt(extractor);
                 if(c.getCascadeType() == Child.CascadeType.RESTRICT) {

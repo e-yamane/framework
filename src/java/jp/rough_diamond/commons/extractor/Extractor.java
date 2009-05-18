@@ -30,10 +30,11 @@ public class Extractor implements Serializable {
      */
     public final String targetAlias;
     
-	private List<Order> 	     orders = new ArrayList<Order>();
-	private List<Condition>     condition = new ArrayList<Condition>();
-    private List<InnerJoin>     innerJoins = new ArrayList<InnerJoin>();
-    private List<ExtractValue>  values = new ArrayList<ExtractValue>();
+	private List<Order> 	     						orders = new ArrayList<Order>();
+	private List<Condition<Property>> 					condition = new ArrayList<Condition<Property>>();
+    private List<InnerJoin>     						innerJoins = new ArrayList<InnerJoin>();
+    private List<ExtractValue>  						values = new ArrayList<ExtractValue>();
+    private List<Condition<? extends SummaryFunction>>	having = new ArrayList<Condition<? extends SummaryFunction>>();
     
 	private int 	offset = 0;
 	private int		limit = -1;
@@ -88,7 +89,7 @@ public class Extractor implements Serializable {
 	 * オーダー条件のIteratorを返却する
 	 * @return オーダー条件のIterator
 	 */
-	public List<Condition> getConditionIterator() {
+	public List<Condition<Property>> getConditionIterator() {
 		return condition;
 	}
 
@@ -169,4 +170,21 @@ public class Extractor implements Serializable {
     public List<ExtractValue> getValues() {
         return values;
     }
+
+	/**
+	 * 抽出条件(having)を追加する
+	 * @param con	抽出条件 nullの場合はNullPointerExceptionを送出する
+	 */
+	public void addHaving(Condition<? extends SummaryFunction> con) {
+		con.getClass();
+		having.add(con);
+	}
+	
+	/**
+	 * オーダー条件のIteratorを返却する
+	 * @return オーダー条件のIterator
+	 */
+	public List<Condition<? extends SummaryFunction>> getHavingIterator() {
+		return having;
+	}
 }

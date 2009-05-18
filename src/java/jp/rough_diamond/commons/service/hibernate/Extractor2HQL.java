@@ -169,6 +169,7 @@ public class Extractor2HQL {
         makeFromCouse(true);
         makeWhereCouse();
         makeGroupByCouse();
+        makeHavingCouse();
         makeOrderByCouse();
         String hql = builder.toString();
         log.debug(hql);
@@ -191,6 +192,19 @@ public class Extractor2HQL {
         return query;
     }
     
+	private void makeHavingCouse() {
+		if(extractor.getHavingIterator().size() == 0) {
+			return;
+		}
+        String joinString = "";
+        builder.append(" having ");
+        for(Condition<? extends SummaryFunction> con : extractor.getHavingIterator()) {
+            builder.append(joinString);
+            makeCondition(con);
+            joinString = " and ";
+        }
+	}
+
 	private void makeGroupByCouse() {
 		if(!usingGroupBy) {
 			return;
@@ -234,19 +248,22 @@ public class Extractor2HQL {
     }
 
     private void setParameter(Query query) {
-        for(Condition con : extractor.getConditionIterator()) {
+        for(Condition<Property> con : extractor.getConditionIterator()) {
+            setParameter(query, con);
+        }
+        for(Condition<? extends SummaryFunction> con : extractor.getHavingIterator()) {
             setParameter(query, con);
         }
     }
 
-    private void setParameter(Query query, Condition con) {
+    private void setParameter(Query query, Condition<? extends Value> con) {
         if(con instanceof CombineCondition) {
-            CombineCondition cc = (CombineCondition)con;
-            for(Condition c : cc.getConditions()) {
+            CombineCondition<? extends Value> cc = (CombineCondition<? extends Value>)con;
+            for(Condition<? extends Value> c : cc.getConditions()) {
                 setParameter(query, c);
             }
         } else if(con instanceof ValueHoldingCondition) {
-            ValueHoldingCondition vhc = (ValueHoldingCondition)con;
+            ValueHoldingCondition<? extends Value> vhc = (ValueHoldingCondition<? extends Value>)con;
             if(con instanceof In || con instanceof NotIn) {
             	Collection col = (Collection)vhc.value;
             	for(Object o : col) {
@@ -266,15 +283,15 @@ public class Extractor2HQL {
         }
         String joinString = "";
         builder.append(" where ");
-        for(Condition con : extractor.getConditionIterator()) {
+        for(Condition<Property> con : extractor.getConditionIterator()) {
             builder.append(joinString);
             makeCondition(con);
             joinString = " and ";
         }
+/*
         Set<String> set = new HashSet<String>();
         set.add(getAlias(extractor.target, extractor.targetAlias));
         //deletedinDBを強制的にチェック
-/*
         for(InnerJoin join : extractor.getInnerJoins()) {
             if(LogicalDeleteEntity.class.isAssignableFrom(join.target)) {
                 String aliase = getAlias(join.target, join.targetAlias);
@@ -317,22 +334,18 @@ public class Extractor2HQL {
         }
     }
 
-    private void makeCondition(Condition con) {
+    private void makeCondition(Condition<? extends Value> con) {
         if(con instanceof CombineCondition) {
             ConditionStrategy cs = combineStrategy.get(con.getClass());
-            cs.makeWhereCouse((CombineCondition)con);
+            cs.makeWhereCouse((CombineCondition<? extends Value>)con);
         } else {
-            LabelHoldingCondition lhc = (LabelHoldingCondition)con;
-            Class target;
-            String targetAliase;
-            if(lhc.target == null) {
-                target = extractor.target;
-                targetAliase = extractor.targetAlias;
-            } else {
-                target = lhc.target;
-                targetAliase = lhc.aliase;
-            }
-            String property = getProperty(target, targetAliase, lhc.propertyName);
+            LabelHoldingCondition<? extends Value> lhc = (LabelHoldingCondition<? extends Value>)con;
+            String property = VALUE_MAKE_STRATEGY_MAP.get(lhc.label.getClass()).makeValue(extractor.target, lhc.label);
+//            if(lhc.label instanceof Property) {
+//            	property = makeLabel((Property)lhc.label);
+//            } else {
+//            	property = makeLabel((SummaryFunction)lhc.label);
+//            }
             String where;
             if(lhc.getClass() == RegularExp.class) {
             	where = makeRegularExtWhere((RegularExp)lhc, property);
@@ -348,6 +361,23 @@ public class Extractor2HQL {
         }
     }
 
+//	private String makeLabel(SummaryFunction label) {
+//		return VALUE_MAKE_STRATEGY_MAP.get(label.getClass()).makeValue(extractor.target, label);
+//	}
+//
+//	private String makeLabel(Property prop) {
+//        Class target;
+//        String targetAliase;
+//        if(prop.target == null) {
+//            target = extractor.target;
+//            targetAliase = extractor.targetAlias;
+//        } else {
+//            target = prop.target;
+//            targetAliase = prop.aliase;
+//        }
+//        return getProperty(target, targetAliase, prop.property);
+//    }
+    
     private String makeRegularExtWhere(RegularExp lhc, String property) {
     	Dialect dialect = HibernateUtils.getDialect();
     	if(dialect == null) {
@@ -376,8 +406,7 @@ public class Extractor2HQL {
     	sb.append(prefix);
     	sb.append(" (");
     	String delimiter = "";
-    	for(@SuppressWarnings("unused")
-		Object o : (Collection)con.value) {
+    	for(@SuppressWarnings("unused") Object o : (Collection)con.value) {
     		sb.append(delimiter);
     		sb.append("?");
     		delimiter = ", ";
@@ -587,18 +616,18 @@ public class Extractor2HQL {
     }
     
     private interface ConditionStrategy {
-        public void makeWhereCouse(CombineCondition con);
+        public void makeWhereCouse(CombineCondition<? extends Value> con);
     }
 
     class OrStrategy implements ConditionStrategy {
-        public void makeWhereCouse(CombineCondition con) {
+        public void makeWhereCouse(CombineCondition<? extends Value> con) {
             log.debug("OrStrategyを実行します。");
             if(con.getConditions().size() == 0) {
                 return;
             }
             builder.append("(");
             String combineString = "";
-            for(Condition c : con.getConditions()) {
+            for(Condition<? extends Value> c : con.getConditions()) {
                 builder.append(combineString);
                 makeCondition(c);
                 combineString = " or ";
@@ -609,13 +638,13 @@ public class Extractor2HQL {
     }
 
     class AndStrategy implements ConditionStrategy {
-        public void makeWhereCouse(CombineCondition con) {
+        public void makeWhereCouse(CombineCondition<? extends Value> con) {
             if(con.getConditions().size() == 0) {
                 return;
             }
             builder.append("(");
             String combineString = "";
-            for(Condition c : con.getConditions()) {
+            for(Condition<? extends Value> c : con.getConditions()) {
                 builder.append(combineString);
                 makeCondition(c);
                 combineString = " and ";

@@ -10,7 +10,7 @@ package jp.rough_diamond.commons.extractor;
  * Eq(等値条件）Condition
  */
 @SuppressWarnings("unchecked")
-public class Eq extends ValueHoldingCondition {
+public class Eq<T extends Value> extends ValueHoldingCondition<T> {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -19,8 +19,19 @@ public class Eq extends ValueHoldingCondition {
      * @param target    プロパティを保持しているエンティティクラス
      * @param aliase    エンティティの別名
 	 * @param value		値 nullの場合はNullPointerExceptionを送出する
+	 * @deprecated		Eq(T, Object)の使用を推奨します
 	 */
+	@Deprecated
 	public Eq(String propertyName, Class target, String aliase, Object value) {
 		super(propertyName, target, aliase, value);
+	}
+	
+	/**
+	 * Eq(等値条件）Conditionを生成する
+	 * @param label		比較対照ラベル
+	 * @param value		値 nullの場合はNullPointerExceptionを送出する
+	 */
+	public Eq(T label, Object value) {
+		super(label, value);
 	}
 }

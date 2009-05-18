@@ -12,23 +12,23 @@ import java.util.Collection;
 /**
  * 複数のConditionを結合するCondition
  */
-public abstract class CombineCondition extends Condition {
+public abstract class CombineCondition<T extends Value> extends Condition<T> {
 	private static final long serialVersionUID = 1L;
-	private final Collection<Condition> conditions;
+	private final Collection<Condition<T>> conditions;
 
 	/**
 	 * CombineConditionオブジェクトを生成する
 	 * 結合される中身は殻とする
 	 */
 	public CombineCondition() {
-		conditions = new ArrayList<Condition>();
+		conditions = new ArrayList<Condition<T>>();
 	}
 	
 	/**
 	 * CombineConditionオブジェクトを生成する
 	 * @param conditions	Condition群 nulllの場合はNullPointerExceptionをスローする
 	 */
-	public CombineCondition(Collection<Condition> conditions) {
+	public CombineCondition(Collection<Condition<T>> conditions) {
 		conditions.size();	//NOP nullなら強制的に例外を送出させたいので
 		this.conditions = conditions;
 	}
@@ -37,7 +37,7 @@ public abstract class CombineCondition extends Condition {
 	 * 結合するConditionのイレテータを返却する
 	 * @return 結合するConditionのIterator
 	 */
-	public Collection<Condition> getConditions() {
+	public Collection<Condition<T>> getConditions() {
 		return conditions;
 	}
 	
@@ -45,7 +45,7 @@ public abstract class CombineCondition extends Condition {
 	 * 結合する条件を末尾に追加する
 	 * @param condition	条件
 	 */
-	public void add(Condition condition) {
+	public void add(Condition<T> condition) {
 		conditions.add(condition);
 	}
 

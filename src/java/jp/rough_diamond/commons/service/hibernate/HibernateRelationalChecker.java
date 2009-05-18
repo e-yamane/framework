@@ -15,6 +15,7 @@ import org.hibernate.metadata.ClassMetadata;
 
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.lang.ArrayUtils;
 import jp.rough_diamond.commons.pager.Pager;
 import jp.rough_diamond.commons.resource.Message;
@@ -142,7 +143,7 @@ public class HibernateRelationalChecker extends RelationalChecker {
             Extractor extractor = new Extractor(cm.getMappedClass(EntityMode.POJO));
             String[] childKeys = c.getKeys();
             for(int i = 0 ; i < keys.length ; i++) {
-                extractor.add(Condition.eq(childKeys[i], keys[i]));
+                extractor.add(Condition.eq(new Property(childKeys[i]), keys[i]));
             }
             Pager pager = new PagerExt(extractor);
             if(c.getCascadeType() == Child.CascadeType.RESTRICT) {

@@ -62,7 +62,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	public void testQueryUsingProperty() throws Exception {
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("name", new Property(Unit.NAME)));
-		ex.add(Condition.eq(Unit.ID, 3L));
+		ex.add(Condition.eq(new Property(Unit.ID), 3L));
 		List<Map<String, Object>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		assertEquals("値の取得に失敗しました。", "マイル", list.get(0).get("name"));
@@ -72,7 +72,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"max", new Max(new Property(Unit.RATE + ScalableNumber.VALUE))));
-		ex.add(Condition.le(Unit.ID, 5L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
 		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		assertEquals("値の取得に失敗しました。", 1609344L, list.get(0).get("max").longValue());
@@ -82,7 +82,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"min", new Min(new Property(Unit.RATE + ScalableNumber.VALUE))));
-		ex.add(Condition.le(Unit.ID, 5L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
 		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		assertEquals("値の取得に失敗しました。", 1L, list.get(0).get("min").longValue());
@@ -92,7 +92,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"sum", new Sum(new Property(Unit.RATE + ScalableNumber.VALUE))));
-		ex.add(Condition.le(Unit.ID, 5L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
 		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		assertEquals("値の取得に失敗しました。", 1610347L, list.get(0).get("sum").longValue());
@@ -102,7 +102,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"avg", new Avg(new Property(Unit.RATE + ScalableNumber.VALUE))));
-		ex.add(Condition.le(Unit.ID, 5L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
 		List<Map<String, Double>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		System.out.println(list.get(0).get("avg"));
@@ -114,12 +114,25 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		ex.addExtractValue(new ExtractValue(
 				"sum", new Sum(new Property(Unit.RATE + ScalableNumber.VALUE))));
-		ex.add(Condition.le(Unit.ID, 5L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
 		ex.addOrder(Order.asc(Unit.BASE + "." + Unit.ID));
 		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 2, list.size());
 		assertEquals("値が誤っています。", 1610346L, list.get(0).get("sum").longValue());
 		assertEquals("値が誤っています。", 1L, list.get(1).get("sum").longValue());
+	}
+	
+	public void testQueryUsingSumAndGroupByGreaterThanTwo() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
+		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
+		ex.addExtractValue(new ExtractValue("sum", sum));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.BASE + "." + Unit.ID));
+		ex.addHaving(Condition.gt(sum, 2L));
+		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("値が誤っています。", 1610346L, list.get(0).get("sum").longValue());
 	}
 	
 	public static class CreateQueryService implements Service {

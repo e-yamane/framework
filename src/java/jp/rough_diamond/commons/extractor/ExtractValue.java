@@ -31,6 +31,9 @@ public class ExtractValue {
     @Deprecated
     public final String property;
     
+    /**
+     * ’Šo‚·‚é’l
+     */
     public final Value value;
     
     /**

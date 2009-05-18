@@ -29,7 +29,11 @@ RDF Core Change Log
 　　　下位互換性を保つため
     - 戻り値があるSOAが正しく動作するようにした
     - Extractorで集計関数（sum、avg、max、min）をサポート
+    - Extractorでhavingをサポート
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
-    - 集計関数を使って使用していてかつ、当該データ件数が０件の場合、
+    - 集計関数を使用していてかつ、当該データ件数が０件の場合、
 　　　nullではなく0（Longオブジェクト）を返却するようにする
+  [Reduced]
+　　- MultiLanguageMasterLoaderを削除。現状使用していない。
+　　　ローダーレベルでサポートするものではない

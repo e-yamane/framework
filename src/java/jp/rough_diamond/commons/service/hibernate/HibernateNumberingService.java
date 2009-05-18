@@ -126,7 +126,7 @@ public class HibernateNumberingService extends NumberingService {
 	        while(ret != stop) {
 	            Serializable ser = info.supplimenter.suppliment(ret, info.length);
 	        	Extractor ex = new Extractor(info.entityClass);
-	        	ex.add(Condition.eq(info.identifierName, ser));
+	        	ex.add(Condition.eq(new jp.rough_diamond.commons.extractor.Property(info.identifierName), ser));
 	        	if(bs.getCountByExtractor(ex) == 0) {
 	        		return ser;
 	        	}
