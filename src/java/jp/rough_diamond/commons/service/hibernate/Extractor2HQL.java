@@ -122,7 +122,8 @@ public class Extractor2HQL {
     	private final static MakeMapStrategy INSTANCE = new SingleStrategy();
 		public Map<String, Object> getMap(Object target, List<ExtractValue> values) {
 			Map<String, Object> ret = new HashMap<String, Object>();
-			ret.put(values.get(0).key, target);
+			Object value = ((values.get(0).value instanceof SummaryFunction) && target == null) ? 0L : target; 
+			ret.put(values.get(0).key, value);
 			return ret;
 		}
     	
@@ -134,7 +135,8 @@ public class Extractor2HQL {
 			Object[] row = (Object[])target;
 			Map<String, Object> rowMap = new HashMap<String, Object>();
 			for(int i = 0 ; i < values.size() ; i++) {
-				rowMap.put(values.get(i).key, row[i]);
+				Object value = ((values.get(i).value instanceof SummaryFunction) && row[i] == null) ? 0L : row[i]; 
+				rowMap.put(values.get(i).key, value);
 			}
 			return rowMap;
 		}

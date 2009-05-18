@@ -31,3 +31,5 @@ RDF Core Change Log
     - Extractorで集計関数（sum、avg、max、min）をサポート
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
+    - 集計関数を使って使用していてかつ、当該データ件数が０件の場合、
+　　　nullではなく0（Longオブジェクト）を返却するようにする
