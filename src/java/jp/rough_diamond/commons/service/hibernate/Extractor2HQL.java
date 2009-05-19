@@ -20,10 +20,12 @@ import jp.rough_diamond.commons.extractor.And;
 import jp.rough_diamond.commons.extractor.Avg;
 import jp.rough_diamond.commons.extractor.CombineCondition;
 import jp.rough_diamond.commons.extractor.Condition;
+import jp.rough_diamond.commons.extractor.Count;
 import jp.rough_diamond.commons.extractor.Desc;
 import jp.rough_diamond.commons.extractor.Eq;
 import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.FreeFormat;
 import jp.rough_diamond.commons.extractor.Ge;
 import jp.rough_diamond.commons.extractor.Gt;
 import jp.rough_diamond.commons.extractor.In;
@@ -490,6 +492,41 @@ public class Extractor2HQL {
 				return "avg(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
 			}
     	});
+    	tmp.put(Count.class, new ValueMaker<Count>() {
+			@Override
+			public String makeValue(Class targetCl, Count v) {
+				return "count(" + 
+						(v.distinct ? "distinct " : "") +
+						VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			}
+    	});
+    	tmp.put(FreeFormat.class, new ValueMaker<FreeFormat>() {
+			@Override
+			public String makeValue(Class targetCl, FreeFormat v) {
+				int replaceIndex = 0;
+				int length = v.format.length();
+				StringBuilder ret = new StringBuilder();
+				for(int i = 0 ; i < length ; i++) {
+					char ch = v.format.charAt(i);
+					if(ch == '?') {
+						ret.append(replacetext(targetCl, v.values.get(replaceIndex++)));
+					} else {
+						ret.append(ch);
+					}
+				}
+				return ret.toString();
+			}
+
+			String replacetext(Class targetCl, Object val) {
+				if(val instanceof Value) {
+					return VALUE_MAKE_STRATEGY_MAP.get(val.getClass()).makeValue(targetCl, (Value)val);
+				} else if(val instanceof Number) {
+					return val.toString();
+				} else {
+					return "'" + val.toString() + "'";
+				}
+			}
+    	});
     	VALUE_MAKE_STRATEGY_MAP = Collections.unmodifiableMap(tmp);
     }
     
@@ -572,6 +609,8 @@ public class Extractor2HQL {
         aliase = getAlias(cl, aliase);
         if(property == null || "".equals(property)) {
             return aliase;
+        } else if(property.equals("*")){
+        	return "*";
         } else {
             return aliase + "." + property;
         }

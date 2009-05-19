@@ -16,8 +16,10 @@ import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.extractor.Avg;
 import jp.rough_diamond.commons.extractor.Condition;
+import jp.rough_diamond.commons.extractor.Count;
 import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.FreeFormat;
 import jp.rough_diamond.commons.extractor.Max;
 import jp.rough_diamond.commons.extractor.Min;
 import jp.rough_diamond.commons.extractor.Order;
@@ -133,6 +135,78 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		assertEquals("値が誤っています。", 1610346L, list.get(0).get("sum").longValue());
+	}
+	
+	public void testQueryUsingCount() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
+		ex.addExtractValue(new ExtractValue("count", new Count()));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.BASE + "." + Unit.ID));
+		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 2, list.size());
+		assertEquals("値が誤っています。", 4L, list.get(0).get("count").longValue());
+		assertEquals("値が誤っています。", 1L, list.get(1).get("count").longValue());
+		
+		ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
+		ex.addExtractValue(new ExtractValue("count", new Count(new Property(Unit.RATE + ScalableNumber.VALUE))));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.BASE + "." + Unit.ID));
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 2, list.size());
+		assertEquals("値が誤っています。", 4L, list.get(0).get("count").longValue());
+		assertEquals("値が誤っています。", 1L, list.get(1).get("count").longValue());
+
+		ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
+		ex.addExtractValue(new ExtractValue("count", new Count(new Property(Unit.RATE + ScalableNumber.VALUE), true)));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.BASE + "." + Unit.ID));
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 2, list.size());
+		assertEquals("値が誤っています。", 3L, list.get(0).get("count").longValue());
+		assertEquals("値が誤っています。", 1L, list.get(1).get("count").longValue());
+	}
+	
+	public void testFreeFormat() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("val", new FreeFormat("3*(1 + 1)")));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.ID));
+		List<Map<String, ? extends Number>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 5, list.size());
+		assertEquals("値が誤っています。", 6L, list.get(0).get("val").longValue());
+
+		ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("val", new FreeFormat("3*(? + 1)", 2L)));
+		ex.addOrder(Order.asc(Unit.ID));
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 5, list.size());
+		assertEquals("値が誤っています。", 9L, list.get(0).get("val").longValue());
+
+		ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("val", new FreeFormat("3*(? + ?)", 2L, new Property(Unit.RATE + ScalableNumber.VALUE))));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.ID));
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 5, list.size());
+		assertEquals("値が誤っています。", 9L, 			list.get(0).get("val").longValue());
+		assertEquals("値が誤っています。", 3006L, 		list.get(1).get("val").longValue());
+		assertEquals("値が誤っています。", 4828038L, 	list.get(2).get("val").longValue());
+		assertEquals("値が誤っています。", 9L, 			list.get(3).get("val").longValue());
+		assertEquals("値が誤っています。", 9L, 			list.get(4).get("val").longValue());
+
+		ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("val", new FreeFormat("?*power(10, ?)", 
+				new Property(Unit.RATE + ScalableNumber.VALUE), new Property(Unit.RATE + ScalableNumber.SCALE))));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.ID));
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 5, list.size());
+		assertEquals("値が誤っています。", 1L,			list.get(0).get("val").longValue());
+		assertEquals("値が誤っています。", 1000L,		list.get(1).get("val").longValue());
+		assertEquals("値が誤っています。", 1609344000L,	list.get(2).get("val").longValue());
 	}
 	
 	public static class CreateQueryService implements Service {
