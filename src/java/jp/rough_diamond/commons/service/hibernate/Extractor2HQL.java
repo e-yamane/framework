@@ -60,6 +60,7 @@ import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
+import org.hibernate.type.TypeFactory;
 
 /**
  * ExtractorオブジェクトからHibernateのHQLを生成する
@@ -200,7 +201,7 @@ public class Extractor2HQL {
 		}
         String joinString = "";
         builder.append(" having ");
-        for(Condition<? extends SummaryFunction> con : extractor.getHavingIterator()) {
+        for(Condition<? extends Value> con : extractor.getHavingIterator()) {
             builder.append(joinString);
             makeCondition(con);
             joinString = " and ";
@@ -213,16 +214,24 @@ public class Extractor2HQL {
 		}
 		String delimitor = " group by ";
 		for(ExtractValue ev : extractor.getValues()) {
-			if(ev.value instanceof Property) {
-				Property prop = (Property)ev.value;
-				builder.append(delimitor);
-				builder.append(getProperty(
-						(prop.target == null) ? extractor.target : prop.target, prop.aliase, prop.property));
-				delimitor = ", ";
-			}
+			delimitor = makeGroupByCouse(ev.value, delimitor);
 		}
 	}
 
+	private String makeGroupByCouse(Object value, String delimitor) {
+		if(value instanceof Property) {
+			builder.append(delimitor);
+			builder.append(VALUE_MAKE_STRATEGY_MAP.get(value.getClass()).makeValue(this, (Value)value));
+			delimitor = ", ";
+		} else if(value instanceof FreeFormat) {
+			FreeFormat ff = (FreeFormat)value;
+			for(Object o : ff.values) {
+				delimitor = makeGroupByCouse(o, delimitor);
+			}
+		}
+		return delimitor;
+	}
+	
 	private void makeOrderByCouse() {
         if(extractor.getOrderIterator().size() == 0) {
             return;
@@ -250,10 +259,9 @@ public class Extractor2HQL {
     }
 
     private void setParameter(Query query) {
-        for(Condition<Property> con : extractor.getConditionIterator()) {
-            setParameter(query, con);
-        }
-        for(Condition<? extends SummaryFunction> con : extractor.getHavingIterator()) {
+    	List<Condition<? extends Value>> list = new ArrayList<Condition<? extends Value>>(extractor.getConditionIterator());
+    	list.addAll(extractor.getHavingIterator());
+        for(Condition<? extends Value> con : list) {
             setParameter(query, con);
         }
     }
@@ -269,14 +277,20 @@ public class Extractor2HQL {
             if(con instanceof In || con instanceof NotIn) {
             	Collection col = (Collection)vhc.value;
             	for(Object o : col) {
-    	            query.setParameter(patemeterIndex, o);
-    	            patemeterIndex++;
+            		setParameter(query, o);
             	}
             } else {
-	            query.setParameter(patemeterIndex, vhc.value);
-	            patemeterIndex++;
+        		setParameter(query, vhc.value);
             }
         }
+    }
+    private void setParameter(Query query, Object value) {
+        if(value instanceof Number) {
+            query.setParameter(patemeterIndex, value, TypeFactory.basic(value.getClass().getName()));
+        } else {
+            query.setParameter(patemeterIndex, value);
+        }
+        patemeterIndex++;
     }
     
     private void makeWhereCouse() {
@@ -285,7 +299,7 @@ public class Extractor2HQL {
         }
         String joinString = "";
         builder.append(" where ");
-        for(Condition<Property> con : extractor.getConditionIterator()) {
+        for(Condition<? extends Value> con : extractor.getConditionIterator()) {
             builder.append(joinString);
             makeCondition(con);
             joinString = " and ";
@@ -342,12 +356,7 @@ public class Extractor2HQL {
             cs.makeWhereCouse((CombineCondition<? extends Value>)con);
         } else {
             LabelHoldingCondition<? extends Value> lhc = (LabelHoldingCondition<? extends Value>)con;
-            String property = VALUE_MAKE_STRATEGY_MAP.get(lhc.label.getClass()).makeValue(extractor.target, lhc.label);
-//            if(lhc.label instanceof Property) {
-//            	property = makeLabel((Property)lhc.label);
-//            } else {
-//            	property = makeLabel((SummaryFunction)lhc.label);
-//            }
+            String property = VALUE_MAKE_STRATEGY_MAP.get(lhc.label.getClass()).makeValue(this, lhc.label);
             String where;
             if(lhc.getClass() == RegularExp.class) {
             	where = makeRegularExtWhere((RegularExp)lhc, property);
@@ -363,23 +372,6 @@ public class Extractor2HQL {
         }
     }
 
-//	private String makeLabel(SummaryFunction label) {
-//		return VALUE_MAKE_STRATEGY_MAP.get(label.getClass()).makeValue(extractor.target, label);
-//	}
-//
-//	private String makeLabel(Property prop) {
-//        Class target;
-//        String targetAliase;
-//        if(prop.target == null) {
-//            target = extractor.target;
-//            targetAliase = extractor.targetAlias;
-//        } else {
-//            target = prop.target;
-//            targetAliase = prop.aliase;
-//        }
-//        return getProperty(target, targetAliase, prop.property);
-//    }
-    
     private String makeRegularExtWhere(RegularExp lhc, String property) {
     	Dialect dialect = HibernateUtils.getDialect();
     	if(dialect == null) {
@@ -447,69 +439,71 @@ public class Extractor2HQL {
         String delimitor = "";
         for(ExtractValue v : extractor.getValues()) {
             builder.append(delimitor);
-            String property = VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(extractor.target, v.value);
+            String property = VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(this, v.value);
             builder.append(property);
             delimitor = ",";
-            if(v.value instanceof SummaryFunction) {
-            	usingGroupBy = true;
-            }
         }
     }
 
     static interface ValueMaker<T extends Value> {
-    	public String makeValue(Class targetCl, T v);
+    	public String makeValue(Extractor2HQL generator, T v);
     }
     final static Map<Class<? extends Value>, ValueMaker> VALUE_MAKE_STRATEGY_MAP;
     static {
     	Map<Class<? extends Value>, ValueMaker> tmp = new HashMap<Class<? extends Value>, ValueMaker>();
     	tmp.put(Property.class, new ValueMaker<Property>() {
 			@Override
-			public String makeValue(Class targetCl, Property v) {
-				return getProperty(((v.target == null) ? targetCl : v.target), v.aliase, v.property);
+			public String makeValue(Extractor2HQL generator, Property v) {
+				return generator.getProperty(v.target, v.aliase, v.property);
 			}
     	});
     	tmp.put(Max.class, new ValueMaker<Max>() {
 			@Override
-			public String makeValue(Class targetCl, Max v) {
-				return "max(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			public String makeValue(Extractor2HQL generator, Max v) {
+				generator.usingGroupBy = true;
+				return "max(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
 			}
     	});
     	tmp.put(Min.class, new ValueMaker<Min>() {
 			@Override
-			public String makeValue(Class targetCl, Min v) {
-				return "min(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			public String makeValue(Extractor2HQL generator, Min v) {
+				generator.usingGroupBy = true;
+				return "min(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
 			}
     	});
     	tmp.put(Sum.class, new ValueMaker<Sum>() {
 			@Override
-			public String makeValue(Class targetCl, Sum v) {
-				return "Sum(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			public String makeValue(Extractor2HQL generator, Sum v) {
+				generator.usingGroupBy = true;
+				return "Sum(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
 			}
     	});
     	tmp.put(Avg.class, new ValueMaker<Avg>() {
 			@Override
-			public String makeValue(Class targetCl, Avg v) {
-				return "avg(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+			public String makeValue(Extractor2HQL generator, Avg v) {
+				generator.usingGroupBy = true;
+				return "avg(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
 			}
     	});
     	tmp.put(Count.class, new ValueMaker<Count>() {
 			@Override
-			public String makeValue(Class targetCl, Count v) {
+			public String makeValue(Extractor2HQL generator, Count v) {
+				generator.usingGroupBy = true;
 				return "count(" + 
 						(v.distinct ? "distinct " : "") +
-						VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(targetCl, v.value) + ")";
+						VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
 			}
     	});
     	tmp.put(FreeFormat.class, new ValueMaker<FreeFormat>() {
 			@Override
-			public String makeValue(Class targetCl, FreeFormat v) {
+			public String makeValue(Extractor2HQL generator, FreeFormat v) {
 				int replaceIndex = 0;
 				int length = v.format.length();
 				StringBuilder ret = new StringBuilder();
 				for(int i = 0 ; i < length ; i++) {
 					char ch = v.format.charAt(i);
 					if(ch == '?') {
-						ret.append(replacetext(targetCl, v.values.get(replaceIndex++)));
+						ret.append(replacetext(generator, v.values.get(replaceIndex++)));
 					} else {
 						ret.append(ch);
 					}
@@ -517,9 +511,9 @@ public class Extractor2HQL {
 				return ret.toString();
 			}
 
-			String replacetext(Class targetCl, Object val) {
+			String replacetext(Extractor2HQL generator, Object val) {
 				if(val instanceof Value) {
-					return VALUE_MAKE_STRATEGY_MAP.get(val.getClass()).makeValue(targetCl, (Value)val);
+					return VALUE_MAKE_STRATEGY_MAP.get(val.getClass()).makeValue(generator, (Value)val);
 				} else if(val instanceof Number) {
 					return val.toString();
 				} else {
@@ -605,7 +599,10 @@ public class Extractor2HQL {
         return ret;
     }
     
-    private static String getProperty(Class cl, String aliase, String property) {
+    private String getProperty(Class cl, String aliase, String property) {
+    	if(cl == null) {
+    		cl = this.extractor.target;
+    	}
         aliase = getAlias(cl, aliase);
         if(property == null || "".equals(property)) {
             return aliase;

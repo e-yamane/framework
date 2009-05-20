@@ -209,6 +209,57 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("値が誤っています。", 1609344000L,	list.get(2).get("val").longValue());
 	}
 	
+	public void testSumInFreeFormat() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
+		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
+		ex.addExtractValue(new ExtractValue("sum", new FreeFormat("?", sum)));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.BASE + "." + Unit.ID));
+		ex.addHaving(Condition.gt(sum, 2L));
+		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("値が誤っています。", 1610346L, list.get(0).get("sum").longValue());
+	}
+	
+	public void testSumInFreeFormatAndGrupByColumnInFreeFormat() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("base", new FreeFormat("?", new Property(Unit.BASE + "." + Unit.ID))));
+		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
+		ex.addExtractValue(new ExtractValue("sum", new FreeFormat("?", sum)));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(Unit.BASE + "." + Unit.ID));
+		ex.addHaving(Condition.gt(sum, 2L));
+		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("値が誤っています。", 1610346L, list.get(0).get("sum").longValue());
+	}
+	
+	public void testFreeFormatInWhereCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		Property p = new Property(Unit.ID);
+		FreeFormat ff = new FreeFormat("? * 3", p);
+		ex.addExtractValue(new ExtractValue("val", ff));
+		ex.add(Condition.le(p, 5L));
+		ex.add(Condition.lt(ff, 10));
+		ex.addOrder(Order.asc(Unit.ID));
+		List<Map<String, ? extends Number>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 3, list.size());
+	}
+	
+	public void testFreeFormatInHavingCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		Property p = new Property(Unit.ID);
+		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
+		FreeFormat ff = new FreeFormat("? * 3", sum);
+		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
+		ex.addExtractValue(new ExtractValue("val", ff));
+		ex.add(Condition.le(p, 5L));
+		ex.addHaving(Condition.lt(ff, 10));
+		List<Map<String, ? extends Number>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+	}
+	
 	public static class CreateQueryService implements Service {
 		public void getQuery(int fetchSize) {
 			Extractor ex = new Extractor(Numbering.class);
