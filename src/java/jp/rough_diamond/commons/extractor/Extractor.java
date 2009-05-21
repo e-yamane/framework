@@ -30,7 +30,7 @@ public class Extractor implements Serializable {
      */
     public final String targetAlias;
     
-	private List<Order> 	     						orders = new ArrayList<Order>();
+	private List<Order<? extends Value>> 	 			orders = new ArrayList<Order<? extends Value>>();
 	private List<Condition<? extends Value>>			condition = new ArrayList<Condition<? extends Value>>();
     private List<InnerJoin>     						innerJoins = new ArrayList<InnerJoin>();
     private List<ExtractValue>  						values = new ArrayList<ExtractValue>();
@@ -72,7 +72,7 @@ public class Extractor implements Serializable {
 	 * ソート条件を追加する
 	 * @param order ソート条件 nullの場合はNullPointerExceptionを送出する
 	 */
-	public void addOrder(Order order) {
+	public void addOrder(Order<? extends Value> order) {
 		order.getClass();
 		orders.add(order);
 	}
@@ -81,7 +81,7 @@ public class Extractor implements Serializable {
 	 * ソート条件のIteratorを返却する
 	 * @return 抽出条件のIterator
 	 */
-	public List<Order> getOrderIterator() {
+	public List<Order<? extends Value>> getOrderIterator() {
 		return orders;
 	}
 

@@ -238,18 +238,9 @@ public class Extractor2HQL {
         }
         builder.append(" order by ");
         String delimitor = "";
-        for(Order order : extractor.getOrderIterator()) {
+        for(Order<? extends Value> order : extractor.getOrderIterator()) {
             builder.append(delimitor);
-            Class target;
-            String targetAliase;
-            if(order.target == null) {
-                target = extractor.target;
-                targetAliase = extractor.targetAlias;
-            } else {
-                target = order.target;
-                targetAliase = order.aliase;
-            }
-            String property = getProperty(target, targetAliase, order.propertyName);
+            String property = VALUE_MAKE_STRATEGY_MAP.get(order.label.getClass()).makeValue(this, order.label);
             builder.append(property);
             if(order instanceof Desc) {
                 builder.append(" desc");
@@ -424,30 +415,40 @@ public class Extractor2HQL {
         		builder.append("distinct ");
         	}
             builder.append(getAlias(extractor.target, extractor.targetAlias));
-            for(Order order : extractor.getOrderIterator()) {
-                if(order.target == null) {
-                	continue;
-                }
-                builder.append(",");
-                Class target = order.target;
-                String targetAliase = order.aliase;
-                String property = getProperty(target, targetAliase, order.propertyName);
-                builder.append(property);
+            for(Order<? extends Value> order : extractor.getOrderIterator()) {
+            	if(isSkipSelect(order)) {
+            		continue;
+            	}
+                String property = VALUE_MAKE_STRATEGY_MAP.get(order.label.getClass()).makeValue(this, order.label);
+            	builder.append(property);
             }
-            return;
-        }
-        String delimitor = "";
-        for(ExtractValue v : extractor.getValues()) {
-            builder.append(delimitor);
-            String property = VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(this, v.value);
-            builder.append(property);
-            delimitor = ",";
+        } else {
+	        String delimitor = "";
+	        for(ExtractValue v : extractor.getValues()) {
+	            builder.append(delimitor);
+	            String property = VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(this, v.value);
+	            builder.append(property);
+	            delimitor = ",";
+	        }
         }
     }
 
+    private boolean isSkipSelect(Order<? extends Value> order) {
+    	if(!(order.label instanceof Property)) {
+    		//プロパティ以外ならたぶんExtractValueとして加わっているのでスキップして良い
+    		return true;
+    	}
+    	Property p = (Property)order.label;
+    	if(p.target == null) {
+    		return true;
+    	}
+    	return false;
+    }
+    
     static interface ValueMaker<T extends Value> {
     	public String makeValue(Extractor2HQL generator, T v);
     }
+
     final static Map<Class<? extends Value>, ValueMaker> VALUE_MAKE_STRATEGY_MAP;
     static {
     	Map<Class<? extends Value>, ValueMaker> tmp = new HashMap<Class<? extends Value>, ValueMaker>();
