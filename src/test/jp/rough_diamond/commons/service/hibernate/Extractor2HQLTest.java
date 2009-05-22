@@ -15,6 +15,7 @@ import jp.rough_diamond.commons.entity.Numbering;
 import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.extractor.Avg;
+import jp.rough_diamond.commons.extractor.CombineCondition;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Count;
 import jp.rough_diamond.commons.extractor.ExtractValue;
@@ -271,6 +272,193 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("返却数が誤っています。", 2, list.size());
 		assertEquals("値が誤っています。", 1L, 		list.get(0).get("sum").longValue());
 		assertEquals("値が誤っています。", 1610346L,	list.get(1).get("sum").longValue());
+	}
+	
+	public void testConditionPropertyComparation() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 
+				new Property(Unit.RATE + ScalableNumber.VALUE)));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 2, list.size());
+	}
+	
+	public void testEqCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).getId().longValue());
+	}
+	
+	public void testGeCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.ge(new Property(Unit.BASE + "." + Unit.ID), 3L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("IDが誤っています。", 5L, list.get(0).getId().longValue());
+	}
+	
+	public void testGtCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.gt(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("IDが誤っています。", 5L, list.get(0).getId().longValue());
+	}
+	
+	public void testInCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.in(new Property(Unit.BASE + "." + Unit.ID), 1L, 2L , 3L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).getId().longValue());
+	}
+	
+	public void testIsNotNullCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.isNotNull(new Property(Unit.BASE + "." + Unit.ID)));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 5, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).getId().longValue());
+		assertEquals("IDが誤っています。", 5L, list.get(4).getId().longValue());
+	}
+	
+	public void testIsNullCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.isNull(new Property(Unit.BASE + "." + Unit.ID)));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 0, list.size());
+	}
+	
+	public void testLeCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.le(new Property(Unit.BASE + "." + Unit.ID), 5L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 5, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).getId().longValue());
+		assertEquals("IDが誤っています。", 5L, list.get(4).getId().longValue());
+	}
+	
+	public void testLtCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.lt(new Property(Unit.BASE + "." + Unit.ID), 5L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).getId().longValue());
+	}
+	
+	public void testLikeCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.like(new Property(Unit.NAME), "%m%"));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 3, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(2).getId().longValue());
+	}
+	
+	public void testNotEqCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.notEq(new Property(Unit.NAME), "マイル"));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 5L, list.get(3).getId().longValue());
+	}
+	
+	public void testNotInCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.notIn(new Property(Unit.NAME), "マイル", "m"));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 3, list.size());
+		assertEquals("IDが誤っています。", 2L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 5L, list.get(2).getId().longValue());
+	}
+	
+	public void testRegexCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.regex(new Property(Unit.DESCRIPTION), "[.]*メートル[.]*"));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 3, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(2).getId().longValue());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void testAndCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		CombineCondition condition = Condition.and();
+		condition.add(Condition.regex(new Property(Unit.DESCRIPTION), "[.]*メートル[.]*"));
+		condition.add(Condition.eq(new Property(Unit.RATE + ScalableNumber.VALUE), 1));
+		ex.add(condition);
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 2, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(1).getId().longValue());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void testOrCondition() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		CombineCondition condition = Condition.or();
+		condition.add(Condition.regex(new Property(Unit.DESCRIPTION), "[.]*メートル[.]*"));
+		condition.add(Condition.eq(new Property(Unit.RATE + ScalableNumber.VALUE), 1));
+		ex.add(condition);
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 5L, list.get(3).getId().longValue());
 	}
 	
 	public static class CreateQueryService implements Service {

@@ -72,17 +72,12 @@ public class Extractor2HQL {
 
     private final Extractor extractor;
     private StringBuilder builder;
-    private Map<Class, ConditionStrategy> combineStrategy;
     private int patemeterIndex;
     private boolean usingGroupBy = false;
     
     private Extractor2HQL(Extractor extractor) {
         this.extractor = extractor;
         builder = new StringBuilder();
-        combineStrategy = new HashMap<Class, ConditionStrategy>();
-        combineStrategy.put(And.class, new AndStrategy());
-        combineStrategy.put(Or.class, new OrStrategy());
-        combineStrategy.put(Join.class, new JoinStrategy());
         patemeterIndex = 0;
     }
     
@@ -258,30 +253,8 @@ public class Extractor2HQL {
     }
 
     private void setParameter(Query query, Condition<? extends Value> con) {
-        if(con instanceof CombineCondition) {
-            CombineCondition<? extends Value> cc = (CombineCondition<? extends Value>)con;
-            for(Condition<? extends Value> c : cc.getConditions()) {
-                setParameter(query, c);
-            }
-        } else if(con instanceof ValueHoldingCondition) {
-            ValueHoldingCondition<? extends Value> vhc = (ValueHoldingCondition<? extends Value>)con;
-            if(con instanceof In || con instanceof NotIn) {
-            	Collection col = (Collection)vhc.value;
-            	for(Object o : col) {
-            		setParameter(query, o);
-            	}
-            } else {
-        		setParameter(query, vhc.value);
-            }
-        }
-    }
-    private void setParameter(Query query, Object value) {
-        if(value instanceof Number) {
-            query.setParameter(patemeterIndex, value, TypeFactory.basic(value.getClass().getName()));
-        } else {
-            query.setParameter(patemeterIndex, value);
-        }
-        patemeterIndex++;
+    	ConditionStrategy<Condition> strategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(con.getClass()); 
+    	strategy.setParameter(query, this, con);
     }
     
     private void makeWhereCouse() {
@@ -342,62 +315,9 @@ public class Extractor2HQL {
     }
 
     private void makeCondition(Condition<? extends Value> con) {
-        if(con instanceof CombineCondition) {
-            ConditionStrategy cs = combineStrategy.get(con.getClass());
-            cs.makeWhereCouse((CombineCondition<? extends Value>)con);
-        } else {
-            LabelHoldingCondition<? extends Value> lhc = (LabelHoldingCondition<? extends Value>)con;
-            String property = VALUE_MAKE_STRATEGY_MAP.get(lhc.label.getClass()).makeValue(this, lhc.label);
-            String where;
-            if(lhc.getClass() == RegularExp.class) {
-            	where = makeRegularExtWhere((RegularExp)lhc, property);
-            } else if(lhc.getClass() == In.class) {
-            	where = makeInWhere((In)con, property);
-            } else if(lhc.getClass() == NotIn.class) {
-            	where = makeNotInWhere((NotIn)con, property);
-            } else {
-            	where = MessageFormat.format(
-                    CONDITION_TEMPLATE.get(lhc.getClass()), property);
-            }
-            builder.append(where);
-        }
-    }
-
-    private String makeRegularExtWhere(RegularExp lhc, String property) {
-    	Dialect dialect = HibernateUtils.getDialect();
-    	if(dialect == null) {
-    		throw new RuntimeException("dialect can't get.");
-    	}
-    	String tmpl = REGEXP_TEMPLATE.get(dialect.getClass());
-    	System.out.println(tmpl);
-    	if(tmpl == null) {
-    		throw new RuntimeException("unsupported regular Expression in " + dialect.getClass().getName() + ".");
-    	}
-    	return MessageFormat.format(tmpl, property);
-	}
-
-    private String makeNotInWhere(NotIn con, String property) {
-    	return makeInWhare(con, property, "not in");
-    }
-
-    private String makeInWhere(In con, String property) {
-    	return makeInWhare(con, property, "in");
-    }
-    
-    private String makeInWhare(ValueHoldingCondition con, String property, String prefix) {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append(property);
-    	sb.append(" ");
-    	sb.append(prefix);
-    	sb.append(" (");
-    	String delimiter = "";
-    	for(@SuppressWarnings("unused") Object o : (Collection)con.value) {
-    		sb.append(delimiter);
-    		sb.append("?");
-    		delimiter = ", ";
-    	}
-    	sb.append(")");
-    	return sb.toString();
+        ConditionStrategy<Condition> strategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(con.getClass());
+        String where = strategy.makeWhereCouse(this, con);
+        builder.append(where);
     }
     
     private void addProperty(String targetProperty) {
@@ -449,6 +369,22 @@ public class Extractor2HQL {
     	public String makeValue(Extractor2HQL generator, T v);
     }
 
+    static class SummaryFunctionValueMaker<T extends SummaryFunction> implements ValueMaker<T> {
+    	static final String format = "%s(%s)";
+    	private final String prefix;
+    	SummaryFunctionValueMaker(String prefix) {
+    		this.prefix = prefix;
+    	}
+		@Override
+		public String makeValue(Extractor2HQL generator, T v) {
+			generator.usingGroupBy = true;
+			return String.format(format, prefix, getValue(generator, v));
+		}
+    	
+		protected String getValue(Extractor2HQL generator, T v) {
+			return VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value);
+		}
+    }
     final static Map<Class<? extends Value>, ValueMaker> VALUE_MAKE_STRATEGY_MAP;
     static {
     	Map<Class<? extends Value>, ValueMaker> tmp = new HashMap<Class<? extends Value>, ValueMaker>();
@@ -458,41 +394,14 @@ public class Extractor2HQL {
 				return generator.getProperty(v.target, v.aliase, v.property);
 			}
     	});
-    	tmp.put(Max.class, new ValueMaker<Max>() {
+    	tmp.put(Max.class, new SummaryFunctionValueMaker<Max>("max"));
+    	tmp.put(Min.class, new SummaryFunctionValueMaker<Min>("min"));
+    	tmp.put(Sum.class, new SummaryFunctionValueMaker<Sum>("sum"));
+    	tmp.put(Avg.class, new SummaryFunctionValueMaker<Avg>("avg"));
+    	tmp.put(Count.class, new SummaryFunctionValueMaker<Count>("count") {
 			@Override
-			public String makeValue(Extractor2HQL generator, Max v) {
-				generator.usingGroupBy = true;
-				return "max(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
-			}
-    	});
-    	tmp.put(Min.class, new ValueMaker<Min>() {
-			@Override
-			public String makeValue(Extractor2HQL generator, Min v) {
-				generator.usingGroupBy = true;
-				return "min(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
-			}
-    	});
-    	tmp.put(Sum.class, new ValueMaker<Sum>() {
-			@Override
-			public String makeValue(Extractor2HQL generator, Sum v) {
-				generator.usingGroupBy = true;
-				return "Sum(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
-			}
-    	});
-    	tmp.put(Avg.class, new ValueMaker<Avg>() {
-			@Override
-			public String makeValue(Extractor2HQL generator, Avg v) {
-				generator.usingGroupBy = true;
-				return "avg(" + VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
-			}
-    	});
-    	tmp.put(Count.class, new ValueMaker<Count>() {
-			@Override
-			public String makeValue(Extractor2HQL generator, Count v) {
-				generator.usingGroupBy = true;
-				return "count(" + 
-						(v.distinct ? "distinct " : "") +
-						VALUE_MAKE_STRATEGY_MAP.get(v.value.getClass()).makeValue(generator, v.value) + ")";
+			public String getValue(Extractor2HQL generator, Count v) {
+				return (v.distinct ? "distinct " : "") + super.getValue(generator, v);
 			}
     	});
     	tmp.put(FreeFormat.class, new ValueMaker<FreeFormat>() {
@@ -623,76 +532,193 @@ public class Extractor2HQL {
         }
     }
     
-    private static Map<Class , String> CONDITION_TEMPLATE;
+    private static interface ConditionStrategy<T extends Condition> {
+    	public String makeWhereCouse(Extractor2HQL generator, T condition);
+    	public void setParameter(Query query, Extractor2HQL generator, T condition);
+    }
     
-    static {
-        Map<Class, String> tmp = new HashMap<Class, String>();
-        tmp.put(Eq.class, "{0} = ?");
-        tmp.put(Ge.class, "{0} >= ?");
-        tmp.put(Gt.class, "{0} > ?");
-//展開する        
-//        tmp.put(In.class, "{0} in (?)");
-//        tmp.put(NotIn.class, "not ({0} in (?))");
-        tmp.put(IsNotNull.class, "{0} is not null");
-        tmp.put(IsNull.class, "{0} is null");
-        tmp.put(Le.class, "{0} <= ?");
-        tmp.put(Like.class, "{0} like ?");
-        tmp.put(Lt.class, "{0} < ?");
-        tmp.put(NotEq.class, "{0} <> ?");
-//Dialect毎に実装を切り替える        
-//        tmp.put(RegularExp.class, "char_length(substring({0},?)) > 0");
-        CONDITION_TEMPLATE = Collections.unmodifiableMap(tmp);
+    private static class CombineConditionStrategy<T extends CombineCondition> implements ConditionStrategy<T> {
+    	private final String combinString;
+    	CombineConditionStrategy(String combinString) {
+    		this.combinString = " " + combinString + " ";
+    	}
+
+		@Override
+		public String makeWhereCouse(Extractor2HQL generator, T condition) {
+			StringBuilder sb = new StringBuilder();
+            if(condition.getConditions().size() == 0) {
+                return "";
+            }
+            sb.append("(");
+            String combineString = "";
+            for(Object o : condition.getConditions()) {
+            	Condition con = (Condition)o;
+                sb.append(combineString);
+            	ConditionStrategy<Condition> strategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(con.getClass());
+            	sb.append(strategy.makeWhereCouse(generator, con));
+                combineString = this.combinString;
+            }
+            sb.append(")");
+            return sb.toString();
+		}
+
+		@Override
+		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+            for(Object o : condition.getConditions()) {
+            	Condition con = (Condition)o;
+            	ConditionStrategy<Condition> strategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(con.getClass());
+            	strategy.setParameter(query, generator, con);
+            }
+		}
+    }
+    
+    private static class LabelHoldingStrategy<T extends LabelHoldingCondition> implements ConditionStrategy<T> {
+    	public String makeWhereCouse(Extractor2HQL generator, T condition) {
+    		return String.format("%s %s %s", 
+    				getLeftSide(generator, condition), 
+    				getExpression(generator, condition), 
+    				getRightSide(generator, condition));
+    	}
+    	
+    	protected String getLeftSide(Extractor2HQL generator, T condition) {
+    		return VALUE_MAKE_STRATEGY_MAP.get(condition.label.getClass()).makeValue(generator, condition.label);
+    	}
+    	
+    	protected String getExpression(Extractor2HQL generator, T condition) {
+    		return CONDITION_EXPRESSION_MAP.get(condition.getClass());
+    	}
+    	
+    	protected String getRightSide(Extractor2HQL generator, T condition) {
+    		return "";
+    	}
+
+		@Override
+		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+		}
     }
 
-    private static Map<Class<? extends Dialect>, String> REGEXP_TEMPLATE;
+    private static class ValueHoldingStrategy<T extends ValueHoldingCondition> extends LabelHoldingStrategy<T> {
+    	@Override
+    	protected String getRightSide(Extractor2HQL generator, T condition) {
+    		if(condition.value instanceof Value) {
+    			return VALUE_MAKE_STRATEGY_MAP.get(condition.value.getClass()).makeValue(generator, (Value)condition.value);
+    		} else {
+    			return "?";
+    		}
+    	}
+		@Override
+		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+			if(!(condition.value instanceof Value)) {
+				setParameter2(query, generator, condition.value);
+			}
+		}
+		
+	    protected void setParameter2(Query query, Extractor2HQL generator, Object value) {
+	        if(value instanceof Number) {
+	            query.setParameter(generator.patemeterIndex, value, TypeFactory.basic(value.getClass().getName()));
+	        } else {
+	            query.setParameter(generator.patemeterIndex, value);
+	        }
+	        generator.patemeterIndex++;
+	    }
+    }
+    
+    private static class CollectionValueHoldingStrategy<T extends ValueHoldingCondition> extends ValueHoldingStrategy<T> {
+    	@Override
+    	protected String getRightSide(Extractor2HQL generator, T condition) {
+        	StringBuilder sb = new StringBuilder();
+        	sb.append("(");
+        	String delimiter = "";
+        	for(@SuppressWarnings("unused") Object o : (Collection)condition.value) {
+        		sb.append(delimiter);
+        		sb.append("?");
+        		delimiter = ", ";
+        	}
+        	sb.append(")");
+        	return sb.toString();
+    	}
+		@Override
+		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+			if(!(condition.value instanceof Value)) {
+            	Collection col = (Collection)condition.value;
+            	for(Object o : col) {
+            		setParameter2(query, generator, o);
+            	}
+			}
+		}
+    }
+
+    private final static Map<Class<? extends Condition>, ConditionStrategy<? extends Condition>> CONDITION_STRATEGY_MAP2;
+    static {
+    	Map<Class<? extends Condition>, ConditionStrategy<? extends Condition>> tmp = 
+    		new HashMap<Class<? extends Condition>, ConditionStrategy<? extends Condition>>();
+    	tmp.put(And.class, new CombineConditionStrategy<And>("and"));
+    	tmp.put(Or.class, new CombineConditionStrategy<Or>("or"));
+    	tmp.put(Join.class, new CombineConditionStrategy<Join>(""){
+			@Override
+			public String makeWhereCouse(Extractor2HQL generator, Join condition) {
+	               throw new RuntimeException("HQLではサポートしていません。（今のところ）");
+			}
+    	});
+    	tmp.put(Eq.class, new ValueHoldingStrategy<Eq>());
+    	tmp.put(Ge.class, new ValueHoldingStrategy<Ge>());
+    	tmp.put(Gt.class, new ValueHoldingStrategy<Gt>());
+    	tmp.put(In.class, new CollectionValueHoldingStrategy<In>());
+    	tmp.put(IsNotNull.class, new LabelHoldingStrategy<IsNotNull>());
+    	tmp.put(IsNull.class, new LabelHoldingStrategy<IsNull>());
+    	tmp.put(Le.class, new ValueHoldingStrategy<Le>());
+    	tmp.put(Like.class, new ValueHoldingStrategy<Like>());
+    	tmp.put(Lt.class, new ValueHoldingStrategy<Lt>());
+    	tmp.put(NotEq.class, new ValueHoldingStrategy<NotEq>());
+    	tmp.put(NotIn.class, new CollectionValueHoldingStrategy<NotIn>());
+    	tmp.put(RegularExp.class, new ValueHoldingStrategy<RegularExp>(){
+    		@Override
+        	protected String getLeftSide(Extractor2HQL generator, RegularExp condition) {
+	        	Dialect dialect = HibernateUtils.getDialect();
+	        	if(dialect == null) {
+	        		throw new RuntimeException("dialect can't get.");
+	        	}
+	        	String tmpl = REGEXP_TEMPLATE.get(dialect.getClass());
+	        	log.debug(tmpl);
+	        	if(tmpl == null) {
+	        		throw new RuntimeException("unsupported regular Expression in " + dialect.getClass().getName() + ".");
+	        	}
+	        	String property = super.getLeftSide(generator, condition);
+	        	String value = super.getRightSide(generator, condition);
+	        	return MessageFormat.format(tmpl, property, value);
+    		}
+    		@Override
+        	protected String getRightSide(Extractor2HQL generator, RegularExp condition) {
+    			return "0";
+    		}
+    	});
+    	CONDITION_STRATEGY_MAP2 = Collections.unmodifiableMap(tmp);
+    }
+    
+    private final static Map<Class<? extends Condition> , String> CONDITION_EXPRESSION_MAP;
+    
+    static {
+        Map<Class<? extends Condition>, String> tmp = new HashMap<Class<? extends Condition>, String>();
+        tmp.put(Eq.class, 			"=");
+        tmp.put(Ge.class, 			">=");
+        tmp.put(Gt.class, 			">");
+        tmp.put(In.class, 			"in");
+        tmp.put(IsNotNull.class, 	"is not null");
+        tmp.put(IsNull.class, 		"is null");
+        tmp.put(Le.class, 			"<=");
+        tmp.put(Like.class, 		"like");
+        tmp.put(Lt.class, 			"<");
+        tmp.put(NotEq.class, 		"<>");
+        tmp.put(NotIn.class, 		"not in");
+        tmp.put(RegularExp.class, 	">");
+        CONDITION_EXPRESSION_MAP = Collections.unmodifiableMap(tmp);
+    }
+
+    private final static Map<Class<? extends Dialect>, String> REGEXP_TEMPLATE;
     static {
         Map<Class<? extends Dialect>, String> tmp = new HashMap<Class<? extends Dialect>, String>();
-        tmp.put(PostgreSQLDialect.class, "char_length(substring({0},?)) > 0");
-        tmp.put(Oracle10gDialect.class, "REGEXP_INSTR({0}, ?) > 0");
+        tmp.put(PostgreSQLDialect.class, "char_length(substring({0},{1}))");
+        tmp.put(Oracle10gDialect.class, "REGEXP_INSTR({0}, {1})");
         REGEXP_TEMPLATE = Collections.unmodifiableMap(tmp);
-    }
-    
-    private interface ConditionStrategy {
-        public void makeWhereCouse(CombineCondition<? extends Value> con);
-    }
-
-    class OrStrategy implements ConditionStrategy {
-        public void makeWhereCouse(CombineCondition<? extends Value> con) {
-            log.debug("OrStrategyを実行します。");
-            if(con.getConditions().size() == 0) {
-                return;
-            }
-            builder.append("(");
-            String combineString = "";
-            for(Condition<? extends Value> c : con.getConditions()) {
-                builder.append(combineString);
-                makeCondition(c);
-                combineString = " or ";
-            }
-            builder.append(")");
-        }
-
-    }
-
-    class AndStrategy implements ConditionStrategy {
-        public void makeWhereCouse(CombineCondition<? extends Value> con) {
-            if(con.getConditions().size() == 0) {
-                return;
-            }
-            builder.append("(");
-            String combineString = "";
-            for(Condition<? extends Value> c : con.getConditions()) {
-                builder.append(combineString);
-                makeCondition(c);
-                combineString = " and ";
-            }
-            builder.append(")");
-        }
-    }
-
-    static class JoinStrategy implements ConditionStrategy {
-        public void makeWhereCouse(CombineCondition con) {
-            throw new RuntimeException("HQLではサポートしていません。（今のところ）");
-        }
     }
 }
