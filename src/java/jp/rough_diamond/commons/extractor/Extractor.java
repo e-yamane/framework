@@ -68,18 +68,20 @@ public class Extractor implements Serializable {
 	 * 抽出条件を追加する
 	 * @param con	抽出条件 nullの場合はNullPointerExceptionを送出する
 	 */
-	public void add(Condition con) {
+	public Extractor add(Condition con) {
 		con.getClass();
 		condition.add(con);
+		return this;
 	}
 	
 	/**
 	 * ソート条件を追加する
 	 * @param order ソート条件 nullの場合はNullPointerExceptionを送出する
 	 */
-	public void addOrder(Order<? extends Value> order) {
+	public Extractor addOrder(Order<? extends Value> order) {
 		order.getClass();
 		orders.add(order);
+		return this;
 	}
 	
 	/**
@@ -165,8 +167,9 @@ public class Extractor implements Serializable {
      * 抽出値を追加する
      * @param value
      */
-    public void addExtractValue(ExtractValue value) {
+    public Extractor addExtractValue(ExtractValue value) {
         values.add(value);
+        return this;
     }
     
     /**
@@ -180,9 +183,10 @@ public class Extractor implements Serializable {
 	 * 抽出条件(having)を追加する
 	 * @param con	抽出条件 nullの場合はNullPointerExceptionを送出する
 	 */
-	public void addHaving(Condition<? extends Value> con) {
+	public Extractor addHaving(Condition<? extends Value> con) {
 		con.getClass();
 		having.add(con);
+		return this;
 	}
 	
 	/**

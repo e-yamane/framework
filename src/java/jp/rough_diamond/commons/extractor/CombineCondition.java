@@ -45,8 +45,9 @@ public abstract class CombineCondition<T extends Value> extends Condition<T> {
 	 * Œ‹‡‚·‚éğŒ‚ğ––”ö‚É’Ç‰Á‚·‚é
 	 * @param condition	ğŒ
 	 */
-	public void add(Condition<T> condition) {
+	public CombineCondition<T> add(Condition<T> condition) {
 		conditions.add(condition);
+		return this;
 	}
 
 	/**
