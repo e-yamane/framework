@@ -21,6 +21,7 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
     }
 
 
+
     /**
      * —Ê
     **/ 

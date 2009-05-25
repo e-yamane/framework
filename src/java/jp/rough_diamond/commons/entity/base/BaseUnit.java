@@ -48,6 +48,7 @@ public abstract class BaseUnit  implements Serializable {
     **/
     public void setId(Long id) {
         this.id = id;
+        isLoaded = false;
     }
     
     public int hashCode() {
@@ -69,6 +70,21 @@ public abstract class BaseUnit  implements Serializable {
             }
         }
         return false;
+    }
+
+    private boolean isLoaded;
+    @jp.rough_diamond.commons.service.annotation.PostLoad
+    @jp.rough_diamond.commons.service.annotation.PostPersist
+    public void setLoadingFlag() {
+        isLoaded = true;
+    }
+
+    public void save() throws jp.rough_diamond.framework.transaction.VersionUnmuchException, jp.rough_diamond.commons.resource.MessagesIncludingException {
+        if(isLoaded) {
+            jp.rough_diamond.commons.service.BasicService.getService().update(this);
+        } else {
+            jp.rough_diamond.commons.service.BasicService.getService().insert(this);
+        }
     }
 
     /**

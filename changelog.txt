@@ -35,6 +35,7 @@ RDF Core Change Log
 　　- プロパティ同士の比較を出来るようにしました
 　　- Extractor#add*、CombineCondition#addの戻り値に自分自身を
 　　　返却するようにしました
+　　- 自動生成時にsaveメソッドを自動作成するようにしました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - 集計関数を使用していてかつ、当該データ件数が０件の場合、

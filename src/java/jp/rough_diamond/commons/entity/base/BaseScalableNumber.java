@@ -21,6 +21,7 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
     }
 
 
+
     /**
      * —Ê(®”)
     **/ 
