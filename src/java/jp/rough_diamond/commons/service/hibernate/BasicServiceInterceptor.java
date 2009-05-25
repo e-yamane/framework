@@ -58,13 +58,17 @@ public class BasicServiceInterceptor extends EmptyInterceptor {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Override
-	public boolean onLoad(Object arg0, Serializable arg1, Object[] arg2, String[] arg3, Type[] arg4) {
+	static void addPostLoadObject(Object o) {
 		Map map = TransactionManager.getTransactionContext();
 		Set<Object> set = (Set<Object>)map.get(POST_LOAD_OBJECTS);
 		if(set != null) {
-			set.add(arg0);
+			set.add(o);
 		}
+	}
+	
+	@Override
+	public boolean onLoad(Object arg0, Serializable arg1, Object[] arg2, String[] arg3, Type[] arg4) {
+		addPostLoadObject(arg0);
 		return super.onLoad(arg0, arg1, arg2, arg3, arg4);
 	}
 }

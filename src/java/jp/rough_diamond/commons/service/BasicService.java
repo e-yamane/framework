@@ -157,7 +157,7 @@ abstract public class BasicService implements Service {
      * @return			検索条件に対応するオブジェクト一覧。１件も該当するデータが無ければ要素数０のリストを返却する
      */
     public <T> List<T> findByExtractor(Extractor extractor, boolean isNoCache) {
-    	return findByExtractor(extractor.target, extractor, isNoCache, RecordLock.NONE);
+    	return findByExtractor(getReturnType(extractor), extractor, isNoCache, RecordLock.NONE);
     }
     
     /**
@@ -169,9 +169,19 @@ abstract public class BasicService implements Service {
      * @return			検索条件に対応するオブジェクト一覧。１件も該当するデータが無ければ要素数０のリストを返却する
      */
     public <T> List<T> findByExtractor(Extractor extractor, boolean isNoCache, RecordLock lock) {
-    	return findByExtractor(extractor.target, extractor, isNoCache, lock);
+    	return findByExtractor(getReturnType(extractor), extractor, isNoCache, lock);
     }
 
+    Class getReturnType(Extractor extractor) {
+    	if(extractor.returnType != null) {
+    		return extractor.returnType;
+    	} else if(extractor.getValues().size() != 0) {
+    		return Map.class;
+    	} else {
+    		return extractor.target;
+    	}
+    }
+    
     abstract protected <T> List<T> findByExtractor(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock);
 
     /**

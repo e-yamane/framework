@@ -80,32 +80,10 @@ public class HibernateBasicService extends BasicService {
     }
 
 	@Override
-    @SuppressWarnings("unchecked")
     protected <T> List<T> findByExtractor(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock) {
     	BasicServiceInterceptor.startLoad(isNoCache);
         try {
-            List<T> list;
-//            if(LogicalDeleteEntity.class.isAssignableFrom(type)) {
-//                extractor.add(Condition.eq("deletedInDB", HibernateUtils.BOOLEAN_CHAR_F));
-//            }
-            Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
-            if(extractor.getValues().size() != 0) {
-                //厳密にエンティティはロードされていないのでイベントをファイアしてはいけないのでリターン
-                List<Object> tmp = query.list();
-                list = (List<T>) Extractor2HQL.makeMap(extractor, tmp);
-            } else {
-//                list = query.list();
-            	list = makeList(type, query.list());
-            }
-            List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
-            fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
-            if(isNoCache) {
-	            Session session = HibernateUtils.getSession();
-	            for(Object o : loadedObjects) {
-	            	session.evict(o);
-	            }
-            }
-            return list;
+        	return findByExtractor2(type, extractor, isNoCache, lock);
         } catch(Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -115,35 +93,11 @@ public class HibernateBasicService extends BasicService {
     }
 
 	@Override
-    @SuppressWarnings("unchecked")
     protected <T> FindResult<T> findByExtractorWithCount(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock) {
     	BasicServiceInterceptor.startLoad(isNoCache);
         try {
-//            if(LogicalDeleteEntity.class.isAssignableFrom(type)) {
-//                extractor.add(Condition.eq("deletedInDB", HibernateUtils.BOOLEAN_CHAR_F));
-//            }
-            List<T> list;
+            List<T> list = findByExtractor2(type, extractor, isNoCache, lock);
             long count;
-            if(extractor.getLimit() != 0) {
-	            Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
-	            if(extractor.getValues().size() != 0) {
-	                List<Object> tmp = query.list();
-	                list = (List<T>) Extractor2HQL.makeMap(extractor, tmp);
-	            } else {
-//	            	list = query.list();
-	            	list = makeList(type, query.list());
-	            }
-	            List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
-	            fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
-	            if(isNoCache) {
-		            Session session = HibernateUtils.getSession();
-		            for(Object o : loadedObjects) {
-		            	session.evict(o);
-		            }
-	            }
-            } else {
-            	list = new ArrayList<T>();
-            }
             Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
             Number n = (Number)countQuery.list().get(0);
             count = n.longValue();
@@ -157,6 +111,36 @@ public class HibernateBasicService extends BasicService {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    <T> List<T> findByExtractor2(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock) throws VersionUnmuchException, MessagesIncludingException {
+        List<T> list;
+//      if(LogicalDeleteEntity.class.isAssignableFrom(type)) {
+//          extractor.add(Condition.eq("deletedInDB", HibernateUtils.BOOLEAN_CHAR_F));
+//      }
+        if(extractor.getLimit() != 0) {
+	        Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
+	        if(extractor.getValues().size() != 0) {
+	        	//厳密にはエンティティはロードされていないのでイベントをファイアしてはいけないのでリターン
+	        	List<Object> tmp = query.list();
+	        	list = (List<T>) Extractor2HQL.makeList(type, extractor, tmp);
+	        } else {
+//          	  list = query.list();
+	        	list = makeList(type, query.list());
+	        }
+	        List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
+	        fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
+	        if(isNoCache) {
+	        	Session session = HibernateUtils.getSession();
+	        	for(Object o : loadedObjects) {
+	        		session.evict(o);
+	        	}
+	        }
+        } else {
+        	list = new ArrayList<T>();
+        }
+        return list;
+    }
+    
 	@Override
     @SuppressWarnings("unchecked")
     public <T> List<T> findAll(Class<T> type, boolean isNoCache, int fetchSize) {

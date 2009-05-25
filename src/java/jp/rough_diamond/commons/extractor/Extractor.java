@@ -25,7 +25,12 @@ public class Extractor implements Serializable {
 	 */
 	public final Class target;
 
-    /**
+	/**
+	 * 戻りオブジェクトのタイプ
+	 */
+	public Class<?> returnType;
+	
+	/**
      * 抽出対象エイリアス
      */
     public final String targetAlias;
@@ -186,5 +191,13 @@ public class Extractor implements Serializable {
 	 */
 	public List<Condition<? extends Value>> getHavingIterator() {
 		return having;
+	}
+
+	/**
+	 * 戻りタイプを設定する
+	 * @param returnType
+	 */
+	public void setReturnType(Class<?> returnType) {
+		this.returnType = returnType;
 	}
 }

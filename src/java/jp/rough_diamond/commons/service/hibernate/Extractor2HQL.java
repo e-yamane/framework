@@ -6,12 +6,15 @@
  */
 package jp.rough_diamond.commons.service.hibernate;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +52,7 @@ import jp.rough_diamond.commons.extractor.Sum;
 import jp.rough_diamond.commons.extractor.SummaryFunction;
 import jp.rough_diamond.commons.extractor.Value;
 import jp.rough_diamond.commons.extractor.ValueHoldingCondition;
+import jp.rough_diamond.commons.util.PropertyUtils;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
 import org.apache.commons.logging.Log;
@@ -102,7 +106,7 @@ public class Extractor2HQL {
      * @return
      */
     public static List<Map<String, Object>> makeMap(Extractor extractor, List<Object> list) {
-        List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
+    	List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
         List<ExtractValue> values = extractor.getValues();
         MakeMapStrategy strategy = (values.size() == 1) ? SingleStrategy.INSTANCE : MultiStrategy.INSTANCE;
         for(Object row : list) {
@@ -112,6 +116,56 @@ public class Extractor2HQL {
         return ret;
     }
     
+    public static <T> List<T> makeList(Class<T> returnType, Extractor extractor, List<Object> list) {
+    	List<Map<String, Object>> mapList = makeMap(extractor, list);
+    	if(returnType.isAssignableFrom(Map.class)) {
+    		return (List<T>) mapList;
+    	}
+    	List<T> retList = new ArrayList<T>(mapList.size());
+    	for(Map<String, Object> map : mapList) {
+   			retList.add(makeInstance(returnType, map));
+    	}
+    	return retList;
+    }
+    
+    static <T> T makeInstance(Class<T> returnType, Map<String, Object> map) {
+    	T ret = tryingConstructorInjection(returnType, map);
+    	if(ret == null) {
+    		ret = tryingSetterInjection(returnType, map);
+    	}
+    	BasicServiceInterceptor.addPostLoadObject(ret);
+		return ret;
+    }
+
+    static <T> T tryingSetterInjection(Class<T> returnType, Map<String, Object> map) {
+    	try {
+			T ret = returnType.newInstance();
+			for(Map.Entry<String, Object> entry : map.entrySet()) {
+				PropertyUtils.setProperty(ret, entry.getKey(), entry.getValue());
+			}
+			return ret;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+    }
+    
+    static <T> T tryingConstructorInjection(Class<T> returnType, Map<String, Object> map) {
+    	Object[] array = map.values().toArray();
+    	Constructor<?>[] consts = returnType.getConstructors();
+    	for(Constructor<?> con : consts) {
+    		try {
+				T ret = (T)con.newInstance(array);
+				return ret;
+			} catch (IllegalArgumentException e) {
+			} catch (InstantiationException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalAccessException e) {
+			} catch (InvocationTargetException e) {
+			}
+    	}
+    	return null;
+    }
+
     private static interface MakeMapStrategy {
     	public Map<String, Object> getMap(Object target, List<ExtractValue> values);
     }
@@ -119,7 +173,7 @@ public class Extractor2HQL {
     private static class SingleStrategy implements MakeMapStrategy {
     	private final static MakeMapStrategy INSTANCE = new SingleStrategy();
 		public Map<String, Object> getMap(Object target, List<ExtractValue> values) {
-			Map<String, Object> ret = new HashMap<String, Object>();
+			Map<String, Object> ret = new LinkedHashMap<String, Object>();
 			Object value = ((values.get(0).value instanceof SummaryFunction) && target == null) ? 0L : target; 
 			ret.put(values.get(0).key, value);
 			return ret;
@@ -131,7 +185,7 @@ public class Extractor2HQL {
     	private final static MakeMapStrategy INSTANCE = new MultiStrategy();
 		public Map<String, Object> getMap(Object target, List<ExtractValue> values) {
 			Object[] row = (Object[])target;
-			Map<String, Object> rowMap = new HashMap<String, Object>();
+			Map<String, Object> rowMap = new LinkedHashMap<String, Object>();
 			for(int i = 0 ; i < values.size() ; i++) {
 				Object value = ((values.get(i).value instanceof SummaryFunction) && row[i] == null) ? 0L : row[i]; 
 				rowMap.put(values.get(i).key, value);

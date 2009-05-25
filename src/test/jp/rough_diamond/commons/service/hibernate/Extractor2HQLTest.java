@@ -27,6 +27,7 @@ import jp.rough_diamond.commons.extractor.Order;
 import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.extractor.Sum;
 import jp.rough_diamond.commons.service.BasicService;
+import jp.rough_diamond.commons.service.annotation.PostLoad;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
@@ -459,6 +460,63 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
 		assertEquals("IDが誤っています。", 4L, list.get(2).getId().longValue());
 		assertEquals("IDが誤っています。", 5L, list.get(3).getId().longValue());
+	}
+	
+	public void testSpecificateReturnTypeWithConstructorInjection() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue(
+				"sum", new Sum(new Property(Unit.RATE + ScalableNumber.VALUE))));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.setReturnType(Long.class);
+		List<Long> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("値の取得に失敗しました。", 1610347L, list.get(0).longValue());
+
+		ex.setReturnType(ReturnType2.class);
+		List<ReturnType2> list2 = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list2.size());
+		assertEquals("値の取得に失敗しました。", 1610347L, list2.get(0).sum.longValue());
+		assertTrue("コールバックされていません。", list2.get(0).isCallback);
+	}
+	
+	public void testSpecificateReturnTypeWithSetterInjection() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue(
+				"sum", new Sum(new Property(Unit.RATE + ScalableNumber.VALUE))));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.setReturnType(ReturnType1.class);
+		List<ReturnType1> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("値の取得に失敗しました。", 1610347L, list.get(0).sum.longValue());
+		assertTrue("コールバックされていません。", list.get(0).isCallback);
+	}
+	
+	public static class ReturnType1 {
+		Long sum;
+		public void setSum(Number sum) {
+			this.sum = sum.longValue();
+		}
+		boolean isCallback;
+		@PostLoad
+		public void postLoad() {
+			this.isCallback = true;
+		}
+	}
+	
+	public static class ReturnType2 {
+		public ReturnType2(Number sum) {
+			setSum(sum);
+		}
+		
+		Long sum;
+		public void setSum(Number sum) {
+			this.sum = sum.longValue();
+		}
+		boolean isCallback;
+		@PostLoad
+		public void postLoad() {
+			this.isCallback = true;
+		}
 	}
 	
 	public static class CreateQueryService implements Service {
