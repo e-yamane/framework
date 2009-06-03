@@ -16,7 +16,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -35,7 +34,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
 import jp.rough_diamond.commons.lang.StringUtils;
-import jp.rough_diamond.commons.resource.ResourceManager;
 import jp.rough_diamond.tools.projectgen.ProjectGeneratorParameter.ApplicationOption;
 import jp.rough_diamond.tools.projectgen.ProjectGeneratorParameter.ApplicationType;
 
@@ -44,7 +42,6 @@ import jp.rough_diamond.tools.projectgen.ProjectGeneratorParameter.ApplicationTy
  */
 public class ProjectGeneratorGUI {
 	private ProjectGeneratorParameter param = new ProjectGeneratorParameter();
-	private ResourceBundle rb = ResourceManager.getResource();
 	private JFrame frame;
 	
 	public static void main(String[] args) {
@@ -58,7 +55,7 @@ public class ProjectGeneratorGUI {
 	JFrame createDialog() {
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle(rb.getString("project.gen.frame.title"));
+		frame.setTitle("新規プロジェクトの作成");
 		Box topBox = Box.createVerticalBox();
 		Container panel = frame.getContentPane();
 		panel.setLayout(new BorderLayout());
