@@ -40,11 +40,11 @@
 #end
 
   <target name="makeConfig" depends="init-task, filter-check, filter-exists, makeConfigBase" if="filtering.filename.present" description="EIを実行する">
-    <copy file="${conf.dir}/template/beans.xml" tofile="${src.dir}/beans.xml" filtering="true" overwrite="true" />
-    <copy file="${conf.dir}/template/beans-domain.xml" tofile="${src.dir}/beans-domain.xml" filtering="true" overwrite="true" />
-    <copy file="${conf.dir}/template/log4j.properties" tofile="${src.dir}/log4j.properties" filtering="true" overwrite="true" />
+    <copy file="${conf.dir}/template/beans.xml" tofile="${src.dir}/beans.xml" filtering="true" overwrite="true" encoding="$param.sourceEncoding" />
+    <copy file="${conf.dir}/template/beans-domain.xml" tofile="${src.dir}/beans-domain.xml" filtering="true" overwrite="true" encoding="$param.sourceEncoding" />
+    <copy file="${conf.dir}/template/log4j.properties" tofile="${src.dir}/log4j.properties" filtering="true" overwrite="true" encoding="$param.sourceEncoding" />
 #if($param.isContainOption("USING_ESB"))
-    <copy file="${conf.dir}/template/cxfrouting.properties" tofile="${src.dir}/cxfrouting.properties" filtering="true" overwrite="true" />
+    <copy file="${conf.dir}/template/cxfrouting.properties" tofile="${src.dir}/cxfrouting.properties" filtering="true" overwrite="true" encoding="$param.sourceEncoding" />
 #end
     <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" encoding="$param.sourceEncoding" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
