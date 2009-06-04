@@ -49,7 +49,7 @@
   <property name="report.dir"             value="testRreport" />
   <property name="coverage.dir"           value="coverage" />
   <property name="junit.src.pattern"      value="**/*Test.java" />
-  <property name="cobertura.ser"          value="${test.work.dir}/cobertura.ser" />
+  <property name="cobertura.ser"          value="${my.build.dir}/cobertura.ser" />
   <property name="findbugs.home"          value="${framework.lib.root}/findbugs" />
   <property name="findbugs.output"        value="${result.dir}/findbugs.xml" />
 
