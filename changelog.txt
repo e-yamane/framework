@@ -31,15 +31,15 @@ RDF Core Change Log
     - Extractorで集計関数（sum、avg、max、min, count）をサポート
     - 算術演算用のクラス（FreeFormat）をサポート
     - Extractorでhavingをサポート
-    - ExtractValue使用時の戻り値を指定できるようにしました
+    - 戻り値の型を指定できるようにしました
 　　- プロパティ同士の比較を出来るようにしました
 　　- Extractor#add*、CombineCondition#addの戻り値に自分自身を
 　　　返却するようにしました
 　　- 自動生成時にsaveメソッドを自動作成するようにしました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
-    - 集計関数を使用していてかつ、当該データ件数が０件の場合、
-　　　nullではなく0（Longオブジェクト）を返却するようにする
+    - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの
+　　　カバレッジや、通過していないパスのカバレッジを計上していた
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない

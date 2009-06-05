@@ -491,6 +491,48 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertTrue("コールバックされていません。", list.get(0).isCallback);
 	}
 	
+	public void testNonExtractValueAndReturnTypeConstructorInjection() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		ex.setReturnType(ReturnType3.class);
+		List<ReturnType3> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).u.getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).u.getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).u.getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).u.getId().longValue());
+	}
+	
+	public void testNonExtractValueAndReturnTypeWithSetterInjection() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		ex.setReturnType(ReturnType4.class);
+		List<ReturnType4> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).u.getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).u.getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).u.getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).u.getId().longValue());
+	}
+	
+	public void testNonExtractValueAndReturnTypeWithTypeEquals() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.add(Condition.le(new Property(Unit.ID), 5L));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		ex.setReturnType(Unit.class);
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 4, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
+		assertEquals("IDが誤っています。", 3L, list.get(2).getId().longValue());
+		assertEquals("IDが誤っています。", 4L, list.get(3).getId().longValue());
+	}
+	
 	public static class ReturnType1 {
 		Long sum;
 		public void setSum(Number sum) {
@@ -516,6 +558,20 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		@PostLoad
 		public void postLoad() {
 			this.isCallback = true;
+		}
+	}
+
+	public static class ReturnType3 {
+		final Unit u;
+		public ReturnType3(Unit unit) {
+			u = unit;
+		}
+	}
+	
+	public static class ReturnType4 {
+		Unit u;
+		public void setEntity(Unit unit) {
+			u = unit;
 		}
 	}
 	

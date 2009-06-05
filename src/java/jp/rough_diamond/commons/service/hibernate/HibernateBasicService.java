@@ -7,9 +7,7 @@
 package jp.rough_diamond.commons.service.hibernate;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -119,14 +117,15 @@ public class HibernateBasicService extends BasicService {
 //      }
         if(extractor.getLimit() != 0) {
 	        Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
-	        if(extractor.getValues().size() != 0) {
-	        	//厳密にはエンティティはロードされていないのでイベントをファイアしてはいけないのでリターン
-	        	List<Object> tmp = query.list();
-	        	list = (List<T>) Extractor2HQL.makeList(type, extractor, tmp);
-	        } else {
-//          	  list = query.list();
-	        	list = makeList(type, query.list());
-	        }
+//	        if(extractor.getValues().size() != 0) {
+//	        	//厳密にはエンティティはロードされていないのでイベントをファイアしてはいけないのでリターン
+//	        	List<Object> tmp = query.list();
+//	        	list = (List<T>) Extractor2HQL.makeList(type, extractor, tmp);
+//	        } else {
+////          	  list = query.list();
+//	        	list = makeList(type, query.list());
+//	        }
+        	list = (List<T>) Extractor2HQL.makeList(type, extractor, query.list());
 	        List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
 	        fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
 	        if(isNoCache) {
@@ -162,22 +161,6 @@ public class HibernateBasicService extends BasicService {
         	BasicServiceInterceptor.setNoCache(false);
         }
     }
-
-    @SuppressWarnings("unchecked")
-	private <T> List<T> makeList(Class<T> cl, List list) {
-   		List<T> ret = new ArrayList<T>();
-   		Iterator iterator = list.iterator();
-   		while(iterator.hasNext()) {
-   			Object o = iterator.next();
-   			if(cl.isAssignableFrom(o.getClass())) {
-   				ret.add((T)o);
-   			} else {
-   				ret.add((T)Array.get(o, 0));
-   			}
-   			iterator.remove();
-   		}
-		return ret;
-   	}
 
 	@Override
     @SuppressWarnings("unchecked")

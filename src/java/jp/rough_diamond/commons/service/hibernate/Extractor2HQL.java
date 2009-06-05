@@ -6,6 +6,7 @@
  */
 package jp.rough_diamond.commons.service.hibernate;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -106,8 +107,12 @@ public class Extractor2HQL {
      * @return
      */
     public static List<Map<String, Object>> makeMap(Extractor extractor, List<Object> list) {
-    	List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
         List<ExtractValue> values = extractor.getValues();
+        return makeMap(values, list);
+    }
+    
+    static List<Map<String, Object>> makeMap(List<ExtractValue> values, List<Object> list) {
+    	List<Map<String, Object>> ret = new ArrayList<Map<String, Object>>();
         MakeMapStrategy strategy = (values.size() == 1) ? SingleStrategy.INSTANCE : MultiStrategy.INSTANCE;
         for(Object row : list) {
         	Map<String, Object> rowMap = strategy.getMap(row, values);
@@ -116,18 +121,32 @@ public class Extractor2HQL {
         return ret;
     }
     
-    public static <T> List<T> makeList(Class<T> returnType, Extractor extractor, List<Object> list) {
-    	List<Map<String, Object>> mapList = makeMap(extractor, list);
+    public static <T> List<T> makeList(final Class<T> returnType, Extractor extractor, List<Object> list) {
+    	List<ExtractValue> values = extractor.getValues();
+    	if(extractor.getValues().size() == 0) {
+    		values = new ArrayList<ExtractValue>(){
+				private static final long serialVersionUID = 1L;
+			{
+				add(new ExtractValue("entity", new Wrapper(returnType)));
+    		}};
+    	}
+    	List<Map<String, Object>> mapList = makeMap(values, list);
     	if(returnType.isAssignableFrom(Map.class)) {
     		return (List<T>) mapList;
     	}
     	List<T> retList = new ArrayList<T>(mapList.size());
-    	for(Map<String, Object> map : mapList) {
-   			retList.add(makeInstance(returnType, map));
+    	if(extractor.target.isAssignableFrom(returnType) && extractor.getValues().size() == 0) {
+    		for(Map<String, Object> map : mapList) {
+    			retList.add((T)map.values().toArray()[0]);
+    		}
+    	} else {
+	    	for(Map<String, Object> map : mapList) {
+	   			retList.add(makeInstance(returnType, map));
+	    	}
     	}
     	return retList;
     }
-    
+   
     static <T> T makeInstance(Class<T> returnType, Map<String, Object> map) {
     	T ret = tryingConstructorInjection(returnType, map);
     	if(ret == null) {
@@ -174,7 +193,12 @@ public class Extractor2HQL {
     	private final static MakeMapStrategy INSTANCE = new SingleStrategy();
 		public Map<String, Object> getMap(Object target, List<ExtractValue> values) {
 			Map<String, Object> ret = new LinkedHashMap<String, Object>();
-			Object value = ((values.get(0).value instanceof SummaryFunction) && target == null) ? 0L : target; 
+			Object value = target;
+			if((values.get(0).value instanceof SummaryFunction) && value == null) {
+				value = 0L;
+			} else if(value.getClass().isArray()) {
+				value = Array.get(value, 0);
+			}
 			ret.put(values.get(0).key, value);
 			return ret;
 		}
