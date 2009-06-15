@@ -411,6 +411,8 @@ public class Extractor2HQL {
         if(extractor.getValues().size() == 0) {
         	if(lockMode == LockMode.NONE) {
         		builder.append("distinct ");
+        	} else if(extractor.isDistinct()) {
+        		builder.append("distinct ");
         	}
             builder.append(getAlias(extractor.target, extractor.targetAlias));
             for(Order<? extends Value> order : extractor.getOrderIterator()) {
@@ -421,6 +423,9 @@ public class Extractor2HQL {
             	builder.append(property);
             }
         } else {
+	    	if(extractor.isDistinct()) {
+	    		builder.append("distinct ");
+	    	}
 	        String delimitor = "";
 	        for(ExtractValue v : extractor.getValues()) {
 	            builder.append(delimitor);

@@ -36,6 +36,7 @@ RDF Core Change Log
 　　- Extractor#add*、CombineCondition#addの戻り値に自分自身を
 　　　返却するようにしました
 　　- 自動生成時にsaveメソッドを自動作成するようにしました。
+    - ExtractValue使用時にdistinctの指定ができるようにしました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの

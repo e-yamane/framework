@@ -533,6 +533,19 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("ID‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 4L, list.get(3).getId().longValue());
 	}
 	
+	public void testDistinct() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("baseId", new Property(Unit.BASE + "." + Unit.ID)));
+		ex.addExtractValue(new ExtractValue("value", new Property(Unit.RATE + ScalableNumber.VALUE)));
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.addOrder(Order.asc(new Property(Unit.RATE + ScalableNumber.VALUE)));
+		List<Map<String, Object>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("•Ô‹p”‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 4, list.size());
+		ex.setDistinct(true);
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("•Ô‹p”‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 3, list.size());
+	}
+	
 	public static class ReturnType1 {
 		Long sum;
 		public void setSum(Number sum) {

@@ -44,6 +44,7 @@ public class Extractor implements Serializable {
 	private int 	offset = 0;
 	private int		limit = -1;
 	private int		fetchSize = DEFAULT_FETCH_SIZE;
+	private boolean	distinct = false;
 	
 	/**
 	 * 抽出条件格納オブジェクトを生成する
@@ -203,5 +204,23 @@ public class Extractor implements Serializable {
 	 */
 	public void setReturnType(Class<?> returnType) {
 		this.returnType = returnType;
+	}
+
+	/**
+	 * trueの場合重複データの取得は行わない
+	 * ただし、以下の場合はその限りでない
+	 *  - ExtractValueを指定しておらずLockModeがNONEの場合はfalseでもtrueと扱う
+	 *  　　　（実質的に重複はないと思われるが・・・既存コードにあるため）
+	 * @return
+	 */
+	public boolean isDistinct() {
+		return distinct;
+	}
+
+	/**
+	 * 重複データの取得可否を設定する
+	 */
+	public void setDistinct(boolean distinct) {
+		this.distinct = distinct;
 	}
 }
