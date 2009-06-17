@@ -6,13 +6,11 @@
  */
 package jp.rough_diamond.framework.transaction;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
 import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * トランザクションマネージャ
@@ -23,9 +21,7 @@ import org.aopalliance.intercept.MethodInvocation;
  * 省略された場合は、「REQUIRED」である
  */
 @SuppressWarnings("unchecked")
-public class TransactionManager implements MethodInterceptor {
-	private final static Map TRANSACTION_INTERCEPTORS;
-    
+abstract public class TransactionManager implements MethodInterceptor {
     private static ThreadLocal transactionBeginingStack = new ThreadLocal() {
         protected Object initialValue() {
             return new Stack();
@@ -36,52 +32,11 @@ public class TransactionManager implements MethodInterceptor {
     	transactionContext = new ThreadLocal<Stack<Map>>() {
     		protected Stack<Map> initialValue() {
     			return new Stack<Map>();
-    		}
-    	};
+    	}
+    };
 
-	static {
-		Map tmp = new HashMap();
-		tmp.put("REQUIRED", new RequiredInterceptor());
-		tmp.put("REQUIRED_NEW", new RequiredNewInterceptor());
-		tmp.put("NOP", new NopInterceptor());
-		TRANSACTION_INTERCEPTORS = Collections.unmodifiableMap(tmp);
-	}
-	
-	private Map transactionMap = new HashMap();
-	
 	/**
-	 * トランザクション属性マップをセットする（DI用）
-	 * キーはクラス名、値はトランザクション属性文字列（REQUIRED or REQUIRED_NEW or NOP)
-	 * @param map
-	 */
-	public void setTransactionMap(Map map) {
-		this.transactionMap = map;
-	}
-	
-	/**
-	 * トランザクション属性マップを取得する
-	 * @return
-	 */
-	public Map getTransactionMap() {
-		return transactionMap;
-	}
-	
-	protected Map getTransactionInterceptors() {
-		return TRANSACTION_INTERCEPTORS;
-	}
-	
-	public Object invoke(MethodInvocation arg0) throws Throwable {
-		String className = arg0.getThis().getClass().getName();
-		String transactionAttr = (String)transactionMap.get(className);
-		if(transactionAttr == null) {
-			transactionAttr = "REQUIRED";
-		}
-		TransactionInterceptor ti = (TransactionInterceptor)getTransactionInterceptors().get(transactionAttr);
-        return ti.invoke(arg0);
-	}
-    
-	/**
-	 * 何らかのトランザクション無いか否かを返却する 
+	 * 何らかのトランザクション内か否かを返却する 
 	 */
 	public static boolean isInTransaction() {
 		return !transactionContext.get().isEmpty();

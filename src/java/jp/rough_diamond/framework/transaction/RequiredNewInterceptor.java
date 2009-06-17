@@ -29,7 +29,7 @@ public class RequiredNewInterceptor extends TransactionInterceptor {
 		ConnectionManager cm = ConnectionManager.getConnectionManager();
 		Throwable ex = null;
 		cm.beginTransaction(mi);
-        rollbackOnly.set(Boolean.FALSE);
+        rollbackOnly = Boolean.FALSE;
         TransactionManager.pushTransactionBeginingInterceptor(this);
 		Object ret;
 		try {

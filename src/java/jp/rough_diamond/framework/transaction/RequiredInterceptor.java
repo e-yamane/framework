@@ -32,7 +32,7 @@ public class RequiredInterceptor extends TransactionInterceptor {
 		Throwable ex = null;
 		if(!isBeginTransaction) {
 			cm.beginTransaction(mi);
-            rollbackOnly.set(Boolean.FALSE);
+            rollbackOnly = Boolean.FALSE;
             TransactionManager.pushTransactionBeginingInterceptor(this);
 		}
 		Object ret;

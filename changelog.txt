@@ -41,6 +41,13 @@ RDF Core Change Log
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの
 　　　カバレッジや、通過していないパスのカバレッジを計上していた
+　　- TransactionAttributeがREQUIRED_NEWのサービスがネストした場合、
+　　　下位トランザクションでsetRollbackOnlyした場合に、上位トランザクションも
+　　　強制ロールバックされてしまう。
+　　　REQUIRED->REQUIRED_NEWの場合は発生しない。
+　　　REQUIRED->REQUIREDの場合は、そもそも連鎖させるので問題ない。
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない
+　　- TransactionManagerをabstractにしました。TransactionManagerを使用している場合は、
+　　　jp.rough_diamond.framework.transaction.SimpleTransactionManagerを指定してください

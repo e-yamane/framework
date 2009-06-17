@@ -13,18 +13,14 @@ import org.apache.commons.logging.LogFactory;
 abstract public class TransactionInterceptor implements MethodInterceptor {
     private final static Log log = LogFactory.getLog(TransactionInterceptor.class);
 
-    protected final static ThreadLocal<Boolean> rollbackOnly = new ThreadLocal<Boolean>() {
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
-        }
-    };
+    protected boolean rollbackOnly = Boolean.FALSE;
     
     public boolean isRollbackOnly() {
-        return rollbackOnly.get(); 
+        return rollbackOnly; 
     }
 
 	public void setRollbackOnly() {
         log.debug("ロールバックおんりぃ～");
-        rollbackOnly.set(Boolean.TRUE); 
+        rollbackOnly = Boolean.TRUE;
     }
 }

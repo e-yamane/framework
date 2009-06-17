@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  *   </init-param>
  *   <init-param>
  *     <param-name>clearObjectPrefix</param-name>
- *     <param-value>jp.co.webshark</param-value>
+ *     <param-value>jp.rough_diamond</param-value>
  *   </init-param>
  */
 public class UserCacheFilter implements Filter {

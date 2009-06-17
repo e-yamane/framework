@@ -8,12 +8,11 @@ package jp.rough_diamond.framework.transaction;
 
 import java.lang.reflect.Method;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class AnnotationTransactionManager implements MethodInterceptor {
+public class AnnotationTransactionManager extends TransactionManager {
 	private final static Log log = LogFactory.getLog(AnnotationTransactionManager.class);
 	
 	public Object invoke(MethodInvocation arg0) throws Throwable {
