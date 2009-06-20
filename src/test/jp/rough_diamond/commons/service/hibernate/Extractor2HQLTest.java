@@ -55,6 +55,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	
 	@SuppressWarnings("deprecation")
 	public void testQueryUsingLegacyStyle() throws Exception {
+		//select name from unit where id = 3;
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("name", Unit.class, null, Unit.NAME));
 		ex.add(Condition.eq(Unit.ID, 3L));
@@ -64,6 +65,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testQueryUsingProperty() throws Exception {
+		//select name from unit where id = 3;
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("name", new Property(Unit.NAME)));
 		ex.add(Condition.eq(new Property(Unit.ID), 3L));
@@ -73,6 +75,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 
 	public void testQueryUsingMax() throws Exception {
+		//select max(rate_value) from unit where id <= 5
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"max", new Max(new Property(Unit.RATE + ScalableNumber.VALUE))));
@@ -83,6 +86,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testQueryUsingMin() throws Exception {
+		//select min(rate_value) from unit where id <= 5
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"min", new Min(new Property(Unit.RATE + ScalableNumber.VALUE))));
@@ -93,6 +97,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testQueryUsingSum() throws Exception {
+		//select sum(rate_value) from unit where id <= 5
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"sum", new Sum(new Property(Unit.RATE + ScalableNumber.VALUE))));
@@ -103,6 +108,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testQueryUsingAvg() throws Exception {
+		//select avg(rate_value) from unit where id <= 5
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"avg", new Avg(new Property(Unit.RATE + ScalableNumber.VALUE))));
@@ -110,10 +116,12 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		List<Map<String, Double>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		System.out.println(list.get(0).get("avg"));
-		//誤差があるのでassertはしない
+		//誤差があるのでintで切り捨て
+		assertEquals("返却値が誤っています。", 322069, list.get(0).get("avg").intValue());
 	}
 
 	public void testQueryUsingSumAndGroupBy() throws Exception {
+		//select base_unit_id, sum(rate_value) from unit where id <= 5 group by base_unit_id order by base_unit_id
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		ex.addExtractValue(new ExtractValue(
@@ -127,6 +135,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testQueryUsingSumAndGroupByGreaterThanTwo() throws Exception {
+		//select base_unit_id, sum(rate_value) from unit where id <= 5 group by base_unit_id having sum(rate_value) > 2 order by base_unit_id
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
@@ -140,6 +149,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testQueryUsingCount() throws Exception {
+		//select base_unit_id, count(*) from unit where id <= 5 group by base_unit_id order by base_unit_id
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		ex.addExtractValue(new ExtractValue("count", new Count()));
@@ -150,6 +160,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("値が誤っています。", 4L, list.get(0).get("count").longValue());
 		assertEquals("値が誤っています。", 1L, list.get(1).get("count").longValue());
 		
+		//select base_unit_id, count(rate_value) from unit where id <= 5 group by base_unit_id order by base_unit_id
 		ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		ex.addExtractValue(new ExtractValue("count", new Count(new Property(Unit.RATE + ScalableNumber.VALUE))));
@@ -160,6 +171,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("値が誤っています。", 4L, list.get(0).get("count").longValue());
 		assertEquals("値が誤っています。", 1L, list.get(1).get("count").longValue());
 
+		//select base_unit_id, count(distinct rate_value) from unit where id <= 5 group by base_unit_id order by base_unit_id
 		ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		ex.addExtractValue(new ExtractValue("count", new Count(new Property(Unit.RATE + ScalableNumber.VALUE), true)));
@@ -172,6 +184,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testFreeFormat() throws Exception {
+		//select 3*(1 + 1) from unit where id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("val", new FreeFormat("3*(1 + 1)")));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -180,6 +193,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("返却数が誤っています。", 5, list.size());
 		assertEquals("値が誤っています。", 6L, list.get(0).get("val").longValue());
 
+		//select 3*(2 + 1) from unit where id <= 5 order by id
 		ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("val", new FreeFormat("3*(? + 1)", 2L)));
 		ex.addOrder(Order.asc(new Property(Unit.ID)));
@@ -187,6 +201,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("返却数が誤っています。", 5, list.size());
 		assertEquals("値が誤っています。", 9L, list.get(0).get("val").longValue());
 
+		//select 3*(2 + rate_value) from unit where id <= 5 order by id
 		ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("val", new FreeFormat("3*(? + ?)", 2L, new Property(Unit.RATE + ScalableNumber.VALUE))));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -199,6 +214,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("値が誤っています。", 9L, 			list.get(3).get("val").longValue());
 		assertEquals("値が誤っています。", 9L, 			list.get(4).get("val").longValue());
 
+		//select rate_value*power(10, rate_scale) from unit where id <= 5 order by id
 		ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("val", new FreeFormat("?*power(10, ?)", 
 				new Property(Unit.RATE + ScalableNumber.VALUE), new Property(Unit.RATE + ScalableNumber.SCALE))));
@@ -212,6 +228,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testSumInFreeFormat() throws Exception {
+		//select base_unit_id, sum(rate_value) from unit where id <= 5 group by base_unit_id having sum(rate_value) > 2 order by base_unit_id
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
@@ -225,6 +242,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testSumInFreeFormatAndGrupByColumnInFreeFormat() throws Exception {
+		//select base_unit_id, sum(rate_value) from unit where id <= 5 group by base_unit_id having sum(rate_value) > 2 order by base_unit_id
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new FreeFormat("?", new Property(Unit.BASE + "." + Unit.ID))));
 		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
@@ -238,6 +256,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testFreeFormatInWhereCondition() throws Exception {
+		//select id * 3 from unit where id <= 5 and id * 3 < 10 order by id
 		Extractor ex = new Extractor(Unit.class);
 		Property p = new Property(Unit.ID);
 		FreeFormat ff = new FreeFormat("? * 3", p);
@@ -250,6 +269,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testFreeFormatInHavingCondition() throws Exception {
+		//select base_unit_id, sum(rate_value) * 3 from unit where id <= 5 group by base_unit_id having sum(rate_value) * 3 < 10 order by base_unit_id
 		Extractor ex = new Extractor(Unit.class);
 		Property p = new Property(Unit.ID);
 		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
@@ -263,6 +283,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testSumInOrderBy() throws Exception {
+		//select base_unit_id, sum(rate_value) from unit where id <= 5 group by base_unit_id order by sum(rate_value)
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("base", new Property(Unit.BASE + "." + Unit.ID)));
 		Sum sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
@@ -276,6 +297,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testConditionPropertyComparation() throws Exception {
+		//select * from unit where id <= 5 and base_unit_id = rate_value order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 
 				new Property(Unit.RATE + ScalableNumber.VALUE)));
@@ -286,6 +308,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testEqCondition() throws Exception {
+		//select * from unit where base_unit_id = 1 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -299,6 +322,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testGeCondition() throws Exception {
+		//select * from unit where base_unit_id >= 3 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.ge(new Property(Unit.BASE + "." + Unit.ID), 3L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -309,6 +333,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testGtCondition() throws Exception {
+		//select * from unit where base_unit_id > 1 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.gt(new Property(Unit.BASE + "." + Unit.ID), 1L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -319,6 +344,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testInCondition() throws Exception {
+		//select * from unit where base_unit_id in(1,2,3) and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.in(new Property(Unit.BASE + "." + Unit.ID), 1L, 2L , 3L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -332,6 +358,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testIsNotNullCondition() throws Exception {
+		//select * from unit where base_unit_id is not null and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.isNotNull(new Property(Unit.BASE + "." + Unit.ID)));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -346,6 +373,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testIsNullCondition() throws Exception {
+		//select * from unit where base_unit_id is null and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.isNull(new Property(Unit.BASE + "." + Unit.ID)));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -355,6 +383,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testLeCondition() throws Exception {
+		//select * from unit where base_unit_id <= 5 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.le(new Property(Unit.BASE + "." + Unit.ID), 5L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -369,6 +398,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testLtCondition() throws Exception {
+		//select * from unit where base_unit_id < 5 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.lt(new Property(Unit.BASE + "." + Unit.ID), 5L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -382,6 +412,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testLikeCondition() throws Exception {
+		//select * from unit where name like '%m%' and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.like(new Property(Unit.NAME), "%m%"));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -394,6 +425,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testNotEqCondition() throws Exception {
+		//select * from unit where name<>'マイル' and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.notEq(new Property(Unit.NAME), "マイル"));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -407,6 +439,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testNotInCondition() throws Exception {
+		//select * from unit where name not in('マイル','m') and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.notIn(new Property(Unit.NAME), "マイル", "m"));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -419,6 +452,10 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testRegexCondition() throws Exception {
+		//for postgresql
+		//  select * from unit where char_length(substring(description, '[.]*メートル[.]*'))>0 and id <= 5 order by id
+		//for oracle 10g
+		//  select * from unit where REGEXP_INSTR(description, '[.]*メートル[.]*')>0 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.regex(new Property(Unit.DESCRIPTION), "[.]*メートル[.]*"));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -432,9 +469,10 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	
 	@SuppressWarnings("unchecked")
 	public void testAndCondition() throws Exception {
+		//select * from unit where description like '%メートル%' and rate_value = 1 and id <= 5 order by id 
 		Extractor ex = new Extractor(Unit.class);
 		CombineCondition condition = Condition.and();
-		condition.add(Condition.regex(new Property(Unit.DESCRIPTION), "[.]*メートル[.]*"));
+		condition.add(Condition.like(new Property(Unit.DESCRIPTION), "%メートル%"));
 		condition.add(Condition.eq(new Property(Unit.RATE + ScalableNumber.VALUE), 1));
 		ex.add(condition);
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -447,9 +485,10 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	
 	@SuppressWarnings("unchecked")
 	public void testOrCondition() throws Exception {
+		//select * from unit where (description like '%メートル%' or rate_value = 1) and id <= 5 order by id 
 		Extractor ex = new Extractor(Unit.class);
 		CombineCondition condition = Condition.or();
-		condition.add(Condition.regex(new Property(Unit.DESCRIPTION), "[.]*メートル[.]*"));
+		condition.add(Condition.like(new Property(Unit.DESCRIPTION), "%メートル%"));
 		condition.add(Condition.eq(new Property(Unit.RATE + ScalableNumber.VALUE), 1));
 		ex.add(condition);
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -463,6 +502,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testSpecificateReturnTypeWithConstructorInjection() throws Exception {
+		//select sum(rate_value) from unit where id <= 5
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"sum", new Sum(new Property(Unit.RATE + ScalableNumber.VALUE))));
@@ -480,6 +520,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testSpecificateReturnTypeWithSetterInjection() throws Exception {
+		//select sum(rate_value) from unit where id <= 5
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue(
 				"sum", new Sum(new Property(Unit.RATE + ScalableNumber.VALUE))));
@@ -492,6 +533,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testNonExtractValueAndReturnTypeConstructorInjection() throws Exception {
+		//select * from unit where base_unit_id = 1 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -506,6 +548,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testNonExtractValueAndReturnTypeWithSetterInjection() throws Exception {
+		//select * from unit where base_unit_id = 1 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -520,6 +563,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testNonExtractValueAndReturnTypeWithTypeEquals() throws Exception {
+		//select * from unit where base_unit_id = 1 and id <= 5 order by id
 		Extractor ex = new Extractor(Unit.class);
 		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
 		ex.add(Condition.le(new Property(Unit.ID), 5L));
@@ -534,6 +578,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 	}
 	
 	public void testDistinct() throws Exception {
+		//select base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("baseId", new Property(Unit.BASE + "." + Unit.ID)));
 		ex.addExtractValue(new ExtractValue("value", new Property(Unit.RATE + ScalableNumber.VALUE)));
@@ -542,6 +587,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		List<Map<String, Object>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 4, list.size());
 		ex.setDistinct(true);
+		//select distinct base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
 		list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 3, list.size());
 	}
