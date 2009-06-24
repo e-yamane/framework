@@ -105,7 +105,9 @@ public class Extractor2HQL {
      * 抽出値からMapのリストを生成
      * @param list
      * @return
+     * @deprecated
      */
+	@Deprecated
     public static List<Map<String, Object>> makeMap(Extractor extractor, List<Object> list) {
         List<ExtractValue> values = extractor.getValues();
         return makeMap(values, list);

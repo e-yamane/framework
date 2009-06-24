@@ -37,6 +37,12 @@ RDF Core Change Log
 　　　返却するようにしました
 　　- 自動生成時にsaveメソッドを自動作成するようにしました。
     - ExtractValue使用時にdistinctの指定ができるようにしました。
+　　- BasicService#findAllにレコードロックのモードを指定できるようにしました。
+　　- BasicServiceのリファクタリングを実施し、findByExtractorWithCountを抽象メソッドから
+　　　具象メソッドに変更し、getCountByExtractorを抽象メソッドに変更した。
+　　　findByExtractorWithCountの戻り値は、findByExtractor+getCountByExtractorであるため、
+　　　具象化可能。従来のgetCountByExtractorは、findByExtractorWithCountを呼び出して、
+　　　件数だけ抜き出すという形での実装であった
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの
@@ -46,6 +52,9 @@ RDF Core Change Log
 　　　強制ロールバックされてしまう。
 　　　REQUIRED->REQUIRED_NEWの場合は発生しない。
 　　　REQUIRED->REQUIREDの場合は、そもそも連鎖させるので問題ない。
+　　　REQUIRED->REQUIRED_NEW->REQUIREDの場合も同様の不具合が発生していた
+　　- findAllを使用すると、ターゲットのオブジェクト以外のオブジェクトに
+　　　PostLoadイベントがコールバックされない
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない

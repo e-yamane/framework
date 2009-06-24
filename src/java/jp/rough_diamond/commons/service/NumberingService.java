@@ -33,18 +33,18 @@ import org.apache.commons.logging.LogFactory;
 abstract public class NumberingService implements Service {
 	private final static Log log = LogFactory.getLog(NumberingService.class);
 	
-	final int cashSize;
-	final CashingStrategy cStrategy;
+	final int cacheSize;
+	final CachingStrategy cStrategy;
 	
 	public NumberingService() {
 		this(1);
 	}
 	
-	public NumberingService(int cashSize) {
-		this.cashSize = cashSize;
-		this.cStrategy = (cashSize == 1)
-				? ServiceLocator.getService(NonCashingStrategy.class)
-				: ServiceLocator.getService(NumberCashingStrategy.class);
+	public NumberingService(int cacheSize) {
+		this.cacheSize = cacheSize;
+		this.cStrategy = (cacheSize == 1)
+				? ServiceLocator.getService(NonCachingStrategy.class)
+				: ServiceLocator.getService(NumberCachingStrategy.class);
 	}
 	
     /**
@@ -117,15 +117,15 @@ abstract public class NumberingService implements Service {
     
 	//for mock
 	protected int getCashSize() {
-		return cashSize;
+		return cacheSize;
 	}
 	
 	//for mock
-	protected CashingStrategy getStrategy() {
+	protected CachingStrategy getStrategy() {
 		return cStrategy;
 	}
 
-	abstract public static class CashingStrategy implements Service {
+	abstract public static class CachingStrategy implements Service {
     	abstract public long getNumber(String key);
 
 		@TransactionAttribute(TransactionAttributeType.REQUIRED_NEW)
@@ -175,12 +175,12 @@ abstract public class NumberingService implements Service {
 			return NumberingService.getService().getCashSize();
 		}
 		//for mock
-		protected CashingStrategy getStrategy() {
+		protected CachingStrategy getStrategy() {
 			return NumberingService.getService().getStrategy();
 		}
     }
     
-    public static class NonCashingStrategy extends CashingStrategy {
+    public static class NonCachingStrategy extends CachingStrategy {
 		@Override
 		public long getNumber(String key) {
 			Info info;
@@ -198,7 +198,7 @@ abstract public class NumberingService implements Service {
 		}
     }
     
-    public static class NumberCashingStrategy extends CashingStrategy {
+    public static class NumberCachingStrategy extends CachingStrategy {
     	Map<String, Info> map = new LRUMap(1000);
     	
 		@Override

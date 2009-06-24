@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Criteria;
 import org.hibernate.EntityMode;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
@@ -26,7 +25,6 @@ import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.resource.MessagesIncludingException;
 import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.service.CallbackEventType;
-import jp.rough_diamond.commons.service.FindResult;
 import jp.rough_diamond.commons.service.NumberingService;
 import jp.rough_diamond.commons.service.RelationalChecker;
 import jp.rough_diamond.commons.service.WhenVerifier;
@@ -91,24 +89,12 @@ public class HibernateBasicService extends BasicService {
     }
 
 	@Override
-    protected <T> FindResult<T> findByExtractorWithCount(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock) {
-    	BasicServiceInterceptor.startLoad(isNoCache);
-        try {
-            List<T> list = findByExtractor2(type, extractor, isNoCache, lock);
-            long count;
-            Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
-            Number n = (Number)countQuery.list().get(0);
-            count = n.longValue();
-            FindResult<T> ret = new FindResult<T>(list, count);
-            return ret;
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-        	BasicServiceInterceptor.setNoCache(false);
-        	BasicServiceInterceptor.popPostLoadedObjects();
-        }
-    }
-
+	public <T> long getCountByExtractor(Extractor extractor) {
+        Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
+        Number n = (Number)countQuery.list().get(0);
+        return n.longValue();
+	}
+	
     @SuppressWarnings("unchecked")
     <T> List<T> findByExtractor2(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock) throws VersionUnmuchException, MessagesIncludingException {
         List<T> list;
@@ -140,28 +126,6 @@ public class HibernateBasicService extends BasicService {
         return list;
     }
     
-	@Override
-    @SuppressWarnings("unchecked")
-    public <T> List<T> findAll(Class<T> type, boolean isNoCache, int fetchSize) {
-    	BasicServiceInterceptor.setNoCache(isNoCache);
-        try {
-            Criteria criteria = HibernateUtils.getSession().createCriteria(type);
-//            if(LogicalDeleteEntity.class.isAssignableFrom(type)) {
-//                criteria.add(Restrictions.eq("deletedInDB", HibernateUtils.BOOLEAN_CHAR_F));
-//            }
-            if(fetchSize != Extractor.DEFAULT_FETCH_SIZE) {
-            	criteria.setFetchSize(fetchSize);
-            }
-            List<T> list = criteria.list();
-            fireEvent(CallbackEventType.POST_LOAD, list);
-            return list;
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-        	BasicServiceInterceptor.setNoCache(false);
-        }
-    }
-
 	@Override
     @SuppressWarnings("unchecked")
     public <T> void insert(T... objects) throws MessagesIncludingException {

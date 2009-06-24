@@ -53,8 +53,6 @@ public class HudsonCronTask implements CrontabTask {
 		}
 		
 		Date getNextTimestamp(Date d) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(d);
 			Calendar ret = Calendar.getInstance();
 			ret.setTime(d);
 			ret.set(Calendar.MILLISECOND, 0);

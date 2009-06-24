@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("deprecation")
 public class CronTaskTest extends TestCase {
 	public void testScheduleConstructor() throws Exception {
 		CronTask.Schedule s = new CronTask.Schedule("01 * * * *");

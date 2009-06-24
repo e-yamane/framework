@@ -7,7 +7,7 @@
 package jp.rough_diamond.commons.service;
 
 import jp.rough_diamond.commons.entity.Numbering;
-import jp.rough_diamond.commons.service.NumberingService.CashingStrategy;
+import jp.rough_diamond.commons.service.NumberingService.CachingStrategy;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
@@ -22,7 +22,7 @@ public class NumberingServiceTest extends DataLoadingTestCase {
 	}
 
 	public void testGetNumberInNonCasingStrategy() throws Exception {
-		NumberingService.CashingStrategy strategy = ServiceLocator.getService(NonCashingStrategyExt.class, NonCashingStrategyExt.class);
+		NumberingService.CachingStrategy strategy = ServiceLocator.getService(NonCachingStrategyExt.class, NonCachingStrategyExt.class);
 		
 		assertEquals("返却値が誤っています。", strategy.getNumber("yamane"), 1L);
 		Numbering numbering = BasicService.getService().findByPK(Numbering.class, "yamane");
@@ -59,10 +59,10 @@ public class NumberingServiceTest extends DataLoadingTestCase {
 		assertEquals("返却値が誤っています。", numbering.getNextNumber().longValue(), 11L);
 	}
 	
-	public static class NonCashingStrategyExt extends NumberingService.NonCashingStrategy {}
+	public static class NonCachingStrategyExt extends NumberingService.NonCachingStrategy {}
 	
 	public void testGetNumberInCasingStrategy() throws Exception {
-		NumberingService.NumberCashingStrategy strategy = ServiceLocator.getService(NumberCashingStrategyExt.class, NumberCashingStrategyExt.class);
+		NumberingService.NumberCachingStrategy strategy = ServiceLocator.getService(NumberCachingStrategyExt.class, NumberCachingStrategyExt.class);
 
 		assertEquals("返却値が誤っています。", strategy.getNumber("yamane"), 1L);
 		Numbering numbering = BasicService.getService().findByPK(Numbering.class, "yamane");
@@ -99,13 +99,13 @@ public class NumberingServiceTest extends DataLoadingTestCase {
 		assertEquals("返却値が誤っています。", numbering.getNextNumber().longValue(), 20L);
 	}
 	
-	public static class NumberCashingStrategyExt extends NumberingService.NumberCashingStrategy {
+	public static class NumberCachingStrategyExt extends NumberingService.NumberCachingStrategy {
 		@Override
 		protected int getCashSize() {
 			return 10;
 		}
 		@Override
-		protected CashingStrategy getStrategy() {
+		protected CachingStrategy getStrategy() {
 			return this;
 		}
 	}

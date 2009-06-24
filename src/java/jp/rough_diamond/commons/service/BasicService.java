@@ -217,7 +217,7 @@ abstract public class BasicService implements Service {
      * @return			検索結果
 	 */
 	public <T> FindResult<T> findByExtractorWithCount(Extractor extractor, boolean isNoCache) {
-    	return findByExtractorWithCount(extractor.target, extractor, isNoCache, RecordLock.NONE);
+    	return findByExtractorWithCount(extractor, isNoCache, RecordLock.NONE);
     }
 
 	/**
@@ -229,27 +229,23 @@ abstract public class BasicService implements Service {
      * @return			検索結果
 	 */
 	public <T> FindResult<T> findByExtractorWithCount(Extractor extractor, boolean isNoCache, RecordLock lock) {
-    	return findByExtractorWithCount(extractor.target, extractor, isNoCache, lock);
+    	return findByExtractorWithCount(getReturnType(extractor), extractor, isNoCache, lock);
     }
 
+    protected <T> FindResult<T> findByExtractorWithCount(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock) {
+    	List<T> list = (extractor.getLimit() == 0) ? new ArrayList<T>() : findByExtractor(type, extractor, isNoCache, lock);
+    	long count = getCountByExtractor(extractor);
+    	return new FindResult<T>(list, count);
+    }
+    
 	/**
 	 * 検索条件に合致する永続オブジェクトの件数を取得する
 	 * @param <T>		件数取得対象オブジェクトタイプ
 	 * @param extractor	検索条件
 	 * @return			検索条件に合致する永続オブジェクトの件数
 	 */
-	public <T> long getCountByExtractor(Extractor extractor) {
-		int backup = extractor.getLimit();
-		extractor.setLimit(0);
-		try {
-			return findByExtractorWithCount(extractor).count;
-		} finally {
-			extractor.setLimit(backup);
-		}
-	}
+	abstract public <T> long getCountByExtractor(Extractor extractor);
 	
-    abstract protected <T> FindResult<T> findByExtractorWithCount(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock);
-    
     /**
      * 指定されたクラスの永続化オブジェクトを全て取得する
      * 取得したオブジェクトは永続化エンジン（例：Hibernate）がキャッシュするように指示する
@@ -259,7 +255,19 @@ abstract public class BasicService implements Service {
      * @return		取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
      */
     public <T> List<T> findAll(Class<T> type) {
-    	return findAll(type, false, Extractor.DEFAULT_FETCH_SIZE);
+    	return findAll(type, false, Extractor.DEFAULT_FETCH_SIZE, RecordLock.NONE);
+    }
+
+    /**
+     * 指定されたクラスの永続化オブジェクトを全て取得する
+     * 取得したレコードに対するロックは行わないず、フェッチサイズは下位ライブラリに依存する
+     * @param <T>		取得対象クラスタイプ
+     * @param type		取得対象クラスタイプ
+     * @param isNoCache	true：永続化エンジン（例：Hibernate）がキャッシュしない false:キャッシュする	
+     * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
+     */
+    public <T> List<T> findAll(Class<T> type, boolean isNoCache) {
+    	return findAll(type, isNoCache, Extractor.DEFAULT_FETCH_SIZE, RecordLock.NONE);
     }
 
     /**
@@ -272,7 +280,7 @@ abstract public class BasicService implements Service {
      * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
      */
     public <T> List<T> findAll(Class<T> type, int fetchSize) {
-    	return findAll(type, false, fetchSize);
+    	return findAll(type, false, fetchSize, RecordLock.NONE);
     }
     
     /**
@@ -280,11 +288,11 @@ abstract public class BasicService implements Service {
      * 取得したレコードに対するロックは行わないず、フェッチサイズは下位ライブラリに依存する
      * @param <T>		取得対象クラスタイプ
      * @param type		取得対象クラスタイプ
-     * @param isNoCache	true：永続化エンジン（例：Hibernate）がキャッシュしない false:キャッシュする	
+     * @param lock		取得オブジェクトのロックモードを指定する
      * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
      */
-    public <T> List<T> findAll(Class<T> type, boolean isNoCache) {
-    	return findAll(type, isNoCache, Extractor.DEFAULT_FETCH_SIZE);
+    public <T> List<T> findAll(Class<T> type, RecordLock lock) {
+    	return findAll(type, false, Extractor.DEFAULT_FETCH_SIZE, lock);
     }
 
     /**
@@ -296,7 +304,51 @@ abstract public class BasicService implements Service {
      * @param fetchSize	フェッチサイズ（内部的な振る舞い）
      * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
      */
-    abstract public <T> List<T> findAll(Class<T> type, boolean isNoCache, int fetchSize);
+    public <T> List<T> findAll(Class<T> type, boolean isNoCache, int fetchSize) {
+    	return findAll(type, isNoCache, fetchSize, RecordLock.NONE);
+    }
+    
+    /**
+     * 指定されたクラスの永続化オブジェクトを全て取得する
+     * 取得したレコードに対するロックは行わない
+     * @param <T>		取得対象クラスタイプ
+     * @param type		取得対象クラスタイプ
+     * @param isNoCache	true：永続化エンジン（例：Hibernate）がキャッシュしない false:キャッシュする	
+     * @param lock		取得オブジェクトのロックモードを指定する
+     * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
+     */
+    public <T> List<T> findAll(Class<T> type, boolean isNoCache, RecordLock lock) {
+    	return findAll(type, isNoCache, Extractor.DEFAULT_FETCH_SIZE, lock);
+    }
+    
+    /**
+     * 指定されたクラスの永続化オブジェクトを全て取得する
+     * 取得したレコードに対するロックは行わない
+     * @param <T>		取得対象クラスタイプ
+     * @param type		取得対象クラスタイプ
+     * @param fetchSize	フェッチサイズ（内部的な振る舞い）
+     * @param lock		取得オブジェクトのロックモードを指定する
+     * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
+     */
+    public <T> List<T> findAll(Class<T> type, int fetchSize, RecordLock lock) {
+    	return findAll(type, false, fetchSize, lock);
+    }
+    
+    /**
+     * 指定されたクラスの永続化オブジェクトを全て取得する
+     * 取得したレコードに対するロックは行わない
+     * @param <T>		取得対象クラスタイプ
+     * @param type		取得対象クラスタイプ
+     * @param isNoCache	true：永続化エンジン（例：Hibernate）がキャッシュしない false:キャッシュする	
+     * @param fetchSize	フェッチサイズ（内部的な振る舞い）
+     * @param lock		取得オブジェクトのロックモードを指定する
+     * @return			取得対象クラスの永続オブジェクト一覧。１件も無い場合は要素数０のリストを返却する
+     */
+    public <T> List<T> findAll(Class<T> type, boolean isNoCache, int fetchSize, RecordLock lock) {
+		Extractor ex = new Extractor(type);
+		ex.setFetchSize(fetchSize);
+		return findByExtractor(type, ex, isNoCache, lock);
+    }
     
     /**
      * 指定されたオブジェクト（群）を永続化(INSERT)する
