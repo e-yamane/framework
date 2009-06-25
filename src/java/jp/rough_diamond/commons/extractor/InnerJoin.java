@@ -28,4 +28,9 @@ public class InnerJoin {
         this.joinedProperty = joinedProperty;
         this.joinedAlias = joinedAlias;
     }
+    
+    public InnerJoin(Property target, Property join) {
+    	this(target.target, target.property, target.aliase,
+    			join.target, join.property, join.aliase);
+    }
 }

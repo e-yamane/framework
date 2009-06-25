@@ -43,6 +43,7 @@ RDF Core Change Log
 　　　findByExtractorWithCountの戻り値は、findByExtractor+getCountByExtractorであるため、
 　　　具象化可能。従来のgetCountByExtractorは、findByExtractorWithCountを呼び出して、
 　　　件数だけ抜き出すという形での実装であった
+　　- InnerJointの生成子にPropertyを受けれるものを追加しました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの

@@ -21,6 +21,7 @@ import jp.rough_diamond.commons.extractor.Count;
 import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
 import jp.rough_diamond.commons.extractor.FreeFormat;
+import jp.rough_diamond.commons.extractor.InnerJoin;
 import jp.rough_diamond.commons.extractor.Max;
 import jp.rough_diamond.commons.extractor.Min;
 import jp.rough_diamond.commons.extractor.Order;
@@ -575,6 +576,17 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("IDが誤っています。", 2L, list.get(1).getId().longValue());
 		assertEquals("IDが誤っています。", 3L, list.get(2).getId().longValue());
 		assertEquals("IDが誤っています。", 4L, list.get(3).getId().longValue());
+	}
+	
+	public void testUsingInnerJoin() throws Exception {
+		//select * from unit 'target', unit 'joined' where target.id = joined.scale and joined.id = 3
+		Extractor ex = new Extractor(Unit.class, "target");
+		ex.addInnerJoin(new InnerJoin(new Property(Unit.class, "target", Unit.ID),
+				new Property(Unit.class, "joined", Unit.SCALE)));
+		ex.add(Condition.eq(new Property(Unit.class, "joined", Unit.ID), 3));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("IDが誤っています。", 2, list.get(0).getId().intValue());
 	}
 	
 	public void testDistinct() throws Exception {
