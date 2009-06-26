@@ -8,11 +8,9 @@ package jp.rough_diamond.commons.service;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -438,12 +436,12 @@ abstract public class BasicService implements Service {
         if(objects.size() == 0) {
             return;
         }
-        Map<Class, SortedSet<Method>> map = new HashMap<Class, SortedSet<Method>>();
+        Map<Class, SortedSet<CallbackEventListener>> map = new HashMap<Class, SortedSet<CallbackEventListener>>();
         for(Object o : objects) {
             if(o == null) {
                 continue;
             }
-            SortedSet<Method> set = map.get(o.getClass());
+            SortedSet<CallbackEventListener> set = map.get(o.getClass());
             if(set == null) {
             	set = getEventListener(o.getClass(), eventType);
             	map.put(o.getClass(), set);
@@ -454,16 +452,9 @@ abstract public class BasicService implements Service {
         }
         try {
             for(Object o : objects) {
-                SortedSet<Method> set = map.get(o.getClass());
-                for(Method m : set) {
-                	if(log.isDebugEnabled()) {
-                		log.debug(String.format("CallBack EventType[%s]:%s(%s)#%s()", eventType, o.getClass().getName(), m.getDeclaringClass().getName(), m.getName()));
-                	}
-                    if(m.getParameterTypes().length == 0) {
-                        m.invoke(o);
-                    } else {
-                        m.invoke(o, eventType);
-                    }
+                SortedSet<CallbackEventListener> set = map.get(o.getClass());
+                for(CallbackEventListener listener : set) {
+                	listener.callback(o, eventType);
                 }
                 fireEvent(eventType, getNestedComponents(o));
             }
@@ -527,16 +518,16 @@ abstract public class BasicService implements Service {
 	private Map<Class, List<PropertyDescriptor>> nestedComponentGetterMap =
     		new HashMap<Class, List<PropertyDescriptor>>();
     
-    private Map<Class, Map<CallbackEventType, SortedSet<Method>>> eventListenrsCache = 
-                            new HashMap<Class, Map<CallbackEventType, SortedSet<Method>>>();
+    private Map<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>> eventListenrsCache = 
+                            new HashMap<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>>();
     
-    SortedSet<Method> getEventListener(Class cl, CallbackEventType eventType) {
-        Map<CallbackEventType, SortedSet<Method>> map = eventListenrsCache.get(cl);
+    SortedSet<CallbackEventListener> getEventListener(Class cl, CallbackEventType eventType) {
+        Map<CallbackEventType, SortedSet<CallbackEventListener>> map = eventListenrsCache.get(cl);
         if(map == null) {
-            map = new HashMap<CallbackEventType, SortedSet<Method>>();
+            map = new HashMap<CallbackEventType, SortedSet<CallbackEventListener>>();
             eventListenrsCache.put(cl, map);
         }
-        SortedSet<Method> set = map.get(eventType);
+        SortedSet<CallbackEventListener> set = map.get(eventType);
         if(set == null) {
             set = findEventListener(cl, eventType);
             map.put(eventType, set);
@@ -544,47 +535,32 @@ abstract public class BasicService implements Service {
         return set;
     }
     
-    SortedSet<Method> findEventListener(Class cl, CallbackEventType eventType) {
+    SortedSet<CallbackEventListener> findEventListener(Class cl, CallbackEventType eventType) {
         Class annotationType = eventType.getAnnotation();
+        SortedSet<CallbackEventListener> set = new TreeSet<CallbackEventListener>();
         Method[] methods = cl.getMethods();
-        SortedSet<Method> set = new TreeSet<Method>(new EventListenerSorter(annotationType));
         for(Method m : methods) {
-            Annotation annotation = m.getAnnotation(annotationType);
-            if(annotation != null) {
-                if(m.getParameterTypes().length == 0) {
-                    set.add(m);
-                } else if(m.getParameterTypes().length == 1 && CallbackEventType.class.isAssignableFrom(m.getParameterTypes()[0])) {
-                    set.add(m);
-                } else {
-                    log.warn(m.toString() + "は引数タイプが誤っているためコールバックメソッドとして認識しません。");
-                }
-            }
+        	if(CallbackEventListener.isEventListener(null, cl, m, annotationType)) {
+                set.add(new CallbackEventListener.SelfEventListener(m, annotationType));
+        	}
+        }
+        List<?> listeners = getPersistenceEventListeners();
+        for(Object listener : listeners) {
+        	Class listenerType = listener.getClass();
+        	Method[] listenerMethods = listenerType.getMethods();
+        	for(Method m : listenerMethods) {
+            	if(CallbackEventListener.isEventListener(listener, cl, m, annotationType)) {
+                    set.add(new CallbackEventListener.EventAdapter(listener, m, annotationType));
+            	}
+        	}
         }
         return set;
     }
     
-    private final static class EventListenerSorter implements Comparator<Method>, Serializable {
-		private static final long serialVersionUID = 1L;
-		final Class annotationType;
-        EventListenerSorter(Class annotationType) {
-            this.annotationType = annotationType;
-        }
-        public int compare(Method o1, Method o2) {
-            try {
-                Annotation a1 = o1.getAnnotation(annotationType);
-                Annotation a2 = o2.getAnnotation(annotationType);
-                int p1 = (Integer)a1.getClass().getMethod("priority").invoke(a1);
-                int p2 = (Integer)a2.getClass().getMethod("priority").invoke(a2);
-                if(p1 == p2) {
-                    return o1.toString().compareTo(o2.toString());
-                } else {
-                    return p2 - p1;
-                }
-            } catch(Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        
+    final static String PERSISTENCE_EVENT_LISTENERS = "persistenceEventListeners";
+    List<?> getPersistenceEventListeners() {
+    	List list = (List<?>)DIContainerFactory.getDIContainer().getObject(PERSISTENCE_EVENT_LISTENERS);
+    	return (list == null) ? new ArrayList<Object>() : list;
     }
     
     private Messages unitPropertyValidate(Object o, WhenVerifier when) throws Exception {

@@ -58,12 +58,13 @@ public abstract class DataLoadingTestCase extends TestCase {
 		public <T> T getObject(Class<T> arg0, Object arg1) {
 			if(arg1.equals(ServiceLocator.SERVICE_LOCATOR_KEY)) {
 				System.out.println("ServiceLocatorLogicÇÃéÊìæóvãÅÇ≈Ç∑");
+				DIContainer current = DIContainerFactory.getDIContainer();
 				DIContainerFactory.setDIContainer(org);
 				try {
 					ServiceLocatorLogic orgLogic = ServiceLocatorLogic.getServiceLocatorLogic();
 					return (T)new ServiceLocatorLogicExt(orgLogic);
 				} finally {
-					DIContainerFactory.setDIContainer(this);
+					DIContainerFactory.setDIContainer(current);
 				}
 			}
 			return org.getObject(arg0, arg1);
