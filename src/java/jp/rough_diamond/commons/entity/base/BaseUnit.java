@@ -72,7 +72,7 @@ public abstract class BaseUnit  implements Serializable {
         return false;
     }
 
-    private boolean isLoaded;
+    protected boolean isLoaded;
     @jp.rough_diamond.commons.service.annotation.PostLoad
     @jp.rough_diamond.commons.service.annotation.PostPersist
     public void setLoadingFlag() {
