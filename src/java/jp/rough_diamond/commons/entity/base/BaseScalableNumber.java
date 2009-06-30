@@ -7,20 +7,20 @@
 
 package jp.rough_diamond.commons.entity.base;
 
-
-
-
 import  java.io.Serializable;
+
 
 
 /**
  * 小数点位置指定数値のHibernateマッピングベースクラス
 **/
 public abstract class BaseScalableNumber extends java.lang.Number implements Serializable {
+   private static final long serialVersionUID = 1L;
+    /**
+     * デフォルトコンストラクタ
+    **/
     public BaseScalableNumber() {
     }
-
-
 
     /**
      * 量(整数)
@@ -46,8 +46,6 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
     public void setValue(Long value) {
         this.value = value;
     }
-
-
     /**
      * 小数点位置。正の数なら左へ、負の数なら右へ移動させる
     **/ 
@@ -72,9 +70,8 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
     public void setScale(Integer scale) {
         this.scale = scale;
     }
-
-
+//ForeignProperties.vm start.
 
     
-    private static final long serialVersionUID = 1L;
+//ForeignProperties.vm finish.
 }

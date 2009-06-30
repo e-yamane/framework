@@ -7,10 +7,8 @@
 
 package jp.rough_diamond.commons.entity.base;
 
-
-
-
 import  java.io.Serializable;
+
 
 
 /**
@@ -20,6 +18,10 @@ import  java.io.Serializable;
  *    realClass="jp.rough_diamond.commons.entity.Numbering"
 **/
 public abstract class BaseNumbering  implements Serializable {
+   private static final long serialVersionUID = 1L;
+    /**
+     * デフォルトコンストラクタ
+    **/
     public BaseNumbering() {
     }
 
@@ -27,7 +29,6 @@ public abstract class BaseNumbering  implements Serializable {
      * ＩＤ
     **/ 
     private String id;
-
     public final static String ID = "id";
     /**
      * ＩＤを取得する
@@ -38,7 +39,6 @@ public abstract class BaseNumbering  implements Serializable {
      *    length="128"
      * @return ＩＤ
     **/
-
     public String getId() {
         return id;
     }
@@ -51,7 +51,7 @@ public abstract class BaseNumbering  implements Serializable {
         this.id = id;
         isLoaded = false;
     }
-    
+
     public int hashCode() {
         if(getId() == null) {
             return super.hashCode();
@@ -80,14 +80,43 @@ public abstract class BaseNumbering  implements Serializable {
         isLoaded = true;
     }
 
+    /**
+     * オブジェクトを永続化する
+     * 永続化ルールは以下の通りです。
+     * <ul>
+     *   <li>newした直後のオブジェクトの場合はinsert</li>
+     *   <li>loadされたオブジェクトの場合はupdate</li>
+     *   <li>loadされたオブジェクトでも主キーを差し替えた場合はinsert</li>
+     *   <li>insertしたオブジェクトを再度saveした場合はupdate</li>
+     *   <li>setLoadingFlagメソッドを呼び出した場合は強制的にupdate（非推奨）</li>
+     * </ul>
+     * @throws VersionUnmuchException   楽観的ロッキングエラー
+     * @throws MessagesIncludingException 検証例外
+    **/
     public void save() throws jp.rough_diamond.framework.transaction.VersionUnmuchException, jp.rough_diamond.commons.resource.MessagesIncludingException {
         if(isLoaded) {
-            jp.rough_diamond.commons.service.BasicService.getService().update(this);
+            update();
         } else {
-            jp.rough_diamond.commons.service.BasicService.getService().insert(this);
+            insert();
         }
     }
 
+    /**
+     * オブジェクトを永続化する
+     * @throws MessagesIncludingException 検証例外
+    **/
+    protected void insert() throws jp.rough_diamond.commons.resource.MessagesIncludingException {
+        jp.rough_diamond.commons.service.BasicService.getService().insert(this);
+    }
+
+    /**
+     * 永続化オブジェクトを更新する
+     * @throws MessagesIncludingException 検証例外
+     * @throws VersionUnmuchException   楽観的ロッキングエラー
+    **/
+    protected void update() throws jp.rough_diamond.framework.transaction.VersionUnmuchException, jp.rough_diamond.commons.resource.MessagesIncludingException {
+        jp.rough_diamond.commons.service.BasicService.getService().update(this);
+    }
     /**
      * 現在割り当てている番号
     **/ 
@@ -112,9 +141,8 @@ public abstract class BaseNumbering  implements Serializable {
     public void setNextNumber(Long nextNumber) {
         this.nextNumber = nextNumber;
     }
-
-
+//ForeignProperties.vm start.
 
     
-    private static final long serialVersionUID = 1L;
+//ForeignProperties.vm finish.
 }

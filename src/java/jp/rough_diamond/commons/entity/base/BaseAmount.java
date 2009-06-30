@@ -7,20 +7,20 @@
 
 package jp.rough_diamond.commons.entity.base;
 
-
-
-
 import  java.io.Serializable;
+
 
 
 /**
  * 量のHibernateマッピングベースクラス
 **/
 public abstract class BaseAmount extends java.lang.Number implements Serializable {
+   private static final long serialVersionUID = 1L;
+    /**
+     * デフォルトコンストラクタ
+    **/
     public BaseAmount() {
     }
-
-
 
     /**
      * 量
@@ -49,6 +49,7 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
         this.quantity = quantity;
     }
 
+//ForeignProperties.vm start.
 
     
     private jp.rough_diamond.commons.entity.Unit unit;
@@ -86,5 +87,5 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
         }
     }
 
-    private static final long serialVersionUID = 1L;
+//ForeignProperties.vm finish.
 }
