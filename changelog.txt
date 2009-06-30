@@ -48,6 +48,8 @@ RDF Core Change Log
 　　　DIContainerにpersistenceEventListenersと言う名でListを渡すようにしておけば、
 　　　そのList内のオブジェクトの然るべきメソッドにイベントを伝播させることができます。
 　　- commons-logging.propertiesを追加してlog4jでログを出力するようにしました。
+　　- makeBean実行時にsrc.encodingプロパティが指定されていればその文字コードで
+　　　ソースコードを生成するようにしました。（デフォルトはMS932）
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの

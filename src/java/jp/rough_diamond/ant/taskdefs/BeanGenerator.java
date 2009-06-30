@@ -17,6 +17,15 @@ public class BeanGenerator extends Task {
 	private String root;
 //	private List<FileSet> fileSets = new ArrayList<FileSet>();
 	private String input;
+	private String encoding = "Shift_JIS";
+	
+	public String getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
 
 	public String getRoot() {
 		return root;
@@ -57,7 +66,7 @@ public class BeanGenerator extends Task {
 	    	if(!inputF.exists()) {
 	    		throw new BuildException(inputF.getCanonicalPath() + "is not exists.");
 	    	}
-	    	JavaBeansGenerator jbg = new JavaBeansGenerator(inputF, rootF);
+	    	JavaBeansGenerator jbg = new JavaBeansGenerator(inputF, rootF, getEncoding());
 	    	jbg.doIt();
 		} catch(Exception e) {
 			e.printStackTrace();
