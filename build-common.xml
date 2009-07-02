@@ -857,7 +857,10 @@
     <copy file="${framework.root}/conf/template/middlegen.properties" tofile="./middlegen.properties" filtering="true" overwrite="true" />
   </target>
 
-  <target name="makeWar" depends="init-task, makeConfig, makeBean, makeSchemaAccessor">
+  <target name="makeWar" depends="init-task">
+    <antcall target="makeConfig" />
+    <antcall target="makeBean" />
+    <antcall target="makeSchemaAccessor" />
     <delete dir="${release.dir}" />
     <mkdir dir="${release.dir}/classes" />
     <condition property="src.path.name" value="real.src.path.default" >
