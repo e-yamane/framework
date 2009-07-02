@@ -16,9 +16,7 @@
   <property name="framework.dist.dir"               value="../framework/target"/>
   <property name="framework.classes.dir"            value="${framework.dist.dir}/classes" />
 
-
-  <property name="war.name"               value="ROOT" />
-  <property name="release.dir"            value="release" />
+  <property name="release.dir"            value="${my.build.dir}/release" />
   <property name="src.dir"                value="${my.build.dir}/src/java" />
   <property name="web.root.dir"           value="${my.build.dir}/webapp" />
   <property name="lib.dir"                value="${web.root.dir}/WEB-INF/lib" />
@@ -93,6 +91,7 @@
       <include name="**/*.jar" />
     </fileset>
     <path refid="servletapi.path"/>
+    <path refid="framework.path"/>
   </path>
 
   <path id="framework.path">
@@ -690,66 +689,6 @@
     </antcall>
   </target>
 
-  <!--
-    リリースモジュールを作成する
-    一度なくしたいんだけど、コンパイルエラーになるので
-    非公開タスクとして残す
-  -->
-  <target name="makeReleaseModule">
-    <property file="./dairy-build.properties" />
-    <antcall target="makeReleaseConfig" />
-    <mkdir dir="${release.dir}" />
-    <delete>
-      <fileset dir="${release.dir}/" includes="**/*"/>
-    </delete>
-    <mkdir dir="${release.dir}/work" />
-    <exec dir="${release.dir}/work" executable="svn">
-      <arg line="export --force --no-auth-cache ${svn.url} ."/>
-    </exec>
-    <ant antfile="build.xml" dir="${release.dir}/work">
-      <target name="makeReleaseConfig" />
-<!--
-      <target name="get-deps" />
--->
-      <target name="compile-other" />
-      <target name="makeBean" />
-      <target name="makeSchemaAccessor" />
-      <target name="makeReleaseConfig" />
-      <target name="makeModule" />
-    </ant>
-    <property file="./module.properties" />
-    <copy file="${release.dir}/work/${release.dir}/${war.name}.war" tofile="${release.dir}/${war.name}.war" overwrite="true" />
-  </target>
-
-<!--
-  <target name="makeModule" description="現在の状態でモジュールを作成する">
-    <mkdir dir="${release.dir}" />
-    <delete>
-      <fileset dir="${release.dir}/" includes="**/*"/>
-    </delete>
-    <mkdir dir="${release.dir}/classes" />
-    <antcall target="do.compile">
-      <param name="compile.src.roots"     value="src.real" />
-      <param name="compile.classpath"     value="classpath.real" />
-      <param name="compile.dest.dir"      value="${release.dir}/classes" />
-      <param name="copy.resource.target"  value="copyRealResources" />
-    </antcall>
-    <war destfile="${release.dir}/${war.name}.war" webxml="${web.root.dir}/WEB-INF/web.xml" update="true">
-      <fileset dir="${web.root.dir}">
-        <include name="**/*" />
-        <exclude name="WEB-INF/lib/**/*" />
-        <exclude name="WEB-INF/classes/**/*" />
-      </fileset>
-      <classes dir="${release.dir}/classes">
-        <include name="**/*" />
-      </classes>
-      <lib dir="${lib.dir}/">
-        <include name="*" />
-      </lib>
-    </war>
-  </target>
--->
-
   <target name="doIt">
     <condition property="parameter" value="" >
       <not>
@@ -916,5 +855,40 @@
   <target name="copyMiddlegenProperties" unless="do.not.use.makeSchemaAccessor">
     <filter filtersfile="${conf.dir}/tmp/${conf.target.name}" />
     <copy file="${framework.root}/conf/template/middlegen.properties" tofile="./middlegen.properties" filtering="true" overwrite="true" />
+  </target>
+
+  <target name="makeWar" depends="init-task, makeConfig, makeBean, makeSchemaAccessor">
+    <delete dir="${release.dir}" />
+    <mkdir dir="${release.dir}/classes" />
+    <condition property="src.path.name" value="real.src.path.default" >
+      <not>
+        <isset property="src.path.name" />
+      </not>
+    </condition>
+    <condition property="war.name" value="${ant.project.name}" >
+      <not>
+        <isset property="war.name" />
+      </not>
+    </condition>
+    <echo message="${war.name}" />
+    <antcall target="do.compile">
+      <param name="compile.src.roots"     value="${src.path.name}" />
+      <param name="compile.classpath"     value="classpath.real" />
+      <param name="compile.dest.dir"      value="${release.dir}/classes" />
+      <param name="copy.resource.target"  value="copyRealResources" />
+    </antcall>
+    <war destfile="${release.dir}/${war.name}.war" webxml="${web.root.dir}/WEB-INF/web.xml" update="true">
+      <fileset dir="${web.root.dir}">
+        <include name="**/*" />
+        <exclude name="WEB-INF/lib/**/*" />
+        <exclude name="WEB-INF/classes/**/*" />
+      </fileset>
+      <classes dir="${release.dir}/classes">
+        <include name="**/*" />
+      </classes>
+      <lib dir="${lib.dir}/">
+        <include name="*" />
+      </lib>
+    </war>
   </target>
 </project>
