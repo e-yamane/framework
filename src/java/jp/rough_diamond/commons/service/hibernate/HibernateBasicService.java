@@ -313,4 +313,15 @@ public class HibernateBasicService extends BasicService {
 		}
 		return list;
 	}
+
+	/* (non-Javadoc)
+	 * @see jp.rough_diamond.commons.service.BasicService#clearCache(java.lang.Object)
+	 */
+	@Override
+	public void clearCache(Object o) {
+		Session session = HibernateUtils.getSession();
+		if(session != null) {
+			session.evict(o);
+		}
+	}
 }

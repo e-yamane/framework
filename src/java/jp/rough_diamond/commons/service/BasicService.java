@@ -34,6 +34,8 @@ import jp.rough_diamond.commons.service.annotation.Unique;
 import jp.rough_diamond.commons.service.annotation.Verifier;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
+import jp.rough_diamond.framework.transaction.TransactionAttribute;
+import jp.rough_diamond.framework.transaction.TransactionAttributeType;
 import jp.rough_diamond.framework.transaction.VersionUnmuchException;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -431,6 +433,12 @@ abstract public class BasicService implements Service {
     	}
     }
     
+    /**
+     * 指定されていたオブジェクトがDAOにキャッシュされている場合に削除する
+     * @param o
+     */
+    @TransactionAttribute(TransactionAttributeType.NOP)
+    abstract public void clearCache(Object o);
     
     protected void fireEvent(CallbackEventType eventType, List objects) throws VersionUnmuchException, MessagesIncludingException {
         if(objects.size() == 0) {
