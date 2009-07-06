@@ -1,7 +1,5 @@
 package jp.rough_diamond.commons.testing;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,13 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 import jp.rough_diamond.framework.transaction.ConnectionManager;
@@ -26,7 +17,6 @@ import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
@@ -37,9 +27,6 @@ import org.hibernate.Interceptor;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.mapping.PersistentClass;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 @SuppressWarnings("unchecked")
 abstract public class DBInitializer implements Service {
@@ -49,6 +36,8 @@ abstract public class DBInitializer implements Service {
     private static Map<Class, Set<DBInitializer>> initializerObjects; 
     static Set<Class> modifiedClasses;
     private static TmpService service;
+    
+    private final DatabaseOperation INSERT = new InsertOperationExt(this);
     
     static {
         service = ServiceLocator.getService(TmpService.class); 
@@ -125,57 +114,11 @@ abstract public class DBInitializer implements Service {
             return;
         }
         String[] resourceNames = getResourceNames();
-        execute(DatabaseOperation.INSERT, resourceNames);
+        execute(INSERT, resourceNames);
         list.add(this);
-        
-        for(String name : resourceNames) {
-        	try {
-                if(name.endsWith(".xls")) {
-                	loadExcel(name);
-                } else if(name.endsWith(".xml")) {
-                	loadXML(name);
-                }
-        	} catch(RuntimeException e) {
-        		log.warn("以下のリソースを実行中に例外が発生しました。[" + name + "]");
-        		throw e;
-        	}
-        }
-        
     }
     
-    private void loadXML(String name) throws IOException {
-    	try {
-	    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	    	DocumentBuilder db = dbf.newDocumentBuilder();
-	        InputStream is = this.getClass().getClassLoader().getResourceAsStream(name);
-	        Document doc = db.parse(is);
-			XPathFactory xpf = XPathFactory.newInstance();
-			XPath xpath = xpf.newXPath();
-			XPathExpression exp = xpath.compile("/dataset/table");
-			NodeList nodeList = (NodeList)exp.evaluate(doc, XPathConstants.NODESET);
-			for(int i = 0 ; i < nodeList.getLength() ; i++) {
-				Element el = (Element)nodeList.item(i);
-				String tableName = el.getAttribute("name").toUpperCase();
-				addInitializedObject(tableName);
-			}
-    	} catch(IOException e) {
-    		throw e;
-    	} catch(Exception e) {
-    		throw new IOException(e);
-    	}
-    }
-    
-    private void loadExcel(String name) throws IOException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(name);
-        HSSFWorkbook wb = new HSSFWorkbook(is);
-        int sheetSize = wb.getNumberOfSheets();
-        for(int i = 0 ; i < sheetSize ; i++) {
-            String sheetName = wb.getSheetName(i);
-            addInitializedObject(sheetName);
-        }
-    }
-
-    private void addInitializedObject(String name) {
+    void addInitializedObject(String name) {
         Class cl = entityMap.get(name.toUpperCase());
         Set<DBInitializer> set = initializerObjects.get(cl);
         if(set == null) {
