@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2008, 2009
- *  Rough Diamond Co., Ltd.              -- http://www.rough-diamond.co.jp/
- *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
- *  All rights reserved.
- */
 package jp.rough_diamond.commons.testing;
 
 import java.io.IOException;
@@ -211,6 +205,7 @@ abstract public class DBInitializer implements Service {
     
     abstract protected String[] getResourceNames();
     
+    private static Map<String, IDataSet> datasetMap = new HashMap<String, IDataSet>();
     protected void execute(DatabaseOperation operation, String... resourceNames) throws Exception {
     	String schema = HibernateUtils.getConfig().getProperty(Environment.DEFAULT_SCHEMA);
     	
@@ -226,15 +221,18 @@ abstract public class DBInitializer implements Service {
         for(String name : tmp) {
         	try {
         		System.out.println(name + ":" + operation.getClass().getName());
-        		IDataSet dataset;
-        		if(name.endsWith("xls")) {
-        			dataset = new XlsDataSet(
-    	                    this.getClass().getClassLoader().getResourceAsStream(name)); 
-        		} else if(name.endsWith(".xml")) {
-        			dataset = new XmlDataSet(
-    	                    this.getClass().getClassLoader().getResourceAsStream(name)); 
-        		} else {
-        			throw new RuntimeException();
+        		IDataSet dataset = datasetMap.get(name);
+        		if(dataset == null) {
+	        		if(name.endsWith("xls")) {
+	        			dataset = new XlsDataSet(
+	    	                    this.getClass().getClassLoader().getResourceAsStream(name)); 
+	        		} else if(name.endsWith(".xml")) {
+	        			dataset = new XmlDataSet(
+	    	                    this.getClass().getClassLoader().getResourceAsStream(name)); 
+	        		} else {
+	        			throw new RuntimeException();
+	        		}
+	        		datasetMap.put(name, dataset);
         		}
 	            operation.execute(idc, dataset);
         	} catch(RuntimeException e) {
