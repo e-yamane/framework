@@ -175,6 +175,7 @@ abstract public class DBInitializer implements Service {
 	        		} else {
 	        			throw new RuntimeException();
 	        		}
+	        		dataset = new DataSetProxy(name, dataset);
 	        		datasetMap.put(name, dataset);
         		}
 	            operation.execute(idc, dataset);
