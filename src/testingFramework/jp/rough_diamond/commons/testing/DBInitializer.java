@@ -1,5 +1,8 @@
 package jp.rough_diamond.commons.testing;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,11 +43,15 @@ abstract public class DBInitializer implements Service {
     private final DatabaseOperation INSERT = new InsertOperationExt(this);
     
     static {
-        service = ServiceLocator.getService(TmpService.class); 
-        service.replaceInterceptor();
-        list = new ArrayList<DBInitializer>();
-        initializerObjects = new HashMap<Class, Set<DBInitializer>>();
-        modifiedClasses = new HashSet<Class>();
+    	try {
+	        service = ServiceLocator.getService(TmpService.class); 
+	        service.init();
+	        list = new ArrayList<DBInitializer>();
+	        initializerObjects = new HashMap<Class, Set<DBInitializer>>();
+	        modifiedClasses = new HashSet<Class>();
+    	} catch(Exception e) {
+    		throw new ExceptionInInitializerError(e);
+    	}
     }
     
     static void clearModifiedClasses() {
@@ -97,6 +104,24 @@ abstract public class DBInitializer implements Service {
                 PersistentClass pc = (PersistentClass)iterator.next();
                 entityMap.put(pc.getTable().getName().toUpperCase(), pc.getMappedClass());
             }
+        }
+        
+        public void init() throws SQLException {
+        	replaceInterceptor();
+        	createTestDataTable();
+        }
+        
+        void createTestDataTable() throws SQLException {
+        	Connection con = ConnectionManager.getConnectionManager().getCurrentConnection(null);
+        	String schema = HibernateUtils.getConfig().getProperty(Environment.DEFAULT_SCHEMA);
+        	if(!DatabaseUtils.isExistsTable(con, schema, "test_data")) {
+        		Statement stmt = con.createStatement();
+        		try {
+        			stmt.execute("create table test_data(name varchar(4000), TEST_TABLE varchar(32), ts varchar(20))");
+        		} finally {
+        			stmt.close();
+        		}
+        	}
         }
         
         public void clearData(DBInitializer initializer) throws Exception {
