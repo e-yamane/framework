@@ -5,6 +5,7 @@
   <property name="other.lib.dir"              value="${lib.dir}" />
   <property name="copy.cobertura.target.name" value="copyCoberturaTargetClasses" />
   <property name="ci.preprocess.name"         value="doCopyTorqueGen" />
+  <property name="classes.dir"                value="./bin" />
   <import file="../framework/build-common.xml" />
 
   <property name="product.version"            value="0.8.1" />

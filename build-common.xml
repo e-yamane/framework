@@ -229,6 +229,11 @@
     </taskdef>
   </target>
 
+  <target name="clearTestData" depends="init-task" description="テストデータをクリアする">
+    <java classname="jp.rough_diamond.tools.TestDataEraser" classpathref="classpath.all" fork="yes">
+    </java>
+  </target>
+
   <target name="makeBean" depends="init-task" description="JavaBeansを作成する">
     <condition property="bean.def.xml" value="beanDef/beanDef.xml" >
       <not>
