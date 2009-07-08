@@ -42,6 +42,8 @@ abstract public class DBInitializer implements Service {
     
     private final DatabaseOperation INSERT = new InsertOperationExt(this);
     
+    public final static String TEST_DATA_CONTROLER = "RDF_TEST_DATA_CONTROLER";
+    
     static {
     	try {
 	        service = ServiceLocator.getService(TmpService.class); 
@@ -114,10 +116,12 @@ abstract public class DBInitializer implements Service {
         void createTestDataTable() throws SQLException {
         	Connection con = ConnectionManager.getConnectionManager().getCurrentConnection(null);
         	String schema = HibernateUtils.getConfig().getProperty(Environment.DEFAULT_SCHEMA);
-        	if(!DatabaseUtils.isExistsTable(con, schema, "test_data")) {
+        	if(!DatabaseUtils.isExistsTable(con, schema, TEST_DATA_CONTROLER)) {
         		Statement stmt = con.createStatement();
         		try {
-        			stmt.execute("create table test_data(name varchar(4000), TEST_TABLE varchar(32), ts varchar(20))");
+        			stmt.execute(
+        					String.format("create table %s(name varchar(4000), test_table varchar(32), ts varchar(20))",
+        							TEST_DATA_CONTROLER));
         		} finally {
         			stmt.close();
         		}

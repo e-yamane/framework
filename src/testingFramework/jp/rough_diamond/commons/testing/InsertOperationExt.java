@@ -131,7 +131,7 @@ public class InsertOperationExt extends AbstractOperation {
     	File f = new File(url.getPath());
     	long ts = f.lastModified();
     	PreparedStatement pstmt = connection.getConnection().prepareStatement(
-    			"select ts from test_data where name = ?");
+    			String.format("select ts from %s where name = ?", DBInitializer.TEST_DATA_CONTROLER));
     	try {
     		pstmt.setString(1, resourceName);
     		ResultSet rs = pstmt.executeQuery();
@@ -153,7 +153,7 @@ public class InsertOperationExt extends AbstractOperation {
 
 	void createTestDataRecord(IDatabaseConnection connection, String resourceName, String tempTableName, long ts) throws SQLException {
     	PreparedStatement pstmt = connection.getConnection().prepareStatement(
-				"insert into test_data(test_table, ts, name) values(?, ?, ?)");
+				String.format("insert into %s(test_table, ts, name) values(?, ?, ?)", DBInitializer.TEST_DATA_CONTROLER));
     	try {
     		pstmt.setString(1, tempTableName);
     		pstmt.setString(2, "" + ts);
@@ -166,7 +166,7 @@ public class InsertOperationExt extends AbstractOperation {
 
 	void updateTestDataRecord(IDatabaseConnection connection, String resourceName, long ts) throws SQLException {
     	PreparedStatement pstmt = connection.getConnection().prepareStatement(
-				"update test_data set ts = ? where name = ?");
+				String.format("update %s set ts = ? where name = ?", DBInitializer.TEST_DATA_CONTROLER));
     	try {
     		pstmt.setString(1, "" + ts);
     		pstmt.setString(2, resourceName);

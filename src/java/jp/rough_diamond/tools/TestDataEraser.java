@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import jp.rough_diamond.commons.testing.DBInitializer;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 import jp.rough_diamond.framework.transaction.ConnectionManager;
@@ -27,11 +28,11 @@ public class TestDataEraser implements Service {
 		Connection con = ConnectionManager.getConnectionManager().getCurrentConnection(null);
 		Statement stmt = con.createStatement();
 		try {
-			ResultSet rs = stmt.executeQuery("select test_table from test_data");
+			ResultSet rs = stmt.executeQuery(String.format("select test_table from %s", DBInitializer.TEST_DATA_CONTROLER));
 			while(rs.next()) {
 				dropTable(con, rs.getString(1));
 			}
-			dropTable(con, "test_data");
+			dropTable(con, DBInitializer.TEST_DATA_CONTROLER);
 		} finally {
 			stmt.close();
 		}

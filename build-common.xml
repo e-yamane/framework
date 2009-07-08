@@ -12,7 +12,7 @@
   <property name="framework.java.version"           value="1.6" />
   <property name="framework.compile.debug"          value="on" />
   <property name="framework.src.encoding"           value="MS932" />
-  <property name="framework.ant.extention.version"  value="1.2.2" />
+  <property name="framework.ant.extention.version"  value="1.2.3" />
   <property name="framework.dist.dir"               value="../framework/target"/>
   <property name="framework.classes.dir"            value="${framework.dist.dir}/classes" />
 
@@ -157,6 +157,8 @@
         debug="${framework.compile.debug}"
         encoding="${framework.src.encoding}"
     >
+      <src path="${framework.src.dir}" />
+      <src path="${framework.src.dir}/../testingFramework" />
       <include name="jp/rough_diamond/ant/**/*.java" />
       <include name="jp/rough_diamond/tools/**/*.java" />
       <include name="org/dbunit/**/*.java" />
