@@ -695,45 +695,50 @@ abstract public class BasicService implements Service {
 				continue;	//ƒTƒCƒY‚O‚È‚Ì‚Å–³ðŒ‚É‚n‚j
 			}
 			if(when == WhenVerifier.INSERT) {
-				String targetProperty = u.entity() + "." + check.properties()[0];
 				//“o˜^Žž‚É‚PŒˆÈã‚ ‚é‚Ì‚Å–³ðŒ‚ÉƒGƒ‰[
-				ret.add(targetProperty, new Message("errors.duplicate", 
-						ResourceManager.getResource().getString(targetProperty)));
+				ret.add(makeUniqueErrorMessage(o, u, check));
 			} else {
 				//XVŽž
 				if(list.size() > 1) {
-					String targetProperty = u.entity() + "." + check.properties()[0];
-					ret.add(targetProperty, new Message("errors.duplicate", 
-							ResourceManager.getResource().getString(targetProperty)));
+					ret.add(makeUniqueErrorMessage(o, u, check));
 				} else if(!o.equals(list.get(0))){
-					String targetProperty = u.entity() + "." + check.properties()[0];
-	    			ret.add(targetProperty, new Message("errors.duplicate", 
-	    					ResourceManager.getResource().getString(targetProperty)));
+					ret.add(makeUniqueErrorMessage(o, u, check));
 				}
 			}
 		}
 		return ret;
 	}
 
-	protected List getMutchingObjects(Object o, Check check) {
-		try {
-			Extractor ex = new Extractor(o.getClass());
-			for(String property : check.properties()) {
-				Object value;
-					Method m = jp.rough_diamond.commons.util.PropertyUtils.getGetterMethod(o, property);
-					value = m.invoke(o);
-				if(value == null) {
-					ex.add(Condition.isNull(new Property(property)));
-				} else {
-					ex.add(Condition.eq(new Property(property), value));
-				}
-			}		
-			return findByExtractor(ex, RecordLock.FOR_UPDATE);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
+	static Messages makeUniqueErrorMessage(Object o, Unique u, Check c) {
+		Messages ret = new Messages();
+		String targetProperty = u.entity() + "." + c.properties()[0];
+		String[] strArray = c.properties()[0].split("\\.");
+		if(strArray.length == 1) {
+			ret.add(targetProperty, new Message("errors.duplicate", 
+						ResourceManager.getResource().getString(targetProperty)));
+		} else {
+			int i = 0;
+			Object base = o;
+			for( ; i < strArray.length - 1 ; i++) {
+				base = jp.rough_diamond.commons.util.PropertyUtils.getProperty(base, strArray[0]);
+			}
+			ret.add(targetProperty, new Message("errors.duplicate",
+					ResourceManager.getResource().getString(base.getClass().getSimpleName() + "." + strArray[i])));
 		}
+		return ret;
+	}
+
+	protected List getMutchingObjects(Object o, Check check) {
+		Extractor ex = new Extractor(o.getClass());
+		for(String property : check.properties()) {
+			Object value = jp.rough_diamond.commons.util.PropertyUtils.getProperty(o, property);
+			if(value == null) {
+				ex.add(Condition.isNull(new Property(property)));
+			} else {
+				ex.add(Condition.eq(new Property(property), value));
+			}
+		}		
+		return findByExtractor(ex, RecordLock.FOR_UPDATE);
 	}
 	
 	private int getLength(Object target) throws Exception {

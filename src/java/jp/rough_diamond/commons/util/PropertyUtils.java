@@ -165,6 +165,22 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 		return null;
 	}
 	
+	public static Object getProperty(Object dest, String propertyName) {
+		String[] strArray = propertyName.split("\\.");
+		if(strArray.length == 0) {
+			throw new RuntimeException();
+		}
+		try {
+			for(String methodName : strArray) {
+				Method m  = getGetterMethod(dest, methodName);
+				dest = m.invoke(dest);
+			}
+			return dest;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public static Method getSetterMethod(Object dest, String propertyName) {
 		char[] chs = propertyName.toCharArray();
 		chs[0] = Character.toUpperCase(chs[0]);
