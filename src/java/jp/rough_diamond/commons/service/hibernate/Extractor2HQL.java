@@ -100,6 +100,20 @@ public class Extractor2HQL {
         Extractor2HQL tmp = new Extractor2HQL(extractor);
         Query q = tmp.makeQuery(lockMode);
         tmp.setParameter(q);
+        int offset = extractor.getOffset();
+        if(offset > 0) {
+            q.setFirstResult(offset);
+        }
+        int limit = extractor.getLimit();
+        if(limit > 0) {
+            q.setMaxResults(limit);
+        }
+        if(extractor.getValues().size() == 0) {
+        	q.setLockMode(getAlias(extractor.target, extractor.targetAlias), lockMode);
+        }
+        if(extractor.getFetchSize() != Extractor.DEFAULT_FETCH_SIZE) {
+        	q.setFetchSize(extractor.getFetchSize());
+        }
         return q;
     }
 
@@ -286,20 +300,6 @@ public class Extractor2HQL {
         String hql = builder.toString();
         log.debug(hql);
         Query query = HibernateUtils.getSession().createQuery(hql);
-        int offset = extractor.getOffset();
-        if(offset > 0) {
-            query.setFirstResult(offset);
-        }
-        int limit = extractor.getLimit();
-        if(limit > 0) {
-            query.setMaxResults(limit);
-        }
-        if(extractor.getValues().size() == 0) {
-        	query.setLockMode(getAlias(extractor.target, extractor.targetAlias), lockMode);
-        }
-        if(extractor.getFetchSize() != Extractor.DEFAULT_FETCH_SIZE) {
-        	query.setFetchSize(extractor.getFetchSize());
-        }
         return query;
     }
     
