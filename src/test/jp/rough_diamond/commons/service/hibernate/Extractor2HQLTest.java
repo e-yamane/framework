@@ -147,6 +147,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		List<Map<String, Long>> list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		assertEquals("値が誤っています。", 1610346L, list.get(0).get("sum").longValue());
+		assertEquals("件数が誤っています。", 1, BasicService.getService().getCountByExtractor(ex));
 	}
 	
 	public void testQueryUsingCount() throws Exception {
@@ -602,6 +603,27 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		//select distinct base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
 		list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 3, list.size());
+	}
+	
+	public void testCountQuery() throws Exception {
+		//select count(*) from unit where base_unit_id = 1 order by rate_value
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.addOrder(Order.asc(new Property(Unit.RATE + ScalableNumber.VALUE)));
+		assertEquals("件数が誤っています。", 4, BasicService.getService().getCountByExtractor(ex));
+	}
+
+	public void testCountQueryWithExtractValue() throws Exception {
+		//select base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("baseId", new Property(Unit.BASE + "." + Unit.ID)));
+		ex.addExtractValue(new ExtractValue("value", new Property(Unit.RATE + ScalableNumber.VALUE)));
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.addOrder(Order.asc(new Property(Unit.RATE + ScalableNumber.VALUE)));
+		assertEquals("件数が誤っています。", 4, BasicService.getService().getCountByExtractor(ex));
+		ex.setDistinct(true);
+		//select distinct base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
+		assertEquals("件数が誤っています。", 3, BasicService.getService().getCountByExtractor(ex));
 	}
 	
 	public static class ReturnType1 {

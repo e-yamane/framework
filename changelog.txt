@@ -54,6 +54,8 @@ RDF Core Change Log
 　　　org.hibernate.Session.evictを隠ぺいするのが目的です。
 　　- テストデータのローディング方法を刷新しました。
 　　- AntコマンドにclearTestDataを追加しました。
+　　- テーブル定義ファイルでindex/uniqueを指定する場合に、内部参照テーブルのカラムを
+　　　指定できるようにしました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの

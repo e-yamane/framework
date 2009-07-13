@@ -7,6 +7,9 @@
 package jp.rough_diamond.commons.service.hibernate;
 
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,9 +93,33 @@ public class HibernateBasicService extends BasicService {
 
 	@Override
 	public <T> long getCountByExtractor(Extractor extractor) {
-        Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
-        Number n = (Number)countQuery.list().get(0);
-        return n.longValue();
+		if(extractor.getValues().size() == 0) {
+	        Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
+	        Number n = (Number)countQuery.list().get(0);
+	        return n.longValue();
+		} else {
+			PreparedStatement pstmt = Extractor2HQL.extractor2PreparedStatement(extractor);
+			SQLException sqlex = null;
+			try {
+				ResultSet rs = pstmt.executeQuery();
+				try {
+					rs.next();
+					return rs.getLong(1);
+				} finally {
+					rs.close();
+				}
+			} catch (SQLException e) {
+				sqlex = e;
+				throw new RuntimeException(e);
+			} finally {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					sqlex = (sqlex == null) ? e : sqlex;
+					throw new RuntimeException(sqlex);
+				}
+			}
+		}
 	}
 	
     @SuppressWarnings("unchecked")

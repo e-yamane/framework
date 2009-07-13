@@ -9,6 +9,8 @@ package jp.rough_diamond.commons.service.hibernate;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,6 +65,9 @@ import org.hibernate.Query;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.query.HQLQueryPlan;
+import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
 import org.hibernate.type.TypeFactory;
@@ -93,14 +98,44 @@ public class Extractor2HQL {
      */
     public static Query extractor2Query(Extractor extractor, LockMode lockMode) {
         Extractor2HQL tmp = new Extractor2HQL(extractor);
-        return tmp.makeQuery(lockMode);
+        Query q = tmp.makeQuery(lockMode);
+        tmp.setParameter(q);
+        return q;
     }
 
 	public static Query extractor2CountQuery(Extractor extractor) {
         Extractor2HQL tmp = new Extractor2HQL(extractor);
-        return tmp.makeCountQuery();
+        Query q = tmp.makeCountQuery();
+        tmp.setParameter(q);
+        return q;
 	}
 
+	/**
+	 * Extractorオブジェクトから件数取得用のPreparedStatementを生成/返却する
+	 * こっちは、extractor.getValues().size() > 0の場合にのみ呼び出すこと。
+	 * それ以外の場合はsubqueryを用いるため、性能劣化の原因になります。
+	 * @param extractor
+	 * @return
+	 */
+	public static PreparedStatement extractor2PreparedStatement(Extractor extractor) {
+		try {
+	        Extractor2HQL tmp = new Extractor2HQL(extractor);
+	        Query q = tmp.makeQuery(LockMode.NONE);
+	        SessionImplementor session = (SessionImplementor)HibernateUtils.getSession();
+			SessionFactoryImpl sfi = (SessionFactoryImpl)HibernateUtils.getSession().getSessionFactory();
+			HQLQueryPlan hqp = sfi.getQueryPlanCache().getHQLQueryPlan(q.getQueryString(), false, session.getEnabledFilters());
+			String sql = String.format("select count(*) from (%s) x", hqp.getSqlStrings()[0]);
+			log.debug(sql);
+			PreparedStatement pstmt;
+			pstmt = session.connection().prepareStatement(sql);
+			tmp.setParameter(pstmt);
+	        return pstmt;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+	
 	/**
      * 抽出値からMapのリストを生成
      * @param list
@@ -238,7 +273,6 @@ public class Extractor2HQL {
         String hql = builder.toString();
         log.debug(hql);
         Query query = HibernateUtils.getSession().createQuery(hql);
-        setParameter(query);
         return query;
 	}
 
@@ -252,7 +286,6 @@ public class Extractor2HQL {
         String hql = builder.toString();
         log.debug(hql);
         Query query = HibernateUtils.getSession().createQuery(hql);
-        setParameter(query);
         int offset = extractor.getOffset();
         if(offset > 0) {
             query.setFirstResult(offset);
@@ -324,7 +357,7 @@ public class Extractor2HQL {
         }
     }
 
-    private void setParameter(Query query) {
+    private void setParameter(Object query) {
     	List<Condition<? extends Value>> list = new ArrayList<Condition<? extends Value>>(extractor.getConditionIterator());
     	list.addAll(extractor.getHavingIterator());
         for(Condition<? extends Value> con : list) {
@@ -332,7 +365,7 @@ public class Extractor2HQL {
         }
     }
 
-    private void setParameter(Query query, Condition<? extends Value> con) {
+    private void setParameter(Object query, Condition<? extends Value> con) {
     	ConditionStrategy<Condition> strategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(con.getClass()); 
     	strategy.setParameter(query, this, con);
     }
@@ -619,7 +652,7 @@ public class Extractor2HQL {
     
     private static interface ConditionStrategy<T extends Condition> {
     	public String makeWhereCouse(Extractor2HQL generator, T condition);
-    	public void setParameter(Query query, Extractor2HQL generator, T condition);
+    	public void setParameter(Object query, Extractor2HQL generator, T condition);
     }
     
     private static class CombineConditionStrategy<T extends CombineCondition> implements ConditionStrategy<T> {
@@ -648,7 +681,7 @@ public class Extractor2HQL {
 		}
 
 		@Override
-		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+		public void setParameter(Object query, Extractor2HQL generator, T condition) {
             for(Object o : condition.getConditions()) {
             	Condition con = (Condition)o;
             	ConditionStrategy<Condition> strategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(con.getClass());
@@ -678,7 +711,7 @@ public class Extractor2HQL {
     	}
 
 		@Override
-		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+		public void setParameter(Object query, Extractor2HQL generator, T condition) {
 		}
     }
 
@@ -692,18 +725,28 @@ public class Extractor2HQL {
     		}
     	}
 		@Override
-		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+		public void setParameter(Object query, Extractor2HQL generator, T condition) {
 			if(!(condition.value instanceof Value)) {
 				setParameter2(query, generator, condition.value);
 			}
 		}
 		
-	    protected void setParameter2(Query query, Extractor2HQL generator, Object value) {
-	        if(value instanceof Number) {
-	            query.setParameter(generator.patemeterIndex, value, TypeFactory.basic(value.getClass().getName()));
-	        } else {
-	            query.setParameter(generator.patemeterIndex, value);
-	        }
+	    protected void setParameter2(Object o, Extractor2HQL generator, Object value) {
+	    	if(o instanceof Query) {
+	    		Query query = (Query)o;
+		        if(value instanceof Number) {
+		            query.setParameter(generator.patemeterIndex, value, TypeFactory.basic(value.getClass().getName()));
+		        } else {
+		            query.setParameter(generator.patemeterIndex, value);
+		        }
+	    	} else {
+	    		try {
+		    		PreparedStatement pstmt = (PreparedStatement)o;
+		    		pstmt.setObject(generator.patemeterIndex + 1, value);
+	    		} catch(Exception e) {
+	    			throw new RuntimeException(e);
+	    		}
+	    	}
 	        generator.patemeterIndex++;
 	    }
     }
@@ -723,7 +766,7 @@ public class Extractor2HQL {
         	return sb.toString();
     	}
 		@Override
-		public void setParameter(Query query, Extractor2HQL generator, T condition) {
+		public void setParameter(Object query, Extractor2HQL generator, T condition) {
 			if(!(condition.value instanceof Value)) {
             	Collection col = (Collection)condition.value;
             	for(Object o : col) {
