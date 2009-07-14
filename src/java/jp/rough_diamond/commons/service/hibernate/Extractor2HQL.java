@@ -60,8 +60,10 @@ import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.EntityMode;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
+import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.dialect.PostgreSQLDialect;
@@ -742,7 +744,13 @@ public class Extractor2HQL {
 	    	} else {
 	    		try {
 		    		PreparedStatement pstmt = (PreparedStatement)o;
-		    		pstmt.setObject(generator.patemeterIndex + 1, value);
+	    			SessionFactory sf = HibernateUtils.getSession().getSessionFactory();
+	    	        ClassMetadata cm = sf.getClassMetadata(value.getClass());
+	    	        if(cm != null) {
+	    	        	//TODO ï°çáÉLÅ[ÇæÇ∆Ç«Ç§Ç»ÇÈÅH
+	    	        	value = cm.getIdentifier(value, EntityMode.POJO);
+	    	        }
+    	        	pstmt.setObject(generator.patemeterIndex + 1, value);
 	    		} catch(Exception e) {
 	    			throw new RuntimeException(e);
 	    		}

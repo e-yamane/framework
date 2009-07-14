@@ -618,12 +618,21 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("baseId", new Property(Unit.BASE + "." + Unit.ID)));
 		ex.addExtractValue(new ExtractValue("value", new Property(Unit.RATE + ScalableNumber.VALUE)));
-		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		ex.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1));
 		ex.addOrder(Order.asc(new Property(Unit.RATE + ScalableNumber.VALUE)));
 		assertEquals("件数が誤っています。", 4, BasicService.getService().getCountByExtractor(ex));
 		ex.setDistinct(true);
 		//select distinct base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
 		assertEquals("件数が誤っています。", 3, BasicService.getService().getCountByExtractor(ex));
+	}
+	
+	public void testEntityオブジェクトをwhere句に指定してgetCountByExtractorが正しく動作すること() throws Exception {
+		Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("baseId", new Property(Unit.BASE + "." + Unit.ID)));
+		ex.addExtractValue(new ExtractValue("value", new Property(Unit.RATE + ScalableNumber.VALUE)));
+		ex.add(Condition.eq(new Property(Unit.BASE), u));
+		assertEquals("件数が誤っています。", 4, BasicService.getService().getCountByExtractor(ex));
 	}
 	
 	public static class ReturnType1 {
