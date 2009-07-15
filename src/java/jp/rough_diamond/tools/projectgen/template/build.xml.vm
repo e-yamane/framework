@@ -26,7 +26,7 @@
   <!-- RDF Core‚ÌSQL’è‹`•ª‚ðŽæ“¾‚µ‚Ä‚©‚çDB-init‚ðŽÀs‚·‚é -->
   <target name="DB-init" depends="init-task" description="Ž©“®¶¬‚³‚ê‚½Create Table•¶‚ðŽÀs‚·‚é">
     <property file="./middlegen.properties" />
-    <copy todir="${torque.sql.dir}" overwrite="true">
+    <copy todir="${torque.sql.dir}" overwrite="true" outputencoding="${src.encoding}">
       <fileset dir="${framework.root}/etc/sql/${torque.database.type}">
         <include name="*.sql" />
       </fileset>

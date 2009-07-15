@@ -559,12 +559,22 @@
 
   <target name="DB-clear-1" depends="init-task">
     <property file="./middlegen.properties" />
+    <condition property="src.encoding" value="Shift_JIS" >
+      <not>
+        <isset property="src.encoding" />
+      </not>
+    </condition>
+    <condition property="sql.encoding" value="${src.encoding}" >
+      <not>
+        <isset property="sql.encoding" />
+      </not>
+    </condition>
     <dbunit driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" 
             userid="${hibernate.connection.username}" password="${hibernate.connection.password}"
             schema="${hibernate.schema}">
-      <query file="${torque.sql.dir}/preinit.sql" encoding="Shift_JIS" />
-      <query file="${sql.dropalter}"    encoding="Shift_JIS" />
-      <query file="${sql.createtables}" encoding="Shift_JIS" />
+      <query file="${torque.sql.dir}/preinit.sql" encoding="${sql.encoding}" />
+      <query file="${sql.dropalter}"    encoding="${sql.encoding}" />
+      <query file="${sql.createtables}" encoding="${sql.encoding}" />
     </dbunit>
   </target>
 
