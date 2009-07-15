@@ -580,11 +580,21 @@
 
   <target name="DB-clear-2" depends="init-task">
     <property file="./middlegen.properties" />
+    <condition property="src.encoding" value="Shift_JIS" >
+      <not>
+        <isset property="src.encoding" />
+      </not>
+    </condition>
+    <condition property="sql.encoding" value="${src.encoding}" >
+      <not>
+        <isset property="sql.encoding" />
+      </not>
+    </condition>
     <dbunit driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" 
             userid="${hibernate.connection.username}" password="${hibernate.connection.password}"
             schema="${hibernate.schema}">
-      <query file="${sql.addalter}" encoding="Shift_JIS" />
-      <query file="${torque.sql.dir}/postinit.sql" encoding="Shift_JIS" />
+      <query file="${sql.addalter}" encoding="${sql.encoding}" />
+      <query file="${torque.sql.dir}/postinit.sql" encoding="${sql.encoding}" />
     </dbunit>
   </target>
 
