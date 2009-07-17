@@ -98,12 +98,16 @@
     </antcall>
   </target>
 
-  <target name="newProject" depends="init-task, makeJar" description="新しいプロジェクトを作成する">
+  <target name="newProject" depends="init-task" description="新しいプロジェクトを作成する">
+<!--
     <copy file="${framework.dist.dir}/rd-framework-${product.version}.jar" todir="${lib.dir}/common/" />
+-->
     <antcall target="doIt">
       <param name="target" value="jp.rough_diamond.tools.projectgen.ProjectGeneratorGUI" />
     </antcall>
+<!--
     <delete file="${lib.dir}/common/rd-framework-${product.version}.jar"/>
+-->
   </target>
 
   <target name="makeJar" depends="compile" description="Jarファイルを作成する">
