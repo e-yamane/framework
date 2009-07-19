@@ -29,7 +29,7 @@
   <property name="src.encoding"           value="Windows-31J" />
 
   <!-- データベース関連 -->
-  <property name="export.dir"             value="${my.build.dir}/etc/export" />
+  <property name="export.dir"             value="./etc/export" />
   <property name="table.doc.dir"          value="${my.build.dir}/doc/table" />
   <property name="torque.schema.dir"      value="${my.build.dir}/etc/schema" />
   <property name="torque.sql.dir"         value="${my.build.dir}/etc/sql" />
@@ -625,7 +625,7 @@
     <dbunit driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" 
             userid="${hibernate.connection.username}" password="${hibernate.connection.password}"
             schema="${hibernate.default_schema}">
-      <operation type="INSERT" src="${export.dir}/./*.xml" format="xml"/>
+      <operation type="INSERT" src="${export.dir}/*.xml" format="xml"/>
     </dbunit>
     <antcall target="DB-clear-2" />
   </target>
