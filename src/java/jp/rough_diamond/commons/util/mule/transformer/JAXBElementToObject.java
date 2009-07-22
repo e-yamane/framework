@@ -38,11 +38,15 @@ public class JAXBElementToObject {
 //	protected Object doTransform(Object src, String encoding) throws TransformerException {
 //		return transform(src, getReturnType());
 //	}
-
 	public Object transform(Object src, Class<?> returnType) {
+		return transform(src, returnType, returnType.getComponentType());
+	}
+	
+	public Object transform(Object src, Class<?> returnType, Class<?> componentType) {
 		if(src == null) {
 			return null;
 		}
+		log.debug(src);
 		if(JAXBElement.class.isAssignableFrom(src.getClass())) {
 			return transform(((JAXBElement)src).getValue(), returnType);
 		}
@@ -53,6 +57,15 @@ public class JAXBElementToObject {
 		if(returnType.isPrimitive()) {
 			log.debug("変換が不要なオブジェクト（プリミティブ）なので変換処理は行いません。");
 			return src;
+		}
+		if(isArrayType(src.getClass())) {
+			List list = copyList(src, componentType);
+			if(returnType.isArray()) {
+				Object ret = Array.newInstance(componentType, list.size());
+				return list.toArray((Object[])ret);
+			} else {
+				return list;
+			}
 		}
 		Object dest = createObjectByType(returnType);
 		if(dest == null) {
@@ -65,6 +78,20 @@ public class JAXBElementToObject {
 		} catch(Exception e) {
 			log.warn("プロパティのコピー中に例外が発生したため変換は行いません。", e);
 			return src;
+		}
+	}
+	
+	List copyList(Object src, Class<?> componentType) {
+		List ret = new ArrayList();
+		try {
+			List srcArray = extractArrayData(src.getClass(), src);
+			for(Object o : srcArray) {
+				ret.add(transform(o, componentType));
+			}
+			return ret;
+		} catch(Exception e) {
+			log.warn("プロパティのコピー中に例外が発生したため変換は行いません。", e);
+			return ret;
 		}
 	}
 	
@@ -102,7 +129,7 @@ public class JAXBElementToObject {
 		}
 		if(srcType.equals(XMLGregorianCalendar.class)) {
 			copyDateObject(destPD, (XMLGregorianCalendar)srcVal, dest);
-		} else if(srcType.getSimpleName().startsWith("ArrayOf") /*&& !srcType.isAssignableFrom(srcVal.getClass())*/) {
+		} else if(isArrayType(srcType)) {
 			copyJAXElementOfArray(srcType, destPD, srcVal, dest);
 		} else {
 			Object destVal = transform(srcVal, destPD.getWriteMethod().getParameterTypes()[0]);
@@ -111,12 +138,7 @@ public class JAXBElementToObject {
 	}
 	
 	void copyJAXElementOfArray(Class<?> srcType, PropertyDescriptor pd, Object srcVal, Object dest) throws Exception {
-		String propertyName = srcType.getSimpleName().replaceAll("^ArrayOf", "");
-		char[] tmp = propertyName.toCharArray();
-		tmp[0] = Character.toLowerCase(tmp[0]);
-		propertyName = new String(tmp);
-		PropertyDescriptor pd2 = PropertyUtils.getPropertyDescriptor(srcVal, propertyName);
-		List arrayVal = (List)pd2.getReadMethod().invoke(srcVal);
+		List arrayVal = extractArrayData(srcType, srcVal);
 		if(pd.getWriteMethod().getParameterTypes()[0].isArray()) {
 			copyToArray(arrayVal, pd, dest);
 		} else {
@@ -169,6 +191,20 @@ public class JAXBElementToObject {
 		}
 	}
 
+	boolean isArrayType(Class srcType) {
+		return srcType.getSimpleName().startsWith("ArrayOf") /*&& !srcType.isAssignableFrom(srcVal.getClass())*/;
+	}
+	
+	List extractArrayData(Class srcType, Object src) throws Exception {
+		String propertyName = srcType.getSimpleName().replaceAll("^ArrayOf", "");
+		char[] tmp = propertyName.toCharArray();
+		tmp[0] = Character.toLowerCase(tmp[0]);
+		propertyName = new String(tmp);
+		PropertyDescriptor pd2 = PropertyUtils.getPropertyDescriptor(src, propertyName);
+		List arrayVal = (List)pd2.getReadMethod().invoke(src);
+		return arrayVal;
+	}
+	
 	Object createObjectByType(Class<?> parameterType) {
 		try {
 			return parameterType.newInstance();

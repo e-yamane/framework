@@ -8,7 +8,9 @@ package jp.rough_diamond.framework.es;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +20,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.transport.NullPayload;
 
 import jp.rough_diamond.commons.util.mule.transformer.JAXBElementToObject;
 import jp.rough_diamond.framework.service.Service;
@@ -60,9 +63,18 @@ public class ServiceFinder implements
 				if(exceptionPayload != null) {
 					throwException(method, exceptionPayload.getException());
 				}
-				if(method.getReturnType() != Void.TYPE) {
+				Object returnPayload = result.getPayload();
+				if(returnPayload instanceof NullPayload) {
+					return null;
+				} else if(method.getReturnType() != Void.TYPE) {
 					JAXBElementToObject transformer = new JAXBElementToObject();
-					return transformer.transform(result.getPayload(), method.getReturnType());
+					Type t = method.getGenericReturnType();
+					if(t instanceof Class) {
+						return transformer.transform(returnPayload, method.getReturnType());
+					} else {
+						ParameterizedType pt = (ParameterizedType)t;
+						return transformer.transform(returnPayload, method.getReturnType(), (Class<?>)pt.getActualTypeArguments()[0]);
+					}
 				} else {
 					return null;
 				}
@@ -97,8 +109,8 @@ public class ServiceFinder implements
 	
 	@SuppressWarnings("deprecation")
 	static MuleMessage makeMessage(Object[] args) {
-		if(args.length == 0) {
-			return new DefaultMuleMessage(null);
+		if(args == null || args.length == 0) {
+			return new DefaultMuleMessage(new Object[0]);
 		} else if(args.length != 1) {
 			return new DefaultMuleMessage(args);
 		} else if(args[0] instanceof MuleMessage) {

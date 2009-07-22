@@ -7,9 +7,12 @@
 
 package jp.rough_diamond.commons.util.mule.transformer;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.xml.datatype.DatatypeFactory;
 
@@ -24,7 +27,7 @@ import junit.framework.TestCase;
 
 public class JAXBElementToObjectTest extends TestCase {
 	@SuppressWarnings("unchecked")
-	public void testIt() throws Exception {
+	public void testTransformObject() throws Exception {
 		ObjectFactory of = new ObjectFactory();
 		ParentBean base = of.createParentBean();
 		base.setXxx(of.createParentBeanXxx("Yamane"));
@@ -61,5 +64,49 @@ public class JAXBElementToObjectTest extends TestCase {
 		assertEquals("値が誤っています。", "2009/05/13", sdf.format(after.getDate()));
 		assertEquals("値が誤っています。", 10, after.getInt1().intValue());
 		assertEquals("リストサイズが誤っています。", 3, after.getList().size());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void testTransformStringList() throws Exception {
+		ObjectFactory of = new ObjectFactory();
+		ArrayOfString aos = of.createArrayOfString();
+		aos.getString().addAll(Arrays.asList(new String[]{"abc", "xyz"}));
+		List<String> ret = (List<String>)new JAXBElementToObject().transform(aos, List.class, String.class);
+		assertEquals("配列サイズが誤っています。", 2, ret.size());
+		assertEquals("値が誤っています。", "abc", ret.get(0));
+		assertEquals("値が誤っています。", "xyz", ret.get(1));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void testTransformStringArray() throws Exception {
+		ObjectFactory of = new ObjectFactory();
+		ArrayOfString aos = of.createArrayOfString();
+		aos.getString().addAll(Arrays.asList(new String[]{"abc", "xyz"}));
+		String[] ret = (String[])new JAXBElementToObject().transform(aos, String[].class);
+		assertEquals("配列サイズが誤っています。", 2, ret.length);
+		assertEquals("値が誤っています。", "abc", ret[0]);
+		assertEquals("値が誤っています。", "xyz", ret[1]);
+	}
+
+	public static List<String> foo() {
+		return null;
+	}
+	
+	public static String[] bar() {
+		return null;
+	}
+
+	public static void main(String[] args) throws Exception {
+		Method m = JAXBElementToObjectTest.class.getMethod("foo");
+		Class<?> cl = m.getReturnType();
+		System.out.println(cl.getClass());
+		ParameterizedType pt = (ParameterizedType)m.getGenericReturnType();
+		System.out.println(pt.getClass());
+		System.out.println(pt);
+		System.out.println(pt.getActualTypeArguments()[0]);
+		System.out.println(pt.getRawType());
+
+		m = JAXBElementToObjectTest.class.getMethod("bar");
+		System.out.println(m.getGenericReturnType().getClass().getName());
 	}
 }

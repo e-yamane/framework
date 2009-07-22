@@ -308,13 +308,7 @@ public class ServiceGenerator {
             op.name = new String(nameArray);
             System.out.println(op.name);
             String type = map.getNamedItem("returnType").getNodeValue();
-            int index = type.lastIndexOf('.');
-            if(index == -1) {
-                op.returnType = type;
-            } else {
-                op.returnType = type.substring(index + 1);
-                imports.add(type);
-            }
+            op.returnType = type;
             System.out.println(op.returnType);
             service.operations.add(op);
             generateArgs(el.getElementsByTagName("arg"), service, op, imports);

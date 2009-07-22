@@ -68,6 +68,10 @@ RDF Core Change Log
 　　　REQUIRED->REQUIRED_NEW->REQUIREDの場合も同様の不具合が発生していた
 　　- findAllを使用すると、ターゲットのオブジェクト以外のオブジェクトに
 　　　PostLoadイベントがコールバックされない
+　　- SOAの戻り値にgenerics表記を行うと自動生成で不正なコードを出力する
+　　- 引数がないSOAの呼び出しを行うとNullPointerExceptionが発生する
+　　- SOAの戻り値が配列もしくはListの場合に戻り値の変換が行えない
+　　- SOAの戻り値がnullの場合にClassCastExceptionが発生する
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない
