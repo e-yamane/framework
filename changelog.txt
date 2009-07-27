@@ -56,6 +56,8 @@ RDF Core Change Log
 　　- AntコマンドにclearTestDataを追加しました。
 　　- テーブル定義ファイルでindex/uniqueを指定する場合に、内部参照テーブルのカラムを
 　　　指定できるようにしました。
+　　- １つのWSDLファイル内に複数のoperationが定義されている場合でも、処理可能な
+　　　スタブクラスとmuleの設定ファイルを自動生成できるようにした。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの
@@ -68,10 +70,10 @@ RDF Core Change Log
 　　　REQUIRED->REQUIRED_NEW->REQUIREDの場合も同様の不具合が発生していた
 　　- findAllを使用すると、ターゲットのオブジェクト以外のオブジェクトに
 　　　PostLoadイベントがコールバックされない
-　　- SOAの戻り値にgenerics表記を行うと自動生成で不正なコードを出力する
 　　- 引数がないSOAの呼び出しを行うとNullPointerExceptionが発生する
-　　- SOAの戻り値が配列もしくはListの場合に戻り値の変換が行えない
-　　- SOAの戻り値がnullの場合にClassCastExceptionが発生する
+　　- makeSchemaAccessor実行後、プロパティファイルをnative2asciiするために、
+　　　makeConfigを呼び出していたが、この方法では、ログイン名と違うconfigを使用した場合に
+　　　不具合が生じてしますため、native2asciiのみを実行するように修正した。
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない

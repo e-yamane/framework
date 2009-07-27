@@ -25,7 +25,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import jp.rough_diamond.commons.io.IOUtils;
 import jp.rough_diamond.tools.servicegen.NameSpaceContextImpl;
 
 import org.apache.commons.io.FileUtils;

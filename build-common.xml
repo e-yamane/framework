@@ -117,27 +117,6 @@
     <path refid="framework.path"/>
   </path>
 
-  <macrodef name="findBaseAntFile">
-    <sequential>
-      <script language="javascript">
-          <![CDATA[
-            var map = project.getProperties();
-            var antFile = map.get("ant.file");
-            var ite = map.entrySet().iterator();
-            while(ite.hasNext()) {
-              var entry = ite.next();
-              if(entry.getKey().startsWith("ant.file.") && !entry.getKey().equals("ant.file.common-project")) {
-                antFile = entry.getValue();
-                break;
-              }
-            }
-            project.setProperty("baseAntFile", antFile);
-          ]]>
-      </script>
-      <echo message="${baseAntFile}" />
-    </sequential>
-  </macrodef>
-
   <target name="ant-extention-check">
     <available file="${framework.lib.root}/common/rd-ant-ext-${framework.ant.extention.version}.jar" property="ant.ext.jar.present" />
   </target>
@@ -464,8 +443,8 @@
       <param name="build.file"  value="${basedir}/build.xml" />
       <param name="exec.target" value="hibernatedoclet" />
     </antcall>
-    <echo message="${filtering.filename}" />
-    <antcall target="refreshProperties" />
+    <echo message="プロパティファイルに対してnative2asciiを実行します。" />
+    <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" encoding="${src.encoding}" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 
@@ -492,13 +471,6 @@
       <param name="exec.target" value="sql" />
       <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
-  </target>
-
-  <target name="refreshProperties" depends="filter-check, filter-exists" if="filtering.filename.present">
-    <findBaseAntFile />
-    <ant antfile="${baseAntFile}" target="makeConfig">
-      <property name="filtering.filename" value="${filtering.filename}" />
-    </ant>
   </target>
 
   <!-- JavaのソースコードからHibernateのマッピングファイルを作成する -->
