@@ -29,6 +29,10 @@ public class NameSpaceContextImpl implements NamespaceContext {
 	public String getNamespaceURI(String prefix) {
 		if("mule".equals(prefix)) {
 			return MULE_NAME_SPACE + muleVersion;
+		} else if("vm".equals(prefix)) {
+			return VM_NAME_SPACE + muleVersion;
+		} else if("cxf".equals(prefix)) {
+			return CXF_NAME_SPACE + muleVersion;
 		} else if("wsdl".equals(prefix)) {
 			return WSDL_NAME_SPACE;
 		} else {
