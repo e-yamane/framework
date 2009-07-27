@@ -8,6 +8,7 @@ package jp.rough_diamond.ant.taskdefs;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -256,10 +257,11 @@ public class WSDL2JavaExtTest extends TestCase {
 		assertEquals("WSDLPortÇ™åÎÇ¡ÇƒÇ¢Ç‹Ç∑ÅB", "MonoOperationServicePort", oep.getAttribute("wsdlPort"));
 	}
 
+	@SuppressWarnings("deprecation")
 	File getFile(String wsdlName) throws Exception {
 		URL url = this.getClass().getClassLoader().getResource("jp/rough_diamond/ant/taskdefs/" + wsdlName);
 		System.out.println(url);
-		return new File(url.getPath());
+		return new File(URLDecoder.decode(url.getPath()));
 	}
 	
 	Document getDocument(File f) throws Exception {

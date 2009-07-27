@@ -9,6 +9,7 @@ package jp.rough_diamond.commons.lang;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 /**
  * クラス関連のユーティリティクラス
@@ -48,17 +49,18 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
 	 * @param cl
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	public static File getClassPathRoot(Class<?> cl) {
 		try {
 			String resourceName = translateResourceName(cl);
 			URL url = getClassURL(cl.getClassLoader(), resourceName);
 			if(url.getProtocol().equals("file")) {
-				String fileName = url.getPath();
+				String fileName = URLDecoder.decode(url.getPath());
 				String rootDirName = fileName.replaceAll(resourceName + "$", "");
 				return new File(rootDirName);
 			} else {
 				String jarFileName = url.getPath().replaceAll("\\!.*", "");
-				return new File(new URL(jarFileName).getPath());
+				return new File(URLDecoder.decode(new URL(jarFileName).getPath()));
 			}
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
