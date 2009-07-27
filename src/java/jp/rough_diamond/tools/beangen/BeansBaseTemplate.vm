@@ -16,6 +16,7 @@ import $import;
  * $bean.description
 #end
 **/
+@SuppressWarnings("all")
 abstract public class Base$bean.className $!ext implements Serializable {
 #foreach ($property in $bean.properties)
 #if ($property.description != '')

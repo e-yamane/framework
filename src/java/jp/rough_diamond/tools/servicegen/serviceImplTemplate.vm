@@ -5,6 +5,7 @@ package ${service.packageName}.impl;
 import $import;
 #end
 
+@SuppressWarnings("all")
 public class ${service.className}Impl implements ${service.packageName}.${service.className} {
 #foreach ($op in $service.operations)
     public $op.returnType ${op.name}(

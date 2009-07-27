@@ -12,7 +12,7 @@
   <property name="framework.java.version"           value="1.6" />
   <property name="framework.compile.debug"          value="on" />
   <property name="framework.src.encoding"           value="MS932" />
-  <property name="framework.ant.extention.version"  value="1.2.6" />
+  <property name="framework.ant.extention.version"  value="1.2.7" />
   <property name="framework.dist.dir"               value="../framework/target"/>
   <property name="framework.classes.dir"            value="${framework.dist.dir}/classes" />
 

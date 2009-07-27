@@ -13,6 +13,7 @@ import jp.rough_diamond.framework.es.ServiceConnecter;
     name="${service.className}PortType",
     portName="${service.className}Port"
 )
+@SuppressWarnings("all")
 public interface $service.className extends EnterpriseService {
 #foreach ($op in $service.operations)
 #if($service.operations.size() == 1)

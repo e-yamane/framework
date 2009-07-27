@@ -313,6 +313,7 @@ public class ServiceGenerator {
             service.operations.add(op);
             generateArgs(el.getElementsByTagName("arg"), service, op, imports);
         }
+        imports.add("java.util.*");
         System.out.println(imports);
         service.imports = (String[])imports.toArray(new String[imports.size()]);
 	}
