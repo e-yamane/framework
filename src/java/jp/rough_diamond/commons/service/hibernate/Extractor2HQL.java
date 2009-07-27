@@ -11,10 +11,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -363,7 +365,7 @@ public class Extractor2HQL {
     	List<Condition<? extends Value>> list = new ArrayList<Condition<? extends Value>>(extractor.getConditionIterator());
     	list.addAll(extractor.getHavingIterator());
         for(Condition<? extends Value> con : list) {
-            setParameter(query, con);
+       		setParameter(query, con);
         }
     }
 
@@ -749,6 +751,8 @@ public class Extractor2HQL {
 	    	        if(cm != null) {
 	    	        	//TODO ï°çáÉLÅ[ÇæÇ∆Ç«Ç§Ç»ÇÈÅH
 	    	        	value = cm.getIdentifier(value, EntityMode.POJO);
+	    	        } else if ((value instanceof Date) && !value.getClass().getName().startsWith("java.sql.")) {
+	    	        	value = new Timestamp(((Date)value).getTime());
 	    	        }
     	        	pstmt.setObject(generator.patemeterIndex + 1, value);
 	    		} catch(Exception e) {
