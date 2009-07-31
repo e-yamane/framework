@@ -326,6 +326,8 @@ public class WSDL2JavaExt extends Task {
 	private void generate(File wsdl, Document wsdlDoc) throws Exception {
 		String packageName = getPackage(wsdl);
 		File packageDir = new File(getSrcdir(), packageName.replace('.', '/'));
+		boolean mkdirRet = packageDir.mkdirs();
+		mkdirRet = !mkdirRet;//FindBugŒx‰ñ”ğ
 		File[] files = packageDir.listFiles();
 		for(File f : files) {
 			if(f.isFile()) {
