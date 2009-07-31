@@ -74,14 +74,10 @@ public class AbstractObjectToJAXBElementTest extends TestCase {
 		Object factory = t.createObjectFactory(type);
 		JAXBElementBean dest = (JAXBElementBean)t.createObjectByType(factory, type);
 		PropertyDescriptor pd = PropertyUtils.getPropertyDescriptor(dest, "acceptId");
-		t.copyJAXBElement(factory, pd, null, dest);
-		assertNull("Nullではありません。", dest.getAcceptId());
 		t.copyJAXBElement(factory, pd, "xyz", dest);
 		assertEquals("値が誤っています。", "xyz", dest.getAcceptId().getValue());
 		
 		pd = PropertyUtils.getPropertyDescriptor(dest, "details");
-		t.copyJAXBElement(factory, pd, null, dest);
-		assertNull("Nullではありません。", dest.getDetails());
 
 		InBeanDetails detail1 = new InBeanDetails();
 		detail1.setItemId(1L);
@@ -106,44 +102,6 @@ public class AbstractObjectToJAXBElementTest extends TestCase {
 		assertEquals("要素数が誤っています。", 2, list.size());
 		assertEquals("値が誤っています。", 2L, list.get(0).getItemId().getValue().longValue());
 		assertEquals("値が誤っています。", 1L, list.get(1).getItemId().getValue().longValue());
-	}
-	
-	public void testGetGenericsType() throws Exception {
-		TransformerExt t = new TransformerExt();
-		Class<?> type = t.getMethod().getParameterTypes()[0];
-		Object factory = t.createObjectFactory(type);
-		JAXBElementBean dest = (JAXBElementBean)t.createObjectByType(factory, type);
-		PropertyDescriptor pd = PropertyUtils.getPropertyDescriptor(dest, "details");
-		assertEquals("返却値が誤っています。", ArrayOfDetails.class, t.getGenericsType(pd));
-	}
-	
-	public static class InBean {
-		private Date acceptDate;
-		private String acceptId;
-		private InBeanDetails[] details;
-		public InBeanDetails[] getDetails() {
-			return details;
-		}
-
-		public void setDetails(InBeanDetails[] details) {
-			this.details = details;
-		}
-
-		public String getAcceptId() {
-			return acceptId;
-		}
-
-		public void setAcceptId(String acceptId) {
-			this.acceptId = acceptId;
-		}
-
-		public Date getAcceptDate() {
-			return acceptDate;
-		}
-
-		public void setAcceptDate(Date acceptDate) {
-			this.acceptDate = acceptDate;
-		}
 	}
 	
 	public static class InBeanDetails {

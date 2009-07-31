@@ -25,8 +25,19 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _MapToMapResponse_QNAME = new QName("http://sample.rough_diamond.jp/", "mapToMapResponse");
+    private final static QName _NestedGenerics_QNAME = new QName("http://sample.rough_diamond.jp/", "nestedGenerics");
+    private final static QName _HasMapToHasMapResponse_QNAME = new QName("http://sample.rough_diamond.jp/", "hasMapToHasMapResponse");
     private final static QName _DoItResponse_QNAME = new QName("http://sample.rough_diamond.jp/", "doItResponse");
+    private final static QName _NestedGenericsResponse_QNAME = new QName("http://sample.rough_diamond.jp/", "nestedGenericsResponse");
     private final static QName _DoIt_QNAME = new QName("http://sample.rough_diamond.jp/", "doIt");
+    private final static QName _ListToList_QNAME = new QName("http://sample.rough_diamond.jp/", "listToList");
+    private final static QName _MapToMap_QNAME = new QName("http://sample.rough_diamond.jp/", "mapToMap");
+    private final static QName _ListToListResponse_QNAME = new QName("http://sample.rough_diamond.jp/", "listToListResponse");
+    private final static QName _DimArray_QNAME = new QName("http://sample.rough_diamond.jp/", "dimArray");
+    private final static QName _HasMapToHasMap_QNAME = new QName("http://sample.rough_diamond.jp/", "hasMapToHasMap");
+    private final static QName _DimArrayResponse_QNAME = new QName("http://sample.rough_diamond.jp/", "dimArrayResponse");
+    private final static QName _HasMapBeanMap_QNAME = new QName("http://test.transformer.mule.util.commons.rough_diamond.jp", "map");
     private final static QName _ChildBeanZzz_QNAME = new QName("http://test.transformer.mule.util.commons.rough_diamond.jp", "zzz");
     private final static QName _ChildBeanYyy_QNAME = new QName("http://test.transformer.mule.util.commons.rough_diamond.jp", "yyy");
     private final static QName _ParentBeanXxx_QNAME = new QName("http://test.transformer.mule.util.commons.rough_diamond.jp", "xxx");
@@ -44,19 +55,99 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DoItResponse }
+     * Create an instance of {@link MapToMapResponse }
      * 
      */
-    public DoItResponse createDoItResponse() {
-        return new DoItResponse();
+    public MapToMapResponse createMapToMapResponse() {
+        return new MapToMapResponse();
     }
 
     /**
-     * Create an instance of {@link ChildBean }
+     * Create an instance of {@link NestedGenerics }
      * 
      */
-    public ChildBean createChildBean() {
-        return new ChildBean();
+    public NestedGenerics createNestedGenerics() {
+        return new NestedGenerics();
+    }
+
+    /**
+     * Create an instance of {@link HasMapBean }
+     * 
+     */
+    public HasMapBean createHasMapBean() {
+        return new HasMapBean();
+    }
+
+    /**
+     * Create an instance of {@link String2ChildBeanMap }
+     * 
+     */
+    public String2ChildBeanMap createString2ChildBeanMap() {
+        return new String2ChildBeanMap();
+    }
+
+    /**
+     * Create an instance of {@link String2ArrayOfChildBeanMap.Entry }
+     * 
+     */
+    public String2ArrayOfChildBeanMap.Entry createString2ArrayOfChildBeanMapEntry() {
+        return new String2ArrayOfChildBeanMap.Entry();
+    }
+
+    /**
+     * Create an instance of {@link DimArray }
+     * 
+     */
+    public DimArray createDimArray() {
+        return new DimArray();
+    }
+
+    /**
+     * Create an instance of {@link ListToListResponse }
+     * 
+     */
+    public ListToListResponse createListToListResponse() {
+        return new ListToListResponse();
+    }
+
+    /**
+     * Create an instance of {@link ListToList }
+     * 
+     */
+    public ListToList createListToList() {
+        return new ListToList();
+    }
+
+    /**
+     * Create an instance of {@link ArrayOfChildBean }
+     * 
+     */
+    public ArrayOfChildBean createArrayOfChildBean() {
+        return new ArrayOfChildBean();
+    }
+
+    /**
+     * Create an instance of {@link ArrayOfString }
+     * 
+     */
+    public ArrayOfString createArrayOfString() {
+        return new ArrayOfString();
+    }
+
+    /**
+     * Create an instance of {@link MapToMap }
+     * 
+     */
+    public MapToMap createMapToMap() {
+        return new MapToMap();
+    }
+
+    /**
+     * Create an instance of {@link DimArrayResponse }
+     * 
+     */
+    public DimArrayResponse createDimArrayResponse() {
+        return new DimArrayResponse();
     }
 
     /**
@@ -68,6 +159,86 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link String2ChildBeanMap.Entry }
+     * 
+     */
+    public String2ChildBeanMap.Entry createString2ChildBeanMapEntry() {
+        return new String2ChildBeanMap.Entry();
+    }
+
+    /**
+     * Create an instance of {@link HasMapToHasMapResponse }
+     * 
+     */
+    public HasMapToHasMapResponse createHasMapToHasMapResponse() {
+        return new HasMapToHasMapResponse();
+    }
+
+    /**
+     * Create an instance of {@link String2ArrayOfChildBeanMap }
+     * 
+     */
+    public String2ArrayOfChildBeanMap createString2ArrayOfChildBeanMap() {
+        return new String2ArrayOfChildBeanMap();
+    }
+
+    /**
+     * Create an instance of {@link ChildBean }
+     * 
+     */
+    public ChildBean createChildBean() {
+        return new ChildBean();
+    }
+
+    /**
+     * Create an instance of {@link DoItResponse }
+     * 
+     */
+    public DoItResponse createDoItResponse() {
+        return new DoItResponse();
+    }
+
+    /**
+     * Create an instance of {@link HasMapToHasMap }
+     * 
+     */
+    public HasMapToHasMap createHasMapToHasMap() {
+        return new HasMapToHasMap();
+    }
+
+    /**
+     * Create an instance of {@link ArrayOfArrayOfString }
+     * 
+     */
+    public ArrayOfArrayOfString createArrayOfArrayOfString() {
+        return new ArrayOfArrayOfString();
+    }
+
+    /**
+     * Create an instance of {@link String2StringMap }
+     * 
+     */
+    public String2StringMap createString2StringMap() {
+        return new String2StringMap();
+    }
+
+    /**
+     * Create an instance of {@link String2StringMap.Entry }
+     * 
+     */
+    public String2StringMap.Entry createString2StringMapEntry() {
+        return new String2StringMap.Entry();
+    }
+
+    /**
+     * Create an instance of {@link NestedGenericsResponse }
+     * 
+     */
+    public NestedGenericsResponse createNestedGenericsResponse() {
+        return new NestedGenericsResponse();
+    }
+
+    /**
      * Create an instance of {@link ParentBean }
      * 
      */
@@ -76,11 +247,30 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ArrayOfString }
+     * Create an instance of {@link JAXBElement }{@code <}{@link MapToMapResponse }{@code >}}
      * 
      */
-    public ArrayOfString createArrayOfString() {
-        return new ArrayOfString();
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "mapToMapResponse")
+    public JAXBElement<MapToMapResponse> createMapToMapResponse(MapToMapResponse value) {
+        return new JAXBElement<MapToMapResponse>(_MapToMapResponse_QNAME, MapToMapResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link NestedGenerics }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "nestedGenerics")
+    public JAXBElement<NestedGenerics> createNestedGenerics(NestedGenerics value) {
+        return new JAXBElement<NestedGenerics>(_NestedGenerics_QNAME, NestedGenerics.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link HasMapToHasMapResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "hasMapToHasMapResponse")
+    public JAXBElement<HasMapToHasMapResponse> createHasMapToHasMapResponse(HasMapToHasMapResponse value) {
+        return new JAXBElement<HasMapToHasMapResponse>(_HasMapToHasMapResponse_QNAME, HasMapToHasMapResponse.class, null, value);
     }
 
     /**
@@ -93,12 +283,84 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link NestedGenericsResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "nestedGenericsResponse")
+    public JAXBElement<NestedGenericsResponse> createNestedGenericsResponse(NestedGenericsResponse value) {
+        return new JAXBElement<NestedGenericsResponse>(_NestedGenericsResponse_QNAME, NestedGenericsResponse.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DoIt }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "doIt")
     public JAXBElement<DoIt> createDoIt(DoIt value) {
         return new JAXBElement<DoIt>(_DoIt_QNAME, DoIt.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ListToList }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "listToList")
+    public JAXBElement<ListToList> createListToList(ListToList value) {
+        return new JAXBElement<ListToList>(_ListToList_QNAME, ListToList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MapToMap }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "mapToMap")
+    public JAXBElement<MapToMap> createMapToMap(MapToMap value) {
+        return new JAXBElement<MapToMap>(_MapToMap_QNAME, MapToMap.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ListToListResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "listToListResponse")
+    public JAXBElement<ListToListResponse> createListToListResponse(ListToListResponse value) {
+        return new JAXBElement<ListToListResponse>(_ListToListResponse_QNAME, ListToListResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DimArray }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "dimArray")
+    public JAXBElement<DimArray> createDimArray(DimArray value) {
+        return new JAXBElement<DimArray>(_DimArray_QNAME, DimArray.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link HasMapToHasMap }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "hasMapToHasMap")
+    public JAXBElement<HasMapToHasMap> createHasMapToHasMap(HasMapToHasMap value) {
+        return new JAXBElement<HasMapToHasMap>(_HasMapToHasMap_QNAME, HasMapToHasMap.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DimArrayResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://sample.rough_diamond.jp/", name = "dimArrayResponse")
+    public JAXBElement<DimArrayResponse> createDimArrayResponse(DimArrayResponse value) {
+        return new JAXBElement<DimArrayResponse>(_DimArrayResponse_QNAME, DimArrayResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String2StringMap }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://test.transformer.mule.util.commons.rough_diamond.jp", name = "map", scope = HasMapBean.class)
+    public JAXBElement<String2StringMap> createHasMapBeanMap(String2StringMap value) {
+        return new JAXBElement<String2StringMap>(_HasMapBeanMap_QNAME, String2StringMap.class, HasMapBean.class, value);
     }
 
     /**

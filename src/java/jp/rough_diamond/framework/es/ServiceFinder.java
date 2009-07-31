@@ -8,7 +8,6 @@ package jp.rough_diamond.framework.es;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 
@@ -69,12 +68,13 @@ public class ServiceFinder implements
 				} else if(method.getReturnType() != Void.TYPE) {
 					JAXBElementToObject transformer = new JAXBElementToObject();
 					Type t = method.getGenericReturnType();
-					if(t instanceof Class) {
-						return transformer.transform(returnPayload, method.getReturnType());
-					} else {
-						ParameterizedType pt = (ParameterizedType)t;
-						return transformer.transform(returnPayload, method.getReturnType(), (Class<?>)pt.getActualTypeArguments()[0]);
-					}
+					return transformer.transform(returnPayload, t);
+//					if(t instanceof Class) {
+//						return transformer.transform(returnPayload, method.getReturnType());
+//					} else {
+//						ParameterizedType pt = (ParameterizedType)t;
+//						return transformer.transform(returnPayload, method.getReturnType(), (Class<?>)pt.getActualTypeArguments()[0]);
+//					}
 				} else {
 					return null;
 				}

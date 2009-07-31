@@ -14,7 +14,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -34,15 +36,7 @@ import org.apache.commons.logging.LogFactory;
 public class JAXBElementToObject {
 	private final static Log log = LogFactory.getLog(JAXBElementToObject.class);
 	
-//	@Override
-//	protected Object doTransform(Object src, String encoding) throws TransformerException {
-//		return transform(src, getReturnType());
-//	}
-	public Object transform(Object src, Class<?> returnType) {
-		return transform(src, returnType, returnType.getComponentType());
-	}
-	
-	public Object transform(Object src, Class<?> returnType, Class<?> componentType) {
+	public Object transform(Object src, Type returnType) {
 		if(src == null) {
 			return null;
 		}
@@ -50,24 +44,26 @@ public class JAXBElementToObject {
 		if(JAXBElement.class.isAssignableFrom(src.getClass())) {
 			return transform(((JAXBElement)src).getValue(), returnType);
 		}
-		if(returnType.isAssignableFrom(src.getClass())) {
+		if(!(returnType instanceof Class)) {
+			//XXX ParameterizedType以外の場合はどーなるんだろう。。。
+			return transform(src, (ParameterizedType)returnType);
+		}
+		Class returnClassType = (Class)returnType;
+		if(returnClassType.isAssignableFrom(src.getClass())) {
 			log.debug("変換が不要なオブジェクトなので変換処理は行いません。");
 			return src;
 		}
-		if(returnType.isPrimitive()) {
+		if(returnClassType.isPrimitive()) {
 			log.debug("変換が不要なオブジェクト（プリミティブ）なので変換処理は行いません。");
 			return src;
 		}
-		if(isArrayType(src.getClass())) {
-			List list = copyList(src, componentType);
-			if(returnType.isArray()) {
-				Object ret = Array.newInstance(componentType, list.size());
-				return list.toArray((Object[])ret);
-			} else {
-				return list;
-			}
+		if(returnClassType.isArray()) {
+			Class componentType  = returnClassType.getComponentType();
+			List list = makeList(src, componentType);
+			Object ret = Array.newInstance(componentType, list.size());
+			return list.toArray((Object[])ret);
 		}
-		Object dest = createObjectByType(returnType);
+		Object dest = createObjectByType(returnClassType);
 		if(dest == null) {
 			log.warn("返却オブジェクトの生成に失敗したため変換は行いません");
 			return src;
@@ -81,12 +77,25 @@ public class JAXBElementToObject {
 		}
 	}
 	
-	List copyList(Object src, Class<?> componentType) {
-		List ret = new ArrayList();
+	Object transform(Object src, ParameterizedType pt) {
+		Class cl = (Class)pt.getRawType();
+		log.debug(cl.getName());
+		if(List.class.isAssignableFrom(cl)) {
+			return makeList(src, pt.getActualTypeArguments()[0]);
+		} else if(Map.class.isAssignableFrom(cl)) {
+			return makeMap(src, pt.getActualTypeArguments());
+		}
+		return null;
+	}
+	
+	Object makeMap(Object src, Type[] actualTypeArguments) {
+		Map ret = new HashMap();
 		try {
-			List srcArray = extractArrayData(src.getClass(), src);
-			for(Object o : srcArray) {
-				ret.add(transform(o, componentType));
+			MapInfo info = MapInfo.getMapInfo(src);
+			for(Object o : info.list) {
+				Object key = transform(MapInfo.getKey(o), actualTypeArguments[0]);
+				Object value = transform(MapInfo.getValue(o), actualTypeArguments[1]);
+				ret.put(key, value);
 			}
 			return ret;
 		} catch(Exception e) {
@@ -94,85 +103,55 @@ public class JAXBElementToObject {
 			return ret;
 		}
 	}
-	
+
+	List makeList(Object src, Type type) {
+		List ret = new ArrayList();
+		try {
+			ListInfo info = ListInfo.getListInfo(src);
+			for(Object o : info.list) {
+				ret.add(transform(o, type));
+			}
+			return ret;
+		} catch(Exception e) {
+			log.warn("プロパティのコピー中に例外が発生したため変換は行いません。", e);
+			return ret;
+		}
+	}
+
 	void copyProperty(Object src, Object dest) throws Exception {
 		PropertyDescriptor[] pds = PropertyUtils.getPropertyDescriptors(src);
 		for(PropertyDescriptor pd : pds) {
-			Class<?> pdType = pd.getPropertyType();
-			if(pdType.equals(JAXBElement.class)) {
-				Type t = pd.getReadMethod().getGenericReturnType();
-				if(t instanceof ParameterizedType) {
-					ParameterizedType pt = (ParameterizedType)t;
-					pdType = (Class)pt.getActualTypeArguments()[0];
-				}
-			}
 			PropertyDescriptor destPD = PropertyUtils.getPropertyDescriptor(dest, pd.getName());
 			if(destPD == null) {
 				log.warn(pd.getName() + "プロパティが変換後オブジェクトに存在しません。スキップします。");
+				continue;
+			} else if(destPD.getWriteMethod() == null) {
+				log.debug(pd.getName() + "プロパティのsetterが存在しません。スキップします。");
 				continue;
 			}
 			Method m = PropertyUtils.getGetterMethod(src, pd.getName()); 
 			Object srcVal = m.invoke(src);
 			if(srcVal == null) {
-				//nullの場合はスキップ
-			} else if (destPD.getWriteMethod() == null) {
-				//nullの場合はスキップ
-			} else {
-				copyElement(pdType, destPD, srcVal, dest);
+				log.debug(pd.getName() + "プロパティはnullです。強制的にnullをセットします。");
+				destPD.getWriteMethod().invoke(dest, (Object)null);
+				continue;
 			}
+			if(srcVal instanceof JAXBElement) {
+				srcVal = ((JAXBElement)srcVal).getValue();
+			}
+			copyElement(destPD, srcVal, dest);
 		}
 	}
 
-	void copyElement(Class srcType, PropertyDescriptor destPD, Object srcVal, Object dest) throws Exception {
-		if(srcVal instanceof JAXBElement) {
-			srcVal = ((JAXBElement)srcVal).getValue();
-		}
-		if(srcType.equals(XMLGregorianCalendar.class)) {
+	void copyElement(PropertyDescriptor destPD, Object srcVal, Object dest) throws Exception {
+		if(srcVal instanceof XMLGregorianCalendar) {
 			copyDateObject(destPD, (XMLGregorianCalendar)srcVal, dest);
-		} else if(isArrayType(srcType)) {
-			copyJAXElementOfArray(srcType, destPD, srcVal, dest);
 		} else {
-			Object destVal = transform(srcVal, destPD.getWriteMethod().getParameterTypes()[0]);
+			Object destVal = transform(srcVal, destPD.getWriteMethod().getGenericParameterTypes()[0]);
 			PropertyUtils.setProperty(dest, destPD.getName(), destVal);
 		}
 	}
 	
-	void copyJAXElementOfArray(Class<?> srcType, PropertyDescriptor pd, Object srcVal, Object dest) throws Exception {
-		List arrayVal = extractArrayData(srcType, srcVal);
-		if(pd.getWriteMethod().getParameterTypes()[0].isArray()) {
-			copyToArray(arrayVal, pd, dest);
-		} else {
-			copyToList(arrayVal, pd, dest);
-		}
-	}
-	
-	void copyToList(List arrayVal, PropertyDescriptor pd, Object dest) throws Exception {
-		Type t = pd.getWriteMethod().getGenericParameterTypes()[0];
-		if(!(t instanceof ParameterizedType)) {
-			log.debug(pd.getName() + "リストの要素タイプの指定がないためコピーできません。");
-			return;
-		}
-		ParameterizedType pt = (ParameterizedType)t;
-		Class genericType = (Class)pt.getActualTypeArguments()[0];
-		List destList = new ArrayList();
-		for(Object srcVal : arrayVal) {
-			Object destVal = transform(srcVal, genericType);
-			destList.add(destVal);
-		}
-		PropertyUtils.setProperty(dest, pd.getName(), destList);
-	}
-
-	void copyToArray(List arrayVal, PropertyDescriptor pd, Object dest) throws Exception {
-		Class cl = pd.getWriteMethod().getParameterTypes()[0].getComponentType();
-		Object destArray = Array.newInstance(cl, arrayVal.size());
-		int index = 0;
-		for(Object srcVal : arrayVal) {
-			Object destVal = transform(srcVal, cl);
-			Array.set(destArray, index++, destVal);
-		}
-		PropertyUtils.setProperty(dest, pd.getName(), destArray);
-	}
-
 	void copyDateObject(PropertyDescriptor pd, XMLGregorianCalendar srcVal, Object dest) throws Exception {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, srcVal.getYear());
@@ -191,20 +170,6 @@ public class JAXBElementToObject {
 		}
 	}
 
-	boolean isArrayType(Class srcType) {
-		return srcType.getSimpleName().startsWith("ArrayOf") /*&& !srcType.isAssignableFrom(srcVal.getClass())*/;
-	}
-	
-	List extractArrayData(Class srcType, Object src) throws Exception {
-		String propertyName = srcType.getSimpleName().replaceAll("^ArrayOf", "");
-		char[] tmp = propertyName.toCharArray();
-		tmp[0] = Character.toLowerCase(tmp[0]);
-		propertyName = new String(tmp);
-		PropertyDescriptor pd2 = PropertyUtils.getPropertyDescriptor(src, propertyName);
-		List arrayVal = (List)pd2.getReadMethod().invoke(src);
-		return arrayVal;
-	}
-	
 	Object createObjectByType(Class<?> parameterType) {
 		try {
 			return parameterType.newInstance();

@@ -58,6 +58,7 @@ RDF Core Change Log
 　　　指定できるようにしました。
 　　- １つのWSDLファイル内に複数のoperationが定義されている場合でも、処理可能な
 　　　スタブクラスとmuleの設定ファイルを自動生成できるようにした。
+　　- SOAの引数/戻り値にMapオブジェクトを使用できるようにしました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの

@@ -324,13 +324,6 @@ public class ServiceGenerator {
             Element el = (Element)list.item(i);
             arg.name = el.getAttribute("name");
             arg.type = el.getAttribute("type");
-            int index = arg.type.lastIndexOf('.');
-            if(index != -1) {
-                imports.add(arg.type);
-                arg.type = arg.type.substring(index + 1);
-            }
-            System.out.println(arg.name);
-            System.out.println(arg.type);
             op.args.add(arg);
         }
 	}

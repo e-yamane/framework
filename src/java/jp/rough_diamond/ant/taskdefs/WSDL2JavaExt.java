@@ -359,7 +359,7 @@ public class WSDL2JavaExt extends Task {
 			for(String operation : operations) {
 				String className = getTransformaerClassName(operation);
 				String transformClassBody = String.format(TRANSFORMER_CLASS_TEMPLATE, packageName, className, 
-						className, className, operations, portTypeClassName);
+						className, className, operation, portTypeClassName);
 				System.out.println(transformClassBody);
 				FileUtils.writeStringToFile(new File(packageDir, className + ".java"), transformClassBody, "UTF-8");
 			}
