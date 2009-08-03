@@ -43,12 +43,21 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 			log.warn("ラッパーメソッドが取得できないためタイプ変換は行いません。");
 			return src;
 		}
-		Object factory = createObjectFactory(method.getParameterTypes()[0]);
+		Object factory = createObjectFactory(getPortType());
 		if(factory == null) {
 			log.warn("ObjectFactoryの取得に失敗したため変換は行いません。");
 			return src;
 		}
-		return transform(src, method.getParameterTypes()[0], factory);
+		int numberOfParams = method.getParameterTypes().length;
+		if(numberOfParams == 1) {
+			return transform(src, method.getParameterTypes()[0], factory);
+		}
+		Object[] params = (Object[])src;
+		Object[] ret = new Object[params.length];
+		for(int i = 0 ; i < ret.length ; i++) {
+			ret[i] = transform(params[i], method.getParameterTypes()[i], factory);
+		}
+		return ret;
 	}
 
 	Object transform(Object src, Class<?> parameterType, Object factory) {
@@ -246,8 +255,8 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 		String operation = getOperation();
 		Method[] methods = portType.getMethods();
 		for(Method m : methods) {
-			//XXX 複数パラメータの場合はまた考える
-			if(m.getName().equals(operation) && m.getParameterTypes().length == 1) {
+			//XXX 同名メソッドが複数ある場合はＮＧ
+			if(m.getName().equals(operation)) {
 				return m;
 			}
 		}
