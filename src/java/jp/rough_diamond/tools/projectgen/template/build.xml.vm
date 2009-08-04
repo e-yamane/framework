@@ -46,6 +46,7 @@
 #if($param.isContainOption("USING_ESB"))
     <copy file="${conf.dir}/template/cxfrouting.properties" tofile="${src.dir}/cxfrouting.properties" filtering="true" overwrite="true" encoding="$param.sourceEncoding" />
 #end
+    <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" encoding="$param.sourceEncoding" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
   </target>
 </project>
