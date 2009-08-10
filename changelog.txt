@@ -75,6 +75,7 @@ RDF Core Change Log
 　　- makeSchemaAccessor実行後、プロパティファイルをnative2asciiするために、
 　　　makeConfigを呼び出していたが、この方法では、ログイン名と違うconfigを使用した場合に
 　　　不具合が生じてしますため、native2asciiのみを実行するように修正した。
+　　- 複雑なJOINを多用すると想定しているHQLを出力しない
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない

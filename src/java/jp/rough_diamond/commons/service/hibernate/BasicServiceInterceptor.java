@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jp.rough_diamond.commons.service.BasicService;
+import jp.rough_diamond.commons.util.PropertyUtils;
 import jp.rough_diamond.framework.transaction.TransactionManager;
 
 import org.hibernate.EmptyInterceptor;
@@ -45,30 +47,49 @@ public class BasicServiceInterceptor extends EmptyInterceptor {
 		map.put(POST_LOAD_OBJECTS, set);
 	}
 	
-	@SuppressWarnings("unchecked")
 	static List<Object> popPostLoadedObjects() {
-		Map map = TransactionManager.getTransactionContext();
-		Set<Object> set = (Set<Object>)map.get(POST_LOAD_OBJECTS);
+		Set<Object> set = getLoadedObjectSet();
 		if(set == null) {
 			return new ArrayList<Object>();
 		} else {
-			map.remove(POST_LOAD_OBJECTS);
+			TransactionManager.getTransactionContext().remove(POST_LOAD_OBJECTS);
 			return new ArrayList<Object>(set);
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	static void addPostLoadObject(Object o) {
-		Map map = TransactionManager.getTransactionContext();
-		Set<Object> set = (Set<Object>)map.get(POST_LOAD_OBJECTS);
+		Set<Object> set = getLoadedObjectSet();
 		if(set != null) {
 			set.add(o);
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	private static Set<Object> getLoadedObjectSet() {
+		Map map = TransactionManager.getTransactionContext();
+		Set<Object> set = (Set<Object>)map.get(POST_LOAD_OBJECTS);
+		return set;
+	}
 	
 	@Override
 	public boolean onLoad(Object arg0, Serializable arg1, Object[] arg2, String[] arg3, Type[] arg4) {
+		Set<Object> set = getLoadedObjectSet();
+		if(set == null) {
+			((HibernateBasicService)BasicService.getService(
+					)).firePostLoadDirect(makeObject(arg0, arg2, arg3));
+		}
 		addPostLoadObject(arg0);
 		return super.onLoad(arg0, arg1, arg2, arg3, arg4);
+	}
+
+	Object makeObject(Object arg0, Object[] arg2, String[] arg3) {
+		for(int i = 0 ; i < arg2.length ; i++) {
+			try {
+				PropertyUtils.setProperty(arg0, arg3[i], arg2[i]);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return arg0;
 	}
 }

@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -60,7 +61,6 @@ public class HibernateBasicService extends BasicService {
             T ret = (T)HibernateUtils.getSession().get(type, pk, getLockMode(lock));
             if(ret != null) {
                 List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
-//                fireEvent(CallbackEventType.POST_LOAD, Arrays.asList(new Object[]{ret}));
                 fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
                 if(isNoCache) {
     	            Session session = HibernateUtils.getSession();
@@ -125,19 +125,8 @@ public class HibernateBasicService extends BasicService {
     @SuppressWarnings("unchecked")
     <T> List<T> findByExtractor2(Class<T> type, Extractor extractor, boolean isNoCache, RecordLock lock) throws VersionUnmuchException, MessagesIncludingException {
         List<T> list;
-//      if(LogicalDeleteEntity.class.isAssignableFrom(type)) {
-//          extractor.add(Condition.eq("deletedInDB", HibernateUtils.BOOLEAN_CHAR_F));
-//      }
         if(extractor.getLimit() != 0) {
 	        Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
-//	        if(extractor.getValues().size() != 0) {
-//	        	//厳密にはエンティティはロードされていないのでイベントをファイアしてはいけないのでリターン
-//	        	List<Object> tmp = query.list();
-//	        	list = (List<T>) Extractor2HQL.makeList(type, extractor, tmp);
-//	        } else {
-////          	  list = query.list();
-//	        	list = makeList(type, query.list());
-//	        }
         	list = (List<T>) Extractor2HQL.makeList(type, extractor, query.list());
 	        List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
 	        fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
@@ -159,10 +148,6 @@ public class HibernateBasicService extends BasicService {
         try {
             SessionFactory sf = HibernateUtils.getSession().getSessionFactory();
             for(Object o : objects) {
-//                if(o instanceof LogicalDeleteEntity) {
-//                    LogicalDeleteEntity lde = (LogicalDeleteEntity)o;
-//                    lde.setDeleted(false);
-//                }
                 ClassMetadata cm = sf.getClassMetadata(o.getClass());
                 if(cm.getIdentifier(o, EntityMode.POJO) == null &&
                         NumberingService.isAllowedNumberingType(cm.getIdentifierType().getReturnedClass())) {
@@ -349,6 +334,15 @@ public class HibernateBasicService extends BasicService {
 		Session session = HibernateUtils.getSession();
 		if(session != null) {
 			session.evict(o);
+		}
+	}
+
+	void firePostLoadDirect(Object o) {
+		log.debug("予期しないload（lazy loading）が発生しました。POST_LOADイベントをFireします。");
+		try {
+			fireEvent(CallbackEventType.POST_LOAD, new ArrayList<Object>(Arrays.asList(o)));
+		} catch (Exception e) {
+            throw new RuntimeException(e);
 		}
 	}
 }
