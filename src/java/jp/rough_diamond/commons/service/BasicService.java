@@ -701,7 +701,7 @@ abstract public class BasicService implements Service {
 				//更新時
 				if(list.size() > 1) {
 					ret.add(makeUniqueErrorMessage(o, u, check));
-				} else if(!o.equals(list.get(0))){
+				} else if(!compareUniqueObject(o, list.get(0))){
 					ret.add(makeUniqueErrorMessage(o, u, check));
 				}
 			}
@@ -709,7 +709,11 @@ abstract public class BasicService implements Service {
 		return ret;
 	}
 
-	static Messages makeUniqueErrorMessage(Object o, Unique u, Check c) {
+	protected boolean compareUniqueObject(Object target, Object org) {
+		return target.equals(org);
+	}
+	
+	protected static Messages makeUniqueErrorMessage(Object o, Unique u, Check c) {
 		Messages ret = new Messages();
 		String targetProperty = u.entity() + "." + c.properties()[0];
 		String[] strArray = c.properties()[0].split("\\.");
@@ -728,7 +732,7 @@ abstract public class BasicService implements Service {
 		return ret;
 	}
 
-	protected List getMutchingObjects(Object o, Check check) {
+	protected Extractor getMutchingExtractor(Object o, Check check) {
 		Extractor ex = new Extractor(o.getClass());
 		for(String property : check.properties()) {
 			Object value = jp.rough_diamond.commons.util.PropertyUtils.getProperty(o, property);
@@ -738,6 +742,12 @@ abstract public class BasicService implements Service {
 				ex.add(Condition.eq(new Property(property), value));
 			}
 		}		
+		return ex;
+	}
+	
+	protected List getMutchingObjects(Object o, Check check) {
+		Extractor ex = getMutchingExtractor(o, check);
+		//XXX HibernateBasicServiceを使用するとロックが走らない・・・でも実害ない気がしている。。。
 		return findByExtractor(ex, RecordLock.FOR_UPDATE);
 	}
 	

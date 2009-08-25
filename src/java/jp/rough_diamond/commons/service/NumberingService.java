@@ -203,7 +203,7 @@ abstract public class NumberingService implements Service {
     	
 		@Override
 		public long getNumber(String key) {
-			log.warn("NumberCashingStrategy#getNumber()");
+			log.debug("NumberCashingStrategy#getNumber()");
 			Info info = map.get(key);
 			if(info != null && info.currentNumber < info.numbering.getNextNumber()) {
 				return ++info.currentNumber;

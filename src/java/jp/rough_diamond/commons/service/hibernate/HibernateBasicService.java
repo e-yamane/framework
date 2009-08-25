@@ -24,7 +24,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.metadata.ClassMetadata;
 
+import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.resource.MessagesIncludingException;
 import jp.rough_diamond.commons.service.BasicService;
@@ -344,5 +346,22 @@ public class HibernateBasicService extends BasicService {
 		} catch (Exception e) {
             throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	protected Extractor getMutchingExtractor(Object o, Check check) {
+		Extractor ex = super.getMutchingExtractor(o, check);
+		ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(o.getClass());
+		ex.addExtractValue(new ExtractValue("pk", new Property(cm.getIdentifierPropertyName())));
+		ex.setReturnType(cm.getIdentifierType().getReturnedClass());
+		return ex;
+	}
+	
+	@Override
+	protected boolean compareUniqueObject(Object target, Object org) {
+		ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(target.getClass());
+		Object pk = cm.getIdentifier(target, EntityMode.POJO);
+		log.debug(pk + ":" + org);
+		return pk.equals(org);
 	}
 }
