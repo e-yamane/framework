@@ -459,6 +459,7 @@ public class Extractor2HQL {
             		continue;
             	}
                 String property = VALUE_MAKE_STRATEGY_MAP.get(order.label.getClass()).makeValue(this, order.label);
+            	builder.append(",");
             	builder.append(property);
             }
         } else {

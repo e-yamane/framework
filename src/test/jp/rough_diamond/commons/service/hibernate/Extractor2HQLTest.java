@@ -590,6 +590,17 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("ID‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 2, list.get(0).getId().intValue());
 	}
 	
+	public void testUsingInnerJoin2() throws Exception {
+		Extractor ex = new Extractor(Unit.class, "target");
+		ex.addInnerJoin(new InnerJoin(new Property(Unit.class, "target", Unit.ID),
+				new Property(Unit.class, "child", Unit.BASE + "." + Unit.ID)));
+		ex.add(Condition.eq(new Property(Unit.class, "child", Unit.ID), 2L));
+		ex.addOrder(Order.asc(new Property(Unit.class, "target", Unit.NAME)));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("•Ô‹p”‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 1, list.size());
+		assertEquals("ID‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 1, list.get(0).getId().intValue());
+	}
+	
 	public void testDistinct() throws Exception {
 		//select base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
 		Extractor ex = new Extractor(Unit.class);
