@@ -20,11 +20,13 @@ import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.excel.XlsDataSet;
 import org.dbunit.dataset.xml.XmlDataSet;
+import org.dbunit.ext.oracle.OracleDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
 import org.hibernate.Interceptor;
 import org.hibernate.cfg.Configuration;
@@ -180,6 +182,7 @@ abstract public class DBInitializer implements Service {
     private static Map<String, IDataSet> datasetMap = new HashMap<String, IDataSet>();
     protected void execute(DatabaseOperation operation, String... resourceNames) throws Exception {
     	String schema = HibernateUtils.getConfig().getProperty(Environment.DEFAULT_SCHEMA);
+    	String driverClassName = HibernateUtils.getConfig().getProperty(Environment.DRIVER);
     	
 		String[] tmpArray = new String[resourceNames.length];
         System.arraycopy(resourceNames, 0, tmpArray, 0, tmpArray.length);
@@ -190,6 +193,10 @@ abstract public class DBInitializer implements Service {
         ConnectionManager cm = ConnectionManager.getConnectionManager();
         //TODO nullÇ≈ÇÊÇ¢Ç©Ç»ÇüÅBÅBÅB
         IDatabaseConnection idc = new DatabaseConnection(cm.getCurrentConnection(null), schema);
+        if(driverClassName.toUpperCase().indexOf("ORACLE") != -1) {
+        	//OracleÇÃägí£
+        	idc.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new OracleDataTypeFactory());
+        }
         for(String name : tmp) {
         	try {
         		System.out.println(name + ":" + operation.getClass().getName());
