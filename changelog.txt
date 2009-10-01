@@ -59,6 +59,13 @@ RDF Core Change Log
 　　- １つのWSDLファイル内に複数のoperationが定義されている場合でも、処理可能な
 　　　スタブクラスとmuleの設定ファイルを自動生成できるようにした。
 　　- SOAの引数/戻り値にMapオブジェクトを使用できるようにしました。
+　　- org.mule.api.transformer.TransformerExceptionを継承した
+　　　MessagesIncludingTransformerExceptionを新設しました。
+　　　変換失敗した際にRDFのリソース制御アーキテクチャに合わせることができます。
+　　- スキーマ定義時にタイプをTIMESTAMPにした場合にOracleのカラムタイプをTIMESTAMPと
+　　　なるように変更しました。
+　　- オブジェクト永続化時のユニークチェックの性能向上を実施しました
+　　- FindResultにgetterメソッドを作成しました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの
@@ -76,6 +83,8 @@ RDF Core Change Log
 　　　makeConfigを呼び出していたが、この方法では、ログイン名と違うconfigを使用した場合に
 　　　不具合が生じてしますため、native2asciiのみを実行するように修正した。
 　　- 複雑なJOINを多用すると想定しているHQLを出力しない
+　　- タイプ指定をして、targetとは異なるオブジェクトのプロパティでソート順を指定すると
+　　　HQLの文法エラーとなる不具合を発見/対処しました
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない

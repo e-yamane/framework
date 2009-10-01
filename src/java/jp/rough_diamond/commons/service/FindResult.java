@@ -21,7 +21,7 @@ public class FindResult<T> implements Serializable {
      */
     public final List<T>    list;
     
-    /**
+	/**
      * 総数
      */
     public final long       count;
@@ -35,4 +35,20 @@ public class FindResult<T> implements Serializable {
         this.list = Collections.unmodifiableList(list);
         this.count = count;
     }
+
+    /**
+     * オブジェクト群を返却する
+     * @return
+     */
+    public List<T> getList() {
+		return list;
+	}
+
+    /**
+     * 件数を返却する
+     * @return
+     */
+	public long getCount() {
+		return count;
+	}
 }
