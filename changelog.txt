@@ -66,6 +66,8 @@ RDF Core Change Log
 　　　なるように変更しました。
 　　- オブジェクト永続化時のユニークチェックの性能向上を実施しました
 　　- FindResultにgetterメソッドを作成しました。
+　　- jp.rough_diamond.commons.entity.ScalableNumber生成時に整数部の数値がLong.MAX_VALUEを
+　　　超えていた場合の丸め処理の性能を向上しました。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの
@@ -85,6 +87,9 @@ RDF Core Change Log
 　　- 複雑なJOINを多用すると想定しているHQLを出力しない
 　　- タイプ指定をして、targetとは異なるオブジェクトのプロパティでソート順を指定すると
 　　　HQLの文法エラーとなる不具合を発見/対処しました
+　　- jp.rough_diamond.commons.entity.ScalableNumber生成時に、整数部の数値が
+　　　Long.MIN_VALUEを下回っている場合に、正しく値を保持できていない不具合を
+　　　発見/対処しました。
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない

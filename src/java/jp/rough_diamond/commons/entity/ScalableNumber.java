@@ -15,8 +15,10 @@ import java.math.BigInteger;
 public class ScalableNumber extends jp.rough_diamond.commons.entity.base.BaseScalableNumber {
     private static final long serialVersionUID = 1L;
 
-    private final static int maxScale = ("" + Long.MAX_VALUE).length() + 1;
-    private final static BigInteger limit = new BigInteger("" + Long.MAX_VALUE);
+    private final static int maxUpperScale = ("" + Long.MAX_VALUE).length();
+    private final static BigInteger upperlimit = new BigInteger("" + Long.MAX_VALUE);
+    private final static BigInteger underlimit = new BigInteger("" + Long.MIN_VALUE);
+    private final static int maxUnderScale = ("" + Long.MIN_VALUE).length() - 1;
     
     public ScalableNumber() {
     	this(0L, 0);
@@ -60,9 +62,16 @@ public class ScalableNumber extends jp.rough_diamond.commons.entity.base.BaseSca
     		setValue(null);
     		setScale(null);
     	} else {
-    		int pos = 0;
-    		while(limit.compareTo(bd.unscaledValue()) < 0) {
-    			bd = bd.setScale(maxScale - pos++, BigDecimal.ROUND_HALF_UP);
+    		BigInteger intValue = bd.unscaledValue();
+    		int pos = intValue.abs().toString().length() - bd.scale();
+    		if(upperlimit.compareTo(intValue) < 0) {
+	    		while(upperlimit.compareTo(bd.unscaledValue()) < 0) {
+	    			bd = bd.setScale(maxUpperScale - pos++, BigDecimal.ROUND_HALF_UP);
+	    		}
+    		} else if(underlimit.compareTo(intValue) > 0) {
+	    		while(underlimit.compareTo(bd.unscaledValue()) > 0) {
+	    			bd = bd.setScale(maxUnderScale - pos++, BigDecimal.ROUND_HALF_UP);
+	    		}
     		}
 	    	setValue(bd.unscaledValue().longValue());
 	    	setScale(bd.scale());

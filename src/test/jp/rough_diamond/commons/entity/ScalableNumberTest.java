@@ -36,5 +36,17 @@ public class ScalableNumberTest extends TestCase {
 		sn = new ScalableNumber(new BigDecimal(0.93D));
 		assertEquals("unscaledValueが誤っています。", 930000000000000049L, sn.getValue().longValue());
 		assertEquals("scaleが誤っています。", 18, sn.getScale().intValue());
+
+		System.out.println(new BigDecimal(Long.MAX_VALUE).toPlainString());
+		System.out.println(new BigDecimal("612.75869662999998109342987030745408816301278420723974704742431640625").negate());
+
+		sn = new ScalableNumber(new BigDecimal("612.75869662999998109342987030745408816301278420723974704742431640625"));
+		assertEquals("文字列表現が誤っています。", "612.7586966299999811", sn.decimal().toPlainString());
+
+		sn = new ScalableNumber(new BigDecimal("612.75869662999998109342987030745408816301278420723974704742431640625").negate());
+		assertEquals("文字列表現が誤っています。", "-612.7586966299999811", sn.decimal().toPlainString());
+
+		sn = new ScalableNumber(new BigDecimal("0.00000000061275869662999998109342987030745408816301278420723974704742431640625"));
+		assertEquals("文字列表現が誤っています。", "0.0000000006127586966299999811", sn.decimal().toPlainString());
 	}
 }
