@@ -90,6 +90,12 @@ RDF Core Change Log
 　　- jp.rough_diamond.commons.entity.ScalableNumber生成時に、整数部の数値が
 　　　Long.MIN_VALUEを下回っている場合に、正しく値を保持できていない不具合を
 　　　発見/対処しました。
+　　- PropertyUtils#copyPropertiesメソッドで以下の条件を満たすプロパティを有する
+　　　オブジェクトのコピーを行うとNullPointerExceptionが発生する
+　　　　１．コレクションではないプロパティ
+　　　　２．配列でもないプロパティ
+　　　　３．コピー元のオブジェクトをコピー先へコピーできないプロパティ
+　　　　４．コピー先のオブジェクトにsetterメソッドはあってもgetterメソッドがないプロパティ
   [Reduced]
 　　- MultiLanguageMasterLoaderを削除。現状使用していない。
 　　　ローダーレベルでサポートするものではない

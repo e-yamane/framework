@@ -62,7 +62,11 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 					} else if(outType.isAssignableFrom(inValue.getClass())) {
 						m.invoke(dest, inValue);
 					} else {
-						Object outValue = getGetterMethod(dest, propName).invoke(dest, (Object[])null);
+						Object outValue = null;
+						Method getter = getGetterMethod(dest, propName);
+						if(getter != null) {
+							outValue = getter.invoke(dest, (Object[])null);
+						}
 						if(outValue == null) {
 							outValue = outType.newInstance();
 							m.invoke(dest, outValue);
