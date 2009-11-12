@@ -12,6 +12,9 @@ import java.util.MissingResourceException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import jp.rough_diamond.commons.di.DIContainer;
 import jp.rough_diamond.commons.di.DIContainerFactory;
 import jp.rough_diamond.commons.entity.Amount;
@@ -24,6 +27,7 @@ import jp.rough_diamond.framework.user.UserController;
  * Velocity便利ツール
  */
 public class VelocityUtils {
+	private final static Log log = LogFactory.getLog(VelocityUtils.class);
 	/**
 	 * 現在のユーザーオブジェクトを返却する
 	 * @return
@@ -130,7 +134,7 @@ public class VelocityUtils {
 			Arrays.fill(array, '0');
 			formatSB.append(array);
 		}
-		System.out.println(formatSB.toString());
+		log.debug(formatSB.toString());
 		DecimalFormat df = new DecimalFormat(formatSB.toString());
 		StringBuilder sb = new StringBuilder();
 		if (isPrefix) {

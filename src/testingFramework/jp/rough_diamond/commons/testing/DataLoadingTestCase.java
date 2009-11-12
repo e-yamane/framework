@@ -8,6 +8,8 @@ package jp.rough_diamond.commons.testing;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -27,7 +29,7 @@ import junit.framework.TestCase;
  * DBUnitを利用してデータをローディングしているテストケース
  */
 public abstract class DataLoadingTestCase extends TestCase {
-
+	private final static Log log = LogFactory.getLog(DataLoadingTestCase.class);
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -57,7 +59,7 @@ public abstract class DataLoadingTestCase extends TestCase {
 		@Override
 		public <T> T getObject(Class<T> arg0, Object arg1) {
 			if(arg1.equals(ServiceLocator.SERVICE_LOCATOR_KEY)) {
-				System.out.println("ServiceLocatorLogicの取得要求です");
+				log.debug("ServiceLocatorLogicの取得要求です");
 				DIContainer current = DIContainerFactory.getDIContainer();
 				DIContainerFactory.setDIContainer(org);
 				try {
@@ -95,13 +97,13 @@ public abstract class DataLoadingTestCase extends TestCase {
 				@SuppressWarnings("unchecked")
 				@Override
 				public <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass) {
-					System.out.println("BasicServiceを作成します");
+					log.debug("BasicServiceを作成します");
 					BasicService service = (BasicService)org.getService(cl, defaultClass);
 					ProxyFactory pf = new ProxyFactory(service);
 					MethodInterceptor mi = new MethodInterceptor() {
 						@Override
 						public Object invoke(MethodInvocation arg0) throws Throwable {
-							System.out.println("call deleteAll");
+							log.debug("call deleteAll");
 							Object ret = arg0.proceed();
 							DBInitializer.addModifiedClasses((Class)arg0.getArguments()[0]);
 							return ret;

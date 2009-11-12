@@ -199,7 +199,7 @@ abstract public class DBInitializer implements Service {
         }
         for(String name : tmp) {
         	try {
-        		System.out.println(name + ":" + operation.getClass().getName());
+        		log.debug(name + ":" + operation.getClass().getName());
         		IDataSet dataset = datasetMap.get(name);
         		if(dataset == null) {
 	        		if(name.endsWith("xls")) {
