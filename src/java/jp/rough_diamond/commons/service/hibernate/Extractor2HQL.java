@@ -57,6 +57,7 @@ import jp.rough_diamond.commons.extractor.Sum;
 import jp.rough_diamond.commons.extractor.SummaryFunction;
 import jp.rough_diamond.commons.extractor.Value;
 import jp.rough_diamond.commons.extractor.ValueHoldingCondition;
+import jp.rough_diamond.commons.lang.StringUtils;
 import jp.rough_diamond.commons.util.PropertyUtils;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
@@ -636,6 +637,9 @@ public class Extractor2HQL {
     	if(cl == null) {
     		cl = this.extractor.target;
     	}
+    	if(StringUtils.isBlank(aliase)) {
+    		aliase = extractor.targetAlias;
+    	}
         aliase = getAlias(cl, aliase);
         if(property == null || "".equals(property)) {
             return aliase;
@@ -647,7 +651,7 @@ public class Extractor2HQL {
     }
     
     private static String getAlias(Class cl, String alias) {
-        if(alias == null || "".equals(alias)) {
+    	if(StringUtils.isBlank(alias)) {
             String name = cl.getName();
             return name.substring(name.lastIndexOf(".") + 1);
         } else {
