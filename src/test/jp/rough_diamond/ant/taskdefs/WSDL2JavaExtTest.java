@@ -91,17 +91,18 @@ public class WSDL2JavaExtTest extends TestCase {
 		exp = ext.getXPathExpression(xpathStr);
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_fooIn", iep.getAttribute("path"));
-		xpathStr = "mule:custom-transformer";
-		exp = ext.getXPathExpression(xpathStr);
-		Element t = (Element)exp.evaluate(iep, XPathConstants.NODE);
-		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Foo", t.getAttribute("class"));
-		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_fooInTransformer", t.getAttribute("name"));
+
 		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
 		assertEquals("オペレーションが誤っています。", "foo", oep.getAttribute("operation"));
 		assertEquals("WSDLPortが誤っています。", "MultiOperationServicePort", oep.getAttribute("wsdlPort"));
+		xpathStr = "mule:custom-transformer";
+		exp = ext.getXPathExpression(xpathStr);
+		Element t = (Element)exp.evaluate(oep, XPathConstants.NODE);
+		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Foo", t.getAttribute("class"));
+		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_fooInTransformer", t.getAttribute("name"));
 		
 		e = (Element)nodeList.item(1);
 		assertEquals("Service名が誤っています。", "MultiOperationServiceConnector_bar", e.getAttribute("name"));
@@ -109,17 +110,18 @@ public class WSDL2JavaExtTest extends TestCase {
 		exp = ext.getXPathExpression(xpathStr);
 		iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_barIn", iep.getAttribute("path"));
-		xpathStr = "mule:custom-transformer";
-		exp = ext.getXPathExpression(xpathStr);
-		t = (Element)exp.evaluate(iep, XPathConstants.NODE);
-		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Bar", t.getAttribute("class"));
-		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_barInTransformer", t.getAttribute("name"));
 		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
 		assertEquals("オペレーションが誤っています。", "bar", oep.getAttribute("operation"));
 		assertEquals("WSDLPortが誤っています。", "MultiOperationServicePort", oep.getAttribute("wsdlPort"));
+
+		xpathStr = "mule:custom-transformer";
+		exp = ext.getXPathExpression(xpathStr);
+		t = (Element)exp.evaluate(oep, XPathConstants.NODE);
+		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Bar", t.getAttribute("class"));
+		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_barInTransformer", t.getAttribute("name"));
 	}
 	
 	public void testAddClientConnectorConfig_まっさら状態からモノオペレーション() throws Exception {
@@ -148,17 +150,19 @@ public class WSDL2JavaExtTest extends TestCase {
 		exp = ext.getXPathExpression(xpathStr);
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MonoOperationServiceConnectorIn", iep.getAttribute("path"));
-		xpathStr = "mule:custom-transformer";
-		exp = ext.getXPathExpression(xpathStr);
-		Element t = (Element)exp.evaluate(iep, XPathConstants.NODE);
-		assertEquals("変換クラス名が誤っています。", "hoge.monooperationservice.ObjectToJAXBElement", t.getAttribute("class"));
-		assertEquals("変換名が誤っています。", "MonoOperationServiceConnectorInTransformer", t.getAttribute("name"));
+
 		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.monooperationservice.MonoOperationService", oep.getAttribute("clientClass"));
 		assertEquals("オペレーションが誤っています。", "foo", oep.getAttribute("operation"));
 		assertEquals("WSDLPortが誤っています。", "MonoOperationServicePort", oep.getAttribute("wsdlPort"));
+
+		xpathStr = "mule:custom-transformer";
+		exp = ext.getXPathExpression(xpathStr);
+		Element t = (Element)exp.evaluate(oep, XPathConstants.NODE);
+		assertEquals("変換クラス名が誤っています。", "hoge.monooperationservice.ObjectToJAXBElement", t.getAttribute("class"));
+		assertEquals("変換名が誤っています。", "MonoOperationServiceConnectorInTransformer", t.getAttribute("name"));
 	}
 
 	public void testAddClientConnectorConfig_モノ状態からマルチオペレーション() throws Exception {
@@ -187,17 +191,19 @@ public class WSDL2JavaExtTest extends TestCase {
 		exp = ext.getXPathExpression(xpathStr);
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_fooIn", iep.getAttribute("path"));
-		xpathStr = "mule:custom-transformer";
-		exp = ext.getXPathExpression(xpathStr);
-		Element t = (Element)exp.evaluate(iep, XPathConstants.NODE);
-		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Foo", t.getAttribute("class"));
-		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_fooInTransformer", t.getAttribute("name"));
+
 		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
 		assertEquals("オペレーションが誤っています。", "foo", oep.getAttribute("operation"));
 		assertEquals("WSDLPortが誤っています。", "MultiOperationServicePort", oep.getAttribute("wsdlPort"));
+
+		xpathStr = "mule:custom-transformer";
+		exp = ext.getXPathExpression(xpathStr);
+		Element t = (Element)exp.evaluate(oep, XPathConstants.NODE);
+		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Foo", t.getAttribute("class"));
+		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_fooInTransformer", t.getAttribute("name"));
 		
 		e = (Element)nodeList.item(1);
 		assertEquals("Service名が誤っています。", "MultiOperationServiceConnector_bar", e.getAttribute("name"));
@@ -205,17 +211,19 @@ public class WSDL2JavaExtTest extends TestCase {
 		exp = ext.getXPathExpression(xpathStr);
 		iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_barIn", iep.getAttribute("path"));
-		xpathStr = "mule:custom-transformer";
-		exp = ext.getXPathExpression(xpathStr);
-		t = (Element)exp.evaluate(iep, XPathConstants.NODE);
-		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Bar", t.getAttribute("class"));
-		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_barInTransformer", t.getAttribute("name"));
+
 		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
 		assertEquals("オペレーションが誤っています。", "bar", oep.getAttribute("operation"));
 		assertEquals("WSDLPortが誤っています。", "MultiOperationServicePort", oep.getAttribute("wsdlPort"));
+
+		xpathStr = "mule:custom-transformer";
+		exp = ext.getXPathExpression(xpathStr);
+		t = (Element)exp.evaluate(oep, XPathConstants.NODE);
+		assertEquals("変換クラス名が誤っています。", "hoge.multioperationservice.ObjectToJAXBElement_Bar", t.getAttribute("class"));
+		assertEquals("変換名が誤っています。", "MultiOperationServiceConnector_barInTransformer", t.getAttribute("name"));
 	}
 	
 	public void testAddClientConnectorConfig_マルチ状態からモノオペレーション() throws Exception {
@@ -244,17 +252,19 @@ public class WSDL2JavaExtTest extends TestCase {
 		exp = ext.getXPathExpression(xpathStr);
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MonoOperationServiceConnectorIn", iep.getAttribute("path"));
-		xpathStr = "mule:custom-transformer";
-		exp = ext.getXPathExpression(xpathStr);
-		Element t = (Element)exp.evaluate(iep, XPathConstants.NODE);
-		assertEquals("変換クラス名が誤っています。", "hoge.monooperationservice.ObjectToJAXBElement", t.getAttribute("class"));
-		assertEquals("変換名が誤っています。", "MonoOperationServiceConnectorInTransformer", t.getAttribute("name"));
+
 		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.monooperationservice.MonoOperationService", oep.getAttribute("clientClass"));
 		assertEquals("オペレーションが誤っています。", "foo", oep.getAttribute("operation"));
 		assertEquals("WSDLPortが誤っています。", "MonoOperationServicePort", oep.getAttribute("wsdlPort"));
+
+		xpathStr = "mule:custom-transformer";
+		exp = ext.getXPathExpression(xpathStr);
+		Element t = (Element)exp.evaluate(oep, XPathConstants.NODE);
+		assertEquals("変換クラス名が誤っています。", "hoge.monooperationservice.ObjectToJAXBElement", t.getAttribute("class"));
+		assertEquals("変換名が誤っています。", "MonoOperationServiceConnectorInTransformer", t.getAttribute("name"));
 	}
 
 	@SuppressWarnings("deprecation")

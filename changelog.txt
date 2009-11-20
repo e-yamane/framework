@@ -68,6 +68,8 @@ RDF Core Change Log
 　　- FindResultにgetterメソッドを作成しました。
 　　- jp.rough_diamond.commons.entity.ScalableNumber生成時に整数部の数値がLong.MAX_VALUEを
 　　　超えていた場合の丸め処理の性能を向上しました。
+　　- makeClientStubコマンドで自動生成されるmule-config.xmlでtransformerはinboundで行うのではなく、
+      outboundで行うように変更
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの

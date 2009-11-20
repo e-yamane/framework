@@ -176,16 +176,6 @@ public class WSDL2JavaExt extends Task {
 		inboundEL.appendChild(t);
 		inboundEndpointEL.setAttribute("path", connectorName + "In");
 
-		t = doc.createTextNode("\n          ");
-		inboundEndpointEL.appendChild(t);
-		Element customTransformerEL = doc.createElementNS(muleNameSpace, "custom-transformer");
-		inboundEndpointEL.appendChild(customTransformerEL);
-		t = doc.createTextNode("\n        ");
-		inboundEndpointEL.appendChild(t);
-		customTransformerEL.setAttribute("name", connectorName + "InTransformer");
-		String transformerClassName = (monoOperation) ? TRANSFORMER_CLASS_NAME : getTransformaerClassName(operation);
-		customTransformerEL.setAttribute("class", packageName + "." + transformerClassName);
-		
 		Element bridgeComponentEL = doc.createElementNS(muleNameSpace, "bridge-component");
 		t = doc.createTextNode("\n      ");
 		serviceEL.appendChild(t);
@@ -217,6 +207,15 @@ public class WSDL2JavaExt extends Task {
 		outboundEndpointEL.setAttribute("operation", operation);
 		outboundEndpointEL.setAttribute("wsdlPort", getWsdlPort(wsdlDoc));
 		
+		t = doc.createTextNode("\n            ");
+		outboundEndpointEL.appendChild(t);
+		Element customTransformerEL = doc.createElementNS(muleNameSpace, "custom-transformer");
+		outboundEndpointEL.appendChild(customTransformerEL);
+		t = doc.createTextNode("\n          ");
+		outboundEndpointEL.appendChild(t);
+		customTransformerEL.setAttribute("name", connectorName + "InTransformer");
+		String transformerClassName = (monoOperation) ? TRANSFORMER_CLASS_NAME : getTransformaerClassName(operation);
+		customTransformerEL.setAttribute("class", packageName + "." + transformerClassName);
 		
 		t = doc.createTextNode("\n    ");
 		serviceEL.appendChild(t);
