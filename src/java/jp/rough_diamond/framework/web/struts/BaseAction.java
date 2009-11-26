@@ -150,6 +150,7 @@ abstract public class BaseAction extends DispatchAction {
 
 	private boolean hasRole(AllowRole allowRole) {
 		if(allowRole == null) {
+			log.warn("AllowRole NOT SPECIFIED!!");
 			return false;
 		}
 		if(allowRole.isAllAccess()) {
