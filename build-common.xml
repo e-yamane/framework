@@ -77,6 +77,12 @@
     <pathelement location="${test.src.dir}" />
   </path>
 
+  <path id="test.files.path.default">
+    <fileset dir="${test.src.dir}">
+      <include name="${junit.src.pattern}" />
+    </fileset>
+  </path>
+
   <!-- servletAPI‚Ìƒo[ƒWƒ‡ƒ“‚ÅˆÙ‚È‚é -->
   <path id="servletapi.path">
     <fileset dir="${other.lib.dir}">
@@ -749,6 +755,14 @@
   <target name="doJUnit">
     <taskdef name="junit" classpathref="classpath.all"
                       classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" />
+    <condition property="test.files.path.name" value="test.files.path.default" >
+      <not>
+        <isreference refid="test.files.path" />
+      </not>
+    </condition>
+    <condition property="test.files.path.name" value="test.files.path" >
+      <isreference refid="test.files.path" />
+    </condition>
     <junit printsummary="yes" haltonfailure="no" 
           fork="yes" forkmode="once" showOutput="true" failureproperty="tests.failed" maxmemory="1024m">
       <classpath>
@@ -758,9 +772,7 @@
       <formatter type="xml" />
       <batchtest fork="yes" todir="${result.dir}"
                     failureproperty="tests.failed">
-        <fileset dir="${test.src.dir}">
-          <include name="${junit.src.pattern}" />
-        </fileset>
+        <path refid="${test.files.path.name}"/>
       </batchtest>
     </junit>
     <tstamp>

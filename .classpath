@@ -3,6 +3,7 @@
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/java"/>
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/test"/>
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/testingFramework"/>
+	<classpathentry kind="src" path="src/moreTest"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/common/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="libs/servletapi/jsp-api.jar"/>
@@ -44,6 +45,8 @@
 	<classpathentry kind="lib" path="libs/easymock/easymock.jar"/>
 	<classpathentry kind="lib" path="libs/hudson/hudson-core-1.300.jar"/>
 	<classpathentry kind="lib" path="libs/hudson/localizer-1.9.jar"/>
+	<classpathentry kind="lib" path="libs/jdbcdrivers/classes12.jar"/>
+	<classpathentry kind="lib" path="libs/jdbcdrivers/nls_charset12.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

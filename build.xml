@@ -26,6 +26,14 @@
   <path id="test.src.path">
     <path refid="real.src.path" />
     <pathelement location="${test.src.dir}" />
+    <pathelement location="src/moreTest" />
+  </path>
+
+  <path id="test.files.path">
+    <path refid="test.files.path.default" />
+    <fileset dir="src/moreTest">
+      <include name="${junit.src.pattern}" />
+    </fileset>
   </path>
 
   <target name="doCopyTorqueGen">
