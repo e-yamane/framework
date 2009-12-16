@@ -197,25 +197,25 @@ public abstract class BaseUnit  implements Serializable {
     }
 
     /**
-     * 変換時に保持する少数精度。負数を指定すると整数の切捨て判断する
+     * 変換時に保持する小数精度。負数を指定すると整数の切捨て判断する
     **/ 
     private Integer scale;
     public final static String SCALE = "scale";
 
     /**
-     * 変換時に保持する少数精度。負数を指定すると整数の切捨て判断するを取得する
+     * 変換時に保持する小数精度。負数を指定すると整数の切捨て判断するを取得する
      * @hibernate.property
      *    column="SCALE"
      *    not-null="true"
-     * @return 変換時に保持する少数精度。負数を指定すると整数の切捨て判断する
+     * @return 変換時に保持する小数精度。負数を指定すると整数の切捨て判断する
     **/
     public Integer getScale() {
         return scale;
     }
 
     /**
-     * 変換時に保持する少数精度。負数を指定すると整数の切捨て判断するを設定する
-     * @param scale  変換時に保持する少数精度。負数を指定すると整数の切捨て判断する
+     * 変換時に保持する小数精度。負数を指定すると整数の切捨て判断するを設定する
+     * @param scale  変換時に保持する小数精度。負数を指定すると整数の切捨て判断する
     **/
     public void setScale(Integer scale) {
         this.scale = scale;

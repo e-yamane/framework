@@ -27,7 +27,7 @@ COMMENT ON COLUMN UNIT.BASE_UNIT_ID IS 'ベース数量尺度';
 COMMENT ON COLUMN UNIT.RATE_VALUE IS '変換係数 量(整数)';
 COMMENT ON COLUMN UNIT.RATE_SCALE IS '変換係数 小数点位置。正の数なら左へ、負の数なら右へ移動させる';
 
-COMMENT ON COLUMN UNIT.SCALE IS '変換時に保持する少数精度。負数を指定すると整数の切捨て判断する';
+COMMENT ON COLUMN UNIT.SCALE IS '変換時に保持する小数精度。負数を指定すると整数の切捨て判断する';
 COMMENT ON COLUMN UNIT.VERSION IS '楽観的ロッキングキー';
 
 

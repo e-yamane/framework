@@ -36,7 +36,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		assertEquals("単位が誤っています。", 1L, dest.getUnit().getId().longValue());
 	}
 	
-	public void test変換後の数値が少数のケースで正しく単位変換が行われること() throws Exception {
+	public void test変換後の数値が小数のケースで正しく単位変換が行われること() throws Exception {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
@@ -46,7 +46,7 @@ public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 		assertEquals("単位が誤っています。", 2L, dest.getUnit().getId().longValue());
 	}
 	
-	public void test変換係数に少数が含まれるケースで正しく単位変換が行われること() throws Exception {
+	public void test変換係数に小数が含まれるケースで正しく単位変換が行われること() throws Exception {
 		Unit unit = bService.findByPK(Unit.class, 1L);
 		Amount srcAmount = new Amount();
 		srcAmount.setUnit(unit);
