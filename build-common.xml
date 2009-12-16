@@ -389,7 +389,7 @@
         <isset property="param5" />
       </not>
     </condition>
-    <exec executable="${java.home}/bin/java">
+    <exec executable="${java.home}/bin/java" failonerror="true">
       <arg value="-classpath" />
       <arg value="${java.class.path}" />
       <arg value="org.apache.tools.ant.launch.Launcher" />
