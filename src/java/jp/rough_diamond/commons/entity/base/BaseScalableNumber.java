@@ -35,6 +35,7 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
      *    not-null="true"
      * @return 量(整数)
     **/
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="ScalableNumber.value")
     public Long getValue() {
         return value;
     }
@@ -59,6 +60,7 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
      *    not-null="true"
      * @return 小数点位置。正の数なら左へ、負の数なら右へ移動させる
     **/
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="ScalableNumber.scale")
     public Integer getScale() {
         return scale;
     }

@@ -209,6 +209,7 @@ public abstract class BaseUnit  implements Serializable {
      *    not-null="true"
      * @return •ÏŠ·‚É•Û‚·‚é¬”¸“xB•‰”‚ğw’è‚·‚é‚Æ®”‚ÌØÌ‚Ä”»’f‚·‚é
     **/
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.scale")
     public Integer getScale() {
         return scale;
     }

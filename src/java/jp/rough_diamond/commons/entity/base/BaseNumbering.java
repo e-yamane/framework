@@ -130,6 +130,7 @@ public abstract class BaseNumbering  implements Serializable {
      *    not-null="true"
      * @return Œ»İŠ„‚è“–‚Ä‚Ä‚¢‚é”Ô†
     **/
+    @jp.rough_diamond.commons.service.annotation.NotNull(property="Numbering.nextNumber")
     public Long getNextNumber() {
         return nextNumber;
     }
