@@ -37,7 +37,9 @@ DTDは、
 
   <table name="UNIT" description="数量尺度">
     <column name="ID"           primaryKey="true" required="true"   domain="oid"                description="OID" />
-    <column name="NAME"                           required="true"   type="VARCHAR"  size="32"   description="数量尺度名" />
+    <column name="NAME"                           required="true"   type="VARCHAR"  size="32"   description="数量尺度名">
+      <option key="maxCharLength" value="16" />
+    </column>
     <column name="DESCRIPTION"                    required="false"  type="VARCHAR"  size="64"   description="単位説明" />
     <column name="BASE_UNIT_ID"                   required="true"   type="BIGINT"               description="ベース数量尺度" />
     <column name="RATE"                           required="true"   type="SCALABLE_NUMBER"      description="変換係数" />

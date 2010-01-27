@@ -7,6 +7,7 @@
 package jp.rough_diamond.commons.entity;
 
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
@@ -94,5 +95,27 @@ public class UnitTest extends DataLoadingTestCase {
 		u.save();
 		after = BasicService.getService().getCountByExtractor(ex);
 		assertEquals("挿入されています。", before, after);
+	}
+	
+	public void testMaxCharLengthValidator() throws Exception {
+		Unit u = new Unit();
+		u.setName("12345678901234567");
+		u.setBase(u);
+		u.setScale(0);
+		u.setRate(new ScalableNumber("1"));
+		Messages msgs = u.validateObject();
+		assertTrue("エラーがありません。", msgs.hasError());
+		System.out.println(msgs);
+		assertEquals("エラープロパティ数が誤っています。", 1, msgs.getProperties().size());
+		assertEquals("エラーメッセージ数が誤っています。", 1, msgs.get("Unit.name").size());
+		assertEquals("キーが誤っています。", "errors.maxcharlength", msgs.get("Unit.name").get(0).getKey());
+
+		u.setName("あいうえおかきくけこさしすせそ");
+		msgs = u.validateObject();
+		assertTrue("エラーがありません。", msgs.hasError());
+		System.out.println(msgs);
+		assertEquals("エラープロパティ数が誤っています。", 1, msgs.getProperties().size());
+		assertEquals("エラーメッセージ数が誤っています。", 1, msgs.get("Unit.name").size());
+		assertEquals("キーが誤っています。", "errors.maxlength", msgs.get("Unit.name").get(0).getKey());
 	}
 }
