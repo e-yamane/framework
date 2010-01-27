@@ -579,9 +579,9 @@ abstract public class BasicService implements Service {
     	for(PropertyDescriptor pd : pds) {
     		Method m = pd.getReadMethod();
     		if(m != null) {
-    			Object val = m.invoke(o);
 	    		NotNull nn = m.getAnnotation(NotNull.class);
 	    		if(nn != null) {
+	    			Object val = m.invoke(o);
 	    			if(val == null) {
                         log.debug("必須属性エラー:" + nn.property());
 	    				ret.add(nn.property(), new Message("errors.required", ResourceManager.getResource().getString(nn.property())));
@@ -598,6 +598,7 @@ abstract public class BasicService implements Service {
 	    		}
 	    		MaxCharLength mcl = m.getAnnotation(MaxCharLength.class);
 	    		if(mcl != null) {
+	    			Object val = m.invoke(o);
 	    			if(val != null && val.toString().length() > mcl.length()) {
                         log.debug("最大文字長超過エラー:" + mcl.property());
 	    				ret.add(mcl.property(), new Message("errors.maxcharlength", ResourceManager.getResource().getString(mcl.property()), "" + mcl.length()));
@@ -607,6 +608,7 @@ abstract public class BasicService implements Service {
 	    		}
 	    		MaxLength ml = m.getAnnotation(MaxLength.class);
 	    		if(ml != null) {
+	    			Object val = m.invoke(o);
 	    			if(getLength(val) > ml.length()) {
                         log.debug("最大長超過エラー:" + ml.property());
 	    				ret.add(ml.property(), new Message("errors.maxlength", ResourceManager.getResource().getString(ml.property()), "" + ml.length()));
