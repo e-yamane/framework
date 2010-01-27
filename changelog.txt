@@ -36,7 +36,7 @@ RDF Core Change Log
 　　- Extractor#add*、CombineCondition#addの戻り値に自分自身を
 　　　返却するようにしました
 　　- 自動生成時にsaveメソッドを自動作成するようにしました。
-　　- 自動生成時にvalidateメソッドを自動作成するようにしました。
+　　- 自動生成時にvalidateObjectメソッドを自動作成するようにしました。
     - ExtractValue使用時にdistinctの指定ができるようにしました。
 　　- BasicService#findAllにレコードロックのモードを指定できるようにしました。
 　　- BasicServiceのリファクタリングを実施し、findByExtractorWithCountを抽象メソッドから
@@ -70,8 +70,10 @@ RDF Core Change Log
 　　- jp.rough_diamond.commons.entity.ScalableNumber生成時に整数部の数値がLong.MAX_VALUEを
 　　　超えていた場合の丸め処理の性能を向上しました。
 　　- makeClientStubコマンドで自動生成されるmule-config.xmlでtransformerはinboundで行うのではなく、
-      outboundで行うように変更
+　　　outboundで行うように変更
 　　- makeSchemaAccessorでエラーが発生した場合、以降の自動生成タスクは行わないようにする
+　　- String以外（IntegerとかLongとかBooleanとかDateとか）でrequired="true"と定義した場合に、
+　　　@NotNullアノテーションを付与するようにした。
   [Bug]
     - jp.rough_diamond.commons.resource.SimpleLocaleControllerコメント誤り
     - テスト実行前にcobertura.serを削除していない。そのため削除したクラスの

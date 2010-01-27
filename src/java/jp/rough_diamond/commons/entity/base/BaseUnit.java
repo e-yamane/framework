@@ -129,11 +129,11 @@ public abstract class BaseUnit  implements Serializable {
      * オブジェクトの永続可能性を検証する
      * @return 検証結果。msgs.hasError()==falseが成立する場合は検証成功とみなす
     */
-    public jp.rough_diamond.commons.resource.Messages validate() {
+    public jp.rough_diamond.commons.resource.Messages validateObject() {
         if(isThisObjectAnUpdateObject()) {
-            return validate(jp.rough_diamond.commons.service.WhenVerifier.UPDATE);
+            return validateObject(jp.rough_diamond.commons.service.WhenVerifier.UPDATE);
         } else {
-            return validate(jp.rough_diamond.commons.service.WhenVerifier.INSERT);
+            return validateObject(jp.rough_diamond.commons.service.WhenVerifier.INSERT);
         }
     }
 
@@ -141,7 +141,7 @@ public abstract class BaseUnit  implements Serializable {
      * オブジェクトの永続可能性を検証する
      * @return 検証結果。msgs.hasError()==falseが成立する場合は検証成功とみなす
     */
-    protected jp.rough_diamond.commons.resource.Messages validate(jp.rough_diamond.commons.service.WhenVerifier when) {
+    protected jp.rough_diamond.commons.resource.Messages validateObject(jp.rough_diamond.commons.service.WhenVerifier when) {
         return jp.rough_diamond.commons.service.BasicService.getService().validate(this, when);
     }
 
