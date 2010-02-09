@@ -503,22 +503,6 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("IDが誤っています。", 5L, list.get(3).getId().longValue());
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void testNotCondition() throws Exception {
-		//select * from unit where not (id = 1) order by id 
-		Extractor ex = new Extractor(Unit.class);
-		CombineCondition con = Condition.not();
-		con.add(Condition.eq(new Property(Unit.ID), 1L));
-		ex.add(con);
-		ex.addOrder(Order.asc(new Property(Unit.ID)));
-		List<Unit> list = BasicService.getService().findByExtractor(ex);
-		assertEquals("返却数が誤っています。", 4, list.size());
-		assertEquals("IDが誤っています。", 2L, list.get(0).getId().longValue());
-		assertEquals("IDが誤っています。", 3L, list.get(1).getId().longValue());
-		assertEquals("IDが誤っています。", 4L, list.get(2).getId().longValue());
-		assertEquals("IDが誤っています。", 5L, list.get(3).getId().longValue());
-	}
-	
 	public void testSpecificateReturnTypeWithConstructorInjection() throws Exception {
 		//select sum(rate_value) from unit where id <= 5
 		Extractor ex = new Extractor(Unit.class);
