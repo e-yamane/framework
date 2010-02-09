@@ -26,6 +26,11 @@ DTDは、
   <domain name="oid"                type="BIGINT" description="オブジェクトID" />
   <domain name="optimistickLockKey" type="BIGINT" description="楽観的ロッキングキー" />
 
+  <table name="UPDATE_TIMESTAMP" description="更新日時情報" skipSql="true">
+    <column name="REGISTERER_DATE"              required="true"   type="TIMESTAMP"            description="登録日時" />
+    <column name="LAST_MODIFIED_DATE"           required="true"   type="TIMESTAMP"            description="最終更新日" />
+  </table>
+
   <table name="AMOUNT"  description="量" baseClass="java.lang.Number" skipSql="true">
     <!-- 単位無しを見越してUNIT_IDはnull許可 -->
     <column name="UNIT_ID"                        required="false"  domain="oid"                description="数量尺度ID" />
