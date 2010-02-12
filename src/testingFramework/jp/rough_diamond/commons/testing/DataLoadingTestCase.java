@@ -33,19 +33,30 @@ public abstract class DataLoadingTestCase extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        setUpDB();
+    }
+
+    public static void setUpDB() throws Exception {
         DBInitializer.clearModifiedClasses();
         DIContainer org = DIContainerFactory.getDIContainer();
         DIContainerFactory.setDIContainer(new DIContainerExt(org));
     }
-
+    
     @Override
     protected void tearDown() throws Exception {
+    	try {
+    		cleanUpDB();
+    	} finally {
+    		super.tearDown();
+    	}
+    }
+    
+    public static void cleanUpDB() throws Exception {
     	DIContainer di = DIContainerFactory.getDIContainer();
     	if(di instanceof DIContainerExt) {
 	        DIContainerExt ext = (DIContainerExt)di;
 	        DIContainerFactory.setDIContainer(ext.org);
     	}
-        super.tearDown();
         DBInitializer.clearModifiedData();
     }
     
