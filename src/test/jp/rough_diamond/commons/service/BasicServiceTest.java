@@ -26,6 +26,7 @@ import jp.rough_diamond.commons.service.annotation.PostLoad;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
+import jp.rough_diamond.commons.testing.Loader;
 import junit.framework.Assert;
 
 /**
@@ -34,8 +35,8 @@ import junit.framework.Assert;
 public class BasicServiceTest extends DataLoadingTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
-		NumberingLoader.init();
-		UnitLoader.init();
+		Loader.load(UnitLoader.class);
+		Loader.load(NumberingLoader.class);
 	}
 
 	public void testFindByExtractorWithCount() throws Exception {

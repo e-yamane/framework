@@ -16,8 +16,8 @@ public class DataLoadingTestCaseTest extends DataLoadingTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		UnitLoader.init();
-		NumberingLoader.init();
+		Loader.load(UnitLoader.class);
+		Loader.load(NumberingLoader.class);
 	}
 
 	public void testWhenInsert() throws Exception {

@@ -12,13 +12,14 @@ import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
+import jp.rough_diamond.commons.testing.Loader;
 
 public class UnitTest extends DataLoadingTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		UnitLoader.init();
-		NumberingLoader.init();
+		Loader.load(UnitLoader.class);
+		Loader.load(NumberingLoader.class);
 	}
 
 	public void testGateRate() throws Exception {

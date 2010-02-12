@@ -17,14 +17,15 @@ import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
+import jp.rough_diamond.commons.testing.Loader;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 
 public class TransactionManagerTest extends DataLoadingTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
-		NumberingLoader.init();
-		UnitLoader.init();
+		Loader.load(NumberingLoader.class);
+		Loader.load(UnitLoader.class);
 	}
 	
 	public void testIsInTransaction() {

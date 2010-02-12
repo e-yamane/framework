@@ -32,6 +32,7 @@ import jp.rough_diamond.commons.service.annotation.PostLoad;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
+import jp.rough_diamond.commons.testing.Loader;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 
@@ -41,8 +42,8 @@ import jp.rough_diamond.framework.service.ServiceLocator;
 public class Extractor2HQLTest extends DataLoadingTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
-		NumberingLoader.init();
-		UnitLoader.init();
+		Loader.load(UnitLoader.class);
+		Loader.load(NumberingLoader.class);
 	}
 
 	public void testFetchSizeÇÃéwíËÇ™ê≥ÇµÇ≠çsÇÌÇÍÇƒÇ¢ÇÈÇ±Ç∆() throws Exception {

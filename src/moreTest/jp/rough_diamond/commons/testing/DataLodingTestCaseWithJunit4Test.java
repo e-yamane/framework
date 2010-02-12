@@ -31,8 +31,8 @@ public class DataLodingTestCaseWithJunit4Test {
 	@Before
 	public void setUp() throws Exception {
 		DataLoadingTestCase.setUpDB();
-		UnitLoader.init();
-		NumberingLoader.init();
+		Loader.load(UnitLoader.class);
+		Loader.load(NumberingLoader.class);
 		ex = new Extractor(Unit.class);
 		unitCount = BasicService.getService().getCountByExtractor(ex);
 		status = "dontProcess";

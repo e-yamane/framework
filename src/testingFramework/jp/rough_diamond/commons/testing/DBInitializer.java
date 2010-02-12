@@ -1,10 +1,13 @@
 package jp.rough_diamond.commons.testing;
 
+import java.io.File;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jp.rough_diamond.commons.lang.ClassUtils;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 import jp.rough_diamond.framework.transaction.ConnectionManager;
@@ -177,9 +181,84 @@ abstract public class DBInitializer implements Service {
         return false;
     }
     
-    abstract protected String[] getResourceNames();
+    private String[] resources = null;
+    protected String[] getResourceNames() {
+    	if(resources != null) {
+    		return resources;
+    	}
+    	ResourceNames rn = this.getClass().getAnnotation(ResourceNames.class);
+    	if(rn == null) {
+    		throw new RuntimeException("ResourceNameアノテーションを付与するか、getResourceNamesをオーバーライドしてください");
+    	}
+    	List<String> resources = new ArrayList<String>();
+    	for(String resource : rn.resources()) {
+    		resources.addAll(getResources(resource));
+    	}
+    	this.resources = resources.toArray(new String[resources.size()]);
+    	return this.resources;
+    }
     
-    private static Map<String, IDataSet> datasetMap = new HashMap<String, IDataSet>();
+	Collection<? extends String> getResources(String resource) {
+		if(resource.endsWith(".xls") || resource.endsWith(".xml")) {
+			return Arrays.asList(getResource(resource));
+		} else {
+			return getResourcesByClass(resource);
+		}
+	}
+
+	List<String> getResourcesByClass(String className) {
+		List<String> ret = new ArrayList();
+		//絶対パスで他DBInitializerが指定されているか？
+		try {
+			Class<DBInitializer> cl = (Class<DBInitializer>)Class.forName(className);
+			DBInitializer target = ServiceLocator.getService(cl);
+			ret.addAll(Arrays.asList(target.getResourceNames()));
+			return ret;
+		} catch (ClassNotFoundException e) {
+		}
+		try {
+			className = getResourcePath(className).replace('/', '.');
+			Class<DBInitializer> cl = (Class<DBInitializer>)Class.forName(className);
+			DBInitializer target = ServiceLocator.getService(cl);
+			ret.addAll(Arrays.asList(target.getResourceNames()));
+			return ret;
+		} catch (ClassNotFoundException e) {
+		}
+		throw new RuntimeException(className + "に対応するDBInitializerが存在しません。");
+	}
+	
+	String getResource(String resource) {
+		//絶対パスのリソースが指定されているか？
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream(resource);
+		if(is != null) {
+			return resource;
+		}
+		//指定されていない場合は相対パスで探しに行く
+		resource = getResourcePath(resource);
+		is = this.getClass().getClassLoader().getResourceAsStream(resource);
+		if(is != null) {
+			return resource;
+		}
+		throw new RuntimeException(resource + "に対応するリソースが存在しません。");
+	}
+
+	//ディレクトリトラバースにしたのは、getCanonicalPathが異様に遅いため
+	String getResourcePath(String resource) {
+		String classPath = ClassUtils.translateResourceName(this.getClass());
+		File f = new File(classPath).getParentFile();
+		resource = resource.replace('\\', '/');
+		String[] pathes = resource.split("\\/");
+		for(String path : pathes) {
+			if("..".equals(path)) {
+				f = f.getParentFile();
+			} else {
+				f = new File(f, path);
+			}
+		}
+		return f.getPath().replace('\\', '/');
+	}
+	
+	private static Map<String, IDataSet> datasetMap = new HashMap<String, IDataSet>();
     protected void execute(DatabaseOperation operation, String... resourceNames) throws Exception {
     	String schema = HibernateUtils.getConfig().getProperty(Environment.DEFAULT_SCHEMA);
     	String driverClassName = HibernateUtils.getConfig().getProperty(Environment.DRIVER);
