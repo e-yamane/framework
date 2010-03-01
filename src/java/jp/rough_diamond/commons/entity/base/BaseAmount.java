@@ -64,6 +64,9 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
      * @return the associated Unit object
      */
     public jp.rough_diamond.commons.entity.Unit getUnit() {
+        if(jp.rough_diamond.commons.service.BasicService.isProxy(this.unit)) {
+            this.unit = jp.rough_diamond.commons.service.BasicService.getService().replaceProxy(this.unit);
+        }
         return this.unit;
     }
 
@@ -74,17 +77,6 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
      */
     public void setUnit(jp.rough_diamond.commons.entity.Unit v) {
         this.unit = v;
-    }
-
-    @jp.rough_diamond.commons.service.annotation.PostLoad
-    public void loadUnit() {
-        jp.rough_diamond.commons.entity.Unit unit = getUnit();
-        if(unit != null) {
-            Long pk = unit.getId();
-            setUnit(
-                    jp.rough_diamond.commons.service.BasicService.getService().findByPK(jp.rough_diamond.commons.entity.Unit.class, pk)
-            );
-        }
     }
 
 //ForeignProperties.vm finish.

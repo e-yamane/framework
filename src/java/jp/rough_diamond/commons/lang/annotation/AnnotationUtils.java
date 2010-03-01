@@ -36,7 +36,7 @@ public class AnnotationUtils {
     @SuppressWarnings("unchecked")
     public static <A extends Annotation> A getAnnotation(Class cl, Class<A> acl) {
         A ret = (A) cl.getAnnotation(acl);
-        while(ret == null || cl.getSuperclass() == null) {
+        while(ret == null && cl.getSuperclass() != null) {
             cl = cl.getSuperclass();
             ret = (A)cl.getAnnotation(acl);
         }
@@ -55,7 +55,7 @@ public class AnnotationUtils {
     @SuppressWarnings("unchecked")
 	public static <A extends Annotation> A getAnnotation(Class cl, Method m, Class<A> acl) {
     	A ret = (A)m.getAnnotation(acl);
-    	while(ret == null || cl.getSuperclass() == null) {
+    	while(ret == null && cl.getSuperclass() != null) {
     		cl = cl.getSuperclass();
     		try {
 				m = cl.getMethod(m.getName(), m.getParameterTypes());

@@ -34,7 +34,8 @@ public class Loader {
 	public static void load(Class<? extends DBInitializer> loaderType) throws Exception {
 		ResetterType rt = loaderType.getAnnotation(ResetterType.class);
 		if(rt == null) {
-			log.warn("ResetterTypeが指定されていないため、データのクリーンアップは行いません。");
+			log.warn("ResetterTypeが指定されていないため、指定されたローダーでリセットします。");
+			reset(loaderType);
 		} else {
 			reset(rt.type());
 		}

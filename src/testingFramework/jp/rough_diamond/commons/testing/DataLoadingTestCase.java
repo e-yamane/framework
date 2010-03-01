@@ -65,19 +65,24 @@ public abstract class DataLoadingTestCase extends TestCase {
     	DIContainerExt(DIContainer org) {
     		this.org = org;
     	}
-    	
+    	static ServiceLocatorLogic sllExt;
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> T getObject(Class<T> arg0, Object arg1) {
+		public synchronized <T> T getObject(Class<T> arg0, Object arg1) {
 			if(arg1.equals(ServiceLocator.SERVICE_LOCATOR_KEY)) {
-				log.debug("ServiceLocatorLogicÇÃéÊìæóvãÅÇ≈Ç∑");
-				DIContainer current = DIContainerFactory.getDIContainer();
-				DIContainerFactory.setDIContainer(org);
-				try {
-					ServiceLocatorLogic orgLogic = ServiceLocatorLogic.getServiceLocatorLogic();
-					return (T)new ServiceLocatorLogicExt(orgLogic);
-				} finally {
-					DIContainerFactory.setDIContainer(current);
+				synchronized(this) {
+					if(sllExt == null) {
+						log.debug("ServiceLocatorLogicÇÃéÊìæóvãÅÇ≈Ç∑");
+						DIContainer current = DIContainerFactory.getDIContainer();
+						DIContainerFactory.setDIContainer(org);
+						try {
+							ServiceLocatorLogic orgLogic = ServiceLocatorLogic.getServiceLocatorLogic();
+							sllExt = (ServiceLocatorLogic)new ServiceLocatorLogicExt(orgLogic);
+						} finally {
+							DIContainerFactory.setDIContainer(current);
+						}
+					}
+					return (T)sllExt;
 				}
 			}
 			return org.getObject(arg0, arg1);

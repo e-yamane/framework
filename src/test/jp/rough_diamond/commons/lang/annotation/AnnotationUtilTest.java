@@ -27,6 +27,12 @@ public class AnnotationUtilTest extends TestCase {
 		Method m = Child.class.getMethod("foo");
 		SampleAnno anno3 = AnnotationUtils.getAnnotation(Child.class, m, SampleAnno.class);
 		assertEquals("abc", anno3.value());
+		
+		DummyAnno anno4 = AnnotationUtils.getAnnotation(child, DummyAnno.class);
+		assertNull(anno4);
+		
+		DummyAnno anno5 = AnnotationUtils.getAnnotation(Child.class, m, DummyAnno.class);
+		assertNull(anno5);
 	}
 	
 	@Retention(RetentionPolicy.RUNTIME)
@@ -35,6 +41,12 @@ public class AnnotationUtilTest extends TestCase {
 		String value();
 	};
 	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.TYPE, ElementType.METHOD})
+	public static @interface DummyAnno {
+		String value();
+	};
+
 	@SampleAnno("xyz")
 	public class Parent {
 		@SampleAnno("abc")

@@ -12,10 +12,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Stack;
 
 import jp.rough_diamond.commons.lang.StringUtils;
@@ -128,9 +131,69 @@ public class HibernateConnectionManager extends ConnectionManager {
 	}
 	
 	protected void setListeners() {
-		if(listenersMap == null) {
-			return;
+		Map<String, List<String>> listenersMap;
+		if(this.listenersMap == null) {
+			listenersMap = new HashMap<String, List<String>>();
+		} else {
+			listenersMap = new HashMap<String, List<String>>(this.listenersMap);
 		}
+
+		Set<String> tmp = new HashSet<String>();
+		List<String> flushListeners = listenersMap.get("flush-entity");
+		if(flushListeners == null) {
+			flushListeners = new ArrayList<String>();
+			listenersMap.put("flush-entity", flushListeners);
+		}
+		tmp.clear();
+		tmp.addAll(flushListeners);
+		if(!tmp.contains(FlushListener.FlushListenerInner.class.getName())) {
+			flushListeners.add(FlushListener.FlushListenerInner.class.getName());
+		}
+
+		List<String> autoFlushListeners = listenersMap.get("auto-flush");
+		if(autoFlushListeners == null) {
+			autoFlushListeners = new ArrayList<String>();
+			listenersMap.put("auto-flush", autoFlushListeners);
+		}
+		tmp.clear();
+		tmp.addAll(autoFlushListeners);
+		if(!tmp.contains(FlushListener.AutoFlushListenerInner.class.getName())) {
+			autoFlushListeners.add(FlushListener.AutoFlushListenerInner.class.getName());
+		}
+
+		List<String> saveListeners = listenersMap.get("save");
+		if(saveListeners == null) {
+			saveListeners = new ArrayList<String>();
+			listenersMap.put("save", saveListeners);
+		}
+		tmp.clear();
+		tmp.addAll(saveListeners);
+		if(!tmp.contains(SaveOrUpdateListener.SaveListenerInner.class.getName())) {
+			saveListeners.add(SaveOrUpdateListener.SaveListenerInner.class.getName());
+		}
+		
+		List<String> updateListeners = listenersMap.get("update");
+		if(updateListeners == null) {
+			updateListeners = new ArrayList<String>();
+			listenersMap.put("update", updateListeners);
+		}
+		tmp.clear();
+		tmp.addAll(updateListeners);
+		if(!tmp.contains(SaveOrUpdateListener.UpdateListenerInner.class.getName())) {
+			updateListeners.add(SaveOrUpdateListener.UpdateListenerInner.class.getName());
+		}
+
+		List<String> saveOrUpdateListeners = listenersMap.get("save-update");
+		if(saveOrUpdateListeners == null) {
+			saveOrUpdateListeners = new ArrayList<String>();
+			listenersMap.put("save-update", saveOrUpdateListeners);
+		}
+		tmp.clear();
+		tmp.addAll(saveOrUpdateListeners);
+		if(!tmp.contains(SaveOrUpdateListener.SaveOrUpdateListenerInner.class.getName())) {
+			saveOrUpdateListeners.add(SaveOrUpdateListener.SaveOrUpdateListenerInner.class.getName());
+		}
+
 		for(Map.Entry<String, List<String>> entry : listenersMap.entrySet()) {
 			List<String> list = entry.getValue();
 			if(list != null) {

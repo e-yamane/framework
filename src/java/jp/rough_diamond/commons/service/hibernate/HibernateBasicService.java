@@ -12,7 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,6 +25,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.proxy.HibernateProxy;
 
 import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
@@ -36,8 +39,10 @@ import jp.rough_diamond.commons.service.RelationalChecker;
 import jp.rough_diamond.commons.service.WhenVerifier;
 import jp.rough_diamond.commons.service.annotation.Check;
 import jp.rough_diamond.framework.transaction.VersionUnmuchException;
+import jp.rough_diamond.framework.transaction.hibernate.FlushListener;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateConnectionManager;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
+import jp.rough_diamond.framework.transaction.hibernate.SaveOrUpdateListener;
 
 public class HibernateBasicService extends BasicService {
     private final static Log log = LogFactory.getLog(HibernateBasicService.class);
@@ -55,12 +60,15 @@ public class HibernateBasicService extends BasicService {
 		}
     }
 
+    private ThreadLocal<Boolean> isLoading = new ThreadLocal<Boolean>();
 	@Override
     @SuppressWarnings("unchecked")
     public <T> T findByPK(Class<T> type, Serializable pk, boolean isNoCache, RecordLock lock) {
     	BasicServiceInterceptor.startLoad(isNoCache);
         try {
+        	isLoading.set(Boolean.TRUE);
             T ret = (T)HibernateUtils.getSession().get(type, pk, getLockMode(lock));
+        	isLoading.remove();
             if(ret != null) {
                 List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
                 fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
@@ -75,6 +83,7 @@ public class HibernateBasicService extends BasicService {
         } catch(Exception e) {
             throw new RuntimeException(e);
         } finally {
+        	isLoading.remove();
         	BasicServiceInterceptor.setNoCache(false);
         	BasicServiceInterceptor.popPostLoadedObjects();
         }
@@ -88,6 +97,7 @@ public class HibernateBasicService extends BasicService {
         } catch(Exception e) {
             throw new RuntimeException(e);
         } finally {
+        	isLoading.remove();
         	BasicServiceInterceptor.setNoCache(false);
         	BasicServiceInterceptor.popPostLoadedObjects();
         }
@@ -129,7 +139,9 @@ public class HibernateBasicService extends BasicService {
         List<T> list;
         if(extractor.getLimit() != 0) {
 	        Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
+        	isLoading.set(Boolean.TRUE);
         	list = (List<T>) Extractor2HQL.makeList(type, extractor, query.list());
+        	isLoading.remove();
 	        List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
 	        fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
 	        if(isNoCache) {
@@ -363,5 +375,74 @@ public class HibernateBasicService extends BasicService {
 		Object pk = cm.getIdentifier(target, EntityMode.POJO);
 		log.debug(pk + ":" + org);
 		return pk.equals(org);
+	}
+
+	private ThreadLocal<Boolean> isUnitPropertyValidating = new ThreadLocal<Boolean>();
+	@Override
+    protected Messages unitPropertyValidate(Object o, WhenVerifier when) throws Exception {
+		isUnitPropertyValidating.set(Boolean.TRUE);
+		try {
+			return super.unitPropertyValidate(o, when);
+		} finally {
+			isUnitPropertyValidating.remove();
+		}
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+	public <T> T replaceProxy(T proxy) {
+		try {
+			if(!isProxy(proxy)) {
+				return proxy;
+			}
+			//フラッシュ中時点でProxyならProxyのままでよいはず
+			if(FlushListener.isFlushing()) {
+				return (T)proxy;
+			}
+			if(Boolean.TRUE.equals(isLoading.get())) {
+				return (T)proxy;
+			}
+			if(Boolean.TRUE.equals(isUnitPropertyValidating.get())) {
+				return (T)proxy;
+			}
+			if(Boolean.TRUE.equals(SaveOrUpdateListener.isSaveingOrUpdating())) {
+				return (T)proxy;
+			}
+			ClassMetadata cm = getRealType((Class<?>)proxy.getClass());
+			return (T)findByPK(Class.forName(cm.getEntityName()), cm.getIdentifier(proxy, EntityMode.POJO));
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	static Map<Class<?>, ClassMetadata> realTypeMap = new HashMap<Class<?>, ClassMetadata>();
+	@SuppressWarnings("unchecked")
+	private ClassMetadata getRealType(Class<?> proxyType) {
+		ClassMetadata ret = realTypeMap.get(proxyType);
+		if(ret == null) {
+			Class cl = proxyType;
+			while(!cl.equals(Object.class) && ret == null) {
+				ret = HibernateUtils.getSession().getSessionFactory().getClassMetadata(cl);
+				cl = cl.getSuperclass();
+			}
+			if(ret == null) {
+				throw new RuntimeException("ClassMetadata not found.");
+			}
+			realTypeMap.put(proxyType, ret);
+		}
+		return ret;
+	}
+
+	@Override
+	protected ProxyChecker getProxyChecker() {
+		return PROXY_CHECKER;
+	}
+	
+	final static ProxyChecker PROXY_CHECKER = new HibernateProxyChecker();
+	private static class HibernateProxyChecker implements ProxyChecker {
+		@Override
+		public boolean isProxy(Object target) {
+			return (target instanceof HibernateProxy);
+		}
 	}
 }

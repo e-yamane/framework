@@ -497,6 +497,34 @@
         <isset property="hibernate.pattern" />
       </not>
     </condition>
+    <condition property="hibernate.max_fetch_depth" value="2" >
+      <not>
+        <isset property="hibernate.max_fetch_depth" />
+      </not>
+    </condition>
+    <condition property="hibernate.max_fetch_depth" value="2" >
+      <not>
+        <isset property="hibernate.max_fetch_depth" />
+      </not>
+    </condition>
+    <condition property="hibernate.useOuterJoin" value="true" >
+      <and>
+        <not>
+          <isset property="hibernate.useOuterJoin" />
+        </not>
+        <not>
+          <equals arg1="${hibernate.max_fetch_depth}" arg2="0" />
+        </not>
+      </and>
+    </condition>
+    <condition property="hibernate.useOuterJoin" value="false" >
+      <and>
+        <not>
+          <isset property="hibernate.useOuterJoin" />
+        </not>
+        <equals arg1="${hibernate.max_fetch_depth}" arg2="0" />
+      </and>
+    </condition>
     <echo message="${hibernate.otherResources}" />
     <hibernatedoclet destdir="${src.dir}"
       excludedtags="@version, @author, @todo"
@@ -513,12 +541,13 @@
           userName="${hibernate.connection.username}"
           password="${hibernate.connection.password}"
           showSql="${hibernate.show_sql}"
-          useOuterjoin="true"
+          useOuterjoin="${hibernate.useOuterJoin}"
           destDir="${src.dir}"
           version="3.0"
           destinationFile="hibernate.cfg.xml"
           otherResources="${hibernate.otherResources}"
       >
+        <otherProperty name="max_fetch_depth"                 value="${hibernate.max_fetch_depth}" />
         <otherProperty name="connection.provider_class"       value="${hibernate.connection.provider_class}" />
         <otherProperty name="connection.pool_size"            value="${hibernate.connection.pool_size}" />
         <otherProperty name="connection.c3p0.min_size"        value="${hibernate.connection.c3p0.min_size}" />

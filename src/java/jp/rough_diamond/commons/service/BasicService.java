@@ -247,6 +247,8 @@ abstract public class BasicService implements Service {
 	 */
 	abstract public <T> long getCountByExtractor(Extractor extractor);
 	
+	abstract public <T> T replaceProxy(T t);
+
     /**
      * 指定されたクラスの永続化オブジェクトを全て取得する
      * 取得したオブジェクトは永続化エンジン（例：Hibernate）がキャッシュするように指示する
@@ -572,7 +574,7 @@ abstract public class BasicService implements Service {
     	return (list == null) ? new ArrayList<Object>() : list;
     }
     
-    private Messages unitPropertyValidate(Object o, WhenVerifier when) throws Exception {
+    protected Messages unitPropertyValidate(Object o, WhenVerifier when) throws Exception {
     	Messages ret = new Messages();
     	Class cl = o.getClass();
     	PropertyDescriptor[] pds = PropertyUtils.getPropertyDescriptors(cl);
@@ -839,4 +841,14 @@ abstract public class BasicService implements Service {
     	}
 		return true;
 	}
+    
+    public static boolean isProxy(Object target) {
+    	return BasicService.getService().getProxyChecker().isProxy(target);
+    }
+    
+    abstract protected ProxyChecker getProxyChecker();
+    
+    protected static interface ProxyChecker {
+    	public boolean isProxy(Object target);
+    }
 }

@@ -291,6 +291,9 @@ public abstract class BaseUnit  implements Serializable {
      */
     @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.baseUnitId")
     public jp.rough_diamond.commons.entity.Unit getBase() {
+        if(jp.rough_diamond.commons.service.BasicService.isProxy(this.base)) {
+            this.base = jp.rough_diamond.commons.service.BasicService.getService().replaceProxy(this.base);
+        }
         return this.base;
     }
 
@@ -301,19 +304,6 @@ public abstract class BaseUnit  implements Serializable {
      */
     public void setBase(jp.rough_diamond.commons.entity.Unit v) {
         this.base = v;
-    }
-
-    @jp.rough_diamond.commons.service.annotation.PostLoad
-    public void loadBases() {
-        jp.rough_diamond.commons.entity.Unit base = getBase();
-        if(base != null) {
-            jp.rough_diamond.commons.entity.Unit tmp = base.getBase();
-            if(tmp != null) {
-                Long pk = tmp.getId();
-                base.setBase(
-                        jp.rough_diamond.commons.service.BasicService.getService().findByPK(jp.rough_diamond.commons.entity.Unit.class, pk));
-            }
-        }
     }
 
 //ForeignProperties.vm finish.
