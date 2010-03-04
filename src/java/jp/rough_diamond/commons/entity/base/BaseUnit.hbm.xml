@@ -11,6 +11,7 @@
         name="jp.rough_diamond.commons.entity.Unit"
         table="UNIT"
     >
+        <cache usage="read-write" />
 
         <id
             name="id"

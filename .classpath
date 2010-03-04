@@ -23,7 +23,6 @@
 	<classpathentry kind="lib" path="libs/ant/ant.jar"/>
 	<classpathentry kind="lib" path="libs/dbUnit/dbunit.jar"/>
 	<classpathentry kind="lib" path="libs/POI/poi-3.0.1-FINAL-20070705.jar"/>
-	<classpathentry kind="lib" path="libs/xdoclet/xdoclet-hibernate-module.jar"/>
 	<classpathentry kind="lib" path="libs/xdoclet/xdoclet.jar"/>
 	<classpathentry kind="lib" path="libs/xdoclet/xjavadoc-1.5-snapshot050611.jar"/>
 	<classpathentry kind="lib" path="libs/httpclient/commons-httpclient-3.1.jar"/>
@@ -45,6 +44,7 @@
 	<classpathentry kind="lib" path="libs/easymock/easymock.jar"/>
 	<classpathentry kind="lib" path="libs/hudson/hudson-core-1.300.jar"/>
 	<classpathentry kind="lib" path="libs/hudson/localizer-1.9.jar"/>
+	<classpathentry kind="lib" path="libs/hibernate/ehcache-1.2.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

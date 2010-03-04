@@ -20,7 +20,8 @@ abstract public class ConnectionManager {
 	abstract public void beginTransaction(MethodInvocation mi);
 	abstract public void rollback(MethodInvocation mi);
 	abstract public void commit(MethodInvocation mi) throws SQLException;
-
+	abstract public void clearCache();
+	
 	public final static String CONNECTION_MANAGER_KEY = "connectionManager";
 	
 	public static ConnectionManager getConnectionManager() {

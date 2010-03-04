@@ -16,6 +16,7 @@ import  java.io.Serializable;
  * @hibernate.class
  *    table="UNIT"
  *    realClass="jp.rough_diamond.commons.entity.Unit"
+ *  @hibernate.cache usage="read-only"
 **/
 public abstract class BaseUnit  implements Serializable {
    private static final long serialVersionUID = 1L;

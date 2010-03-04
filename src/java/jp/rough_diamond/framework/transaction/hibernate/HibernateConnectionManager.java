@@ -34,6 +34,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 
 @SuppressWarnings("unchecked")
 public class HibernateConnectionManager extends ConnectionManager {
@@ -306,6 +308,27 @@ public class HibernateConnectionManager extends ConnectionManager {
 		} finally{
 			accessCounter--;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see jp.rough_diamond.framework.transaction.ConnectionManager#clearCache()
+	 */
+	@Override
+	public void clearCache() {
+    	SessionFactory sf = getSessionFactory();
+    	if(sf instanceof SessionFactoryImplementor) {
+    		SessionFactoryImplementor sfi = (SessionFactoryImplementor)sf;
+    		sfi.evictQueries();
+    		String[] regions = sfi.getStatistics().getSecondLevelCacheRegionNames();
+    		for(String region : regions) {
+    			if(sfi.getClassMetadata(region) != null) {
+    				EntityPersister p = sfi.getEntityPersister(region);
+    				if(p.hasCache()) {
+    					p.getCache().clear();
+    				}
+    			}
+    		}
+    	}
 	}
 
 	private String hibernateConfigName;

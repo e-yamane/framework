@@ -96,9 +96,10 @@ abstract public class DBInitializer implements Service {
             service.clearData(list.get(i));
         }
         list = list.subList(0, minimumIndex);
+        ConnectionManager.getConnectionManager().clearCache();
     }
     
-    public static class TmpService implements Service {
+	public static class TmpService implements Service {
         public void replaceInterceptor() {
             Configuration config = HibernateUtils.getConfig();
             Interceptor org = config.getInterceptor();

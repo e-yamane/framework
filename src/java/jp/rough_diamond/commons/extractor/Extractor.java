@@ -46,6 +46,8 @@ public class Extractor implements Serializable {
 	private int		fetchSize = DEFAULT_FETCH_SIZE;
 	private boolean	distinct = false;
 	
+	private boolean isCachable = false;
+	
 	/**
 	 * 抽出条件格納オブジェクトを生成する
 	 * @param target 抽出対象エンティティクラス nullの場合はNullPointerExceptionを送出する
@@ -222,5 +224,21 @@ public class Extractor implements Serializable {
 	 */
 	public void setDistinct(boolean distinct) {
 		this.distinct = distinct;
+	}
+
+	/**
+	 * このExtractorで生成されるクエリーの返却値をキャッシュするか否かを返却する
+	 * @return
+	 */
+	public boolean isCachable() {
+		return isCachable;
+	}
+
+	/**
+	 * このExtractorで生成されるクエリーの返却値のキャッシュ可否を指定する
+	 * @return
+	 */
+	public void setCachable(boolean isCachable) {
+		this.isCachable = isCachable;
 	}
 }

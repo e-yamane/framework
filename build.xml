@@ -6,6 +6,9 @@
   <property name="copy.cobertura.target.name" value="copyCoberturaTargetClasses" />
   <property name="ci.preprocess.name"         value="doCopyTorqueGen" />
   <property name="classes.dir"                value="./bin" />
+
+  <property name="hibernate.cache.avalable"       value="true" />
+
   <import file="../framework/build-common.xml" />
 
   <property name="product.version"            value="0.8.1" />

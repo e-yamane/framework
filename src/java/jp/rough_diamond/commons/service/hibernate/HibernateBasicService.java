@@ -107,10 +107,16 @@ public class HibernateBasicService extends BasicService {
 	public <T> long getCountByExtractor(Extractor extractor) {
 		if(extractor.getValues().size() == 0) {
 	        Query countQuery = Extractor2HQL.extractor2CountQuery(extractor);
+	        if(extractor.isCachable()) {
+	        	countQuery.setCacheable(true);
+	        }
 	        Number n = (Number)countQuery.list().get(0);
 	        return n.longValue();
 		} else {
 			PreparedStatement pstmt = Extractor2HQL.extractor2PreparedStatement(extractor);
+	        if(extractor.isCachable()) {
+	        	log.info("this query doesn't cache!");
+	        }
 			SQLException sqlex = null;
 			try {
 				ResultSet rs = pstmt.executeQuery();
@@ -139,6 +145,9 @@ public class HibernateBasicService extends BasicService {
         List<T> list;
         if(extractor.getLimit() != 0) {
 	        Query query = Extractor2HQL.extractor2Query(extractor, getLockMode(lock));
+	        if(extractor.isCachable()) {
+		        query.setCacheable(true);
+	        }
         	isLoading.set(Boolean.TRUE);
         	list = (List<T>) Extractor2HQL.makeList(type, extractor, query.list());
         	isLoading.remove();

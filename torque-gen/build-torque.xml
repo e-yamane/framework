@@ -642,6 +642,37 @@
     </torque-data-model>
   </target>
 
+  <target
+    name="cache-override-properties"
+    depends="check-use-classpath, om-check"
+    unless="torque.internal.om.uptodate"
+    description="==> generates the Peer-based object model for your project">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Generating Cache Override Properties File for |"/>
+    <echo message="| YOUR Torque project!                          |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+
+    <torque-data-model
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="cache/Control.vm"
+      outputDirectory="${torque.cache.property.dir}"
+      outputFile="${torque.cache.property.file}"
+      targetDatabase="${torque.database}"
+      targetPackage="${torque.targetPackage}"
+      useClasspath="${torque.useClasspath}"
+      templatePath="${torque.templatePath}"
+      inputEncoding="MS932"
+      outputEncoding="${output.src.encoding}">
+      <fileset dir="${torque.schema.dir}"
+        includes="${torque.schema.om.includes}"
+        excludes="${torque.schema.om.excludes}"
+      />
+    </torque-data-model>
+  </target>
+
   <!-- ================================================================ -->
   <!-- G E N E R A T E  O M  Z I P  F I L E                             -->
   <!-- ================================================================ -->

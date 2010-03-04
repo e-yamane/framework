@@ -41,6 +41,7 @@ DTDÇÕÅA
   </table>
 
   <table name="UNIT" description="êîó é⁄ìx">
+    <option key="cache" value="read-only" />
     <column name="ID"           primaryKey="true" required="true"   domain="oid"                description="OID" />
     <column name="NAME"                           required="true"   type="VARCHAR"  size="32"   description="êîó é⁄ìxñº">
       <option key="maxCharLength" value="16" />

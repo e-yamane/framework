@@ -12,7 +12,7 @@
   <property name="framework.java.version"           value="1.6" />
   <property name="framework.compile.debug"          value="on" />
   <property name="framework.src.encoding"           value="MS932" />
-  <property name="framework.ant.extention.version"  value="1.2.9" />
+  <property name="framework.ant.extention.version"  value="1.2.10" />
   <property name="framework.dist.dir"               value="../framework/target"/>
   <property name="framework.classes.dir"            value="${framework.dist.dir}/classes" />
 
@@ -26,6 +26,7 @@
   <property name="conf.dir"               value="${my.build.dir}/conf" />
   <property name="resource.dir"           value="${my.build.dir}/src/resource" />
   <property name="schema.property.file"   value="schemaResources.properties" />
+  <property name="cache.property.file"    value="overrideCache.properties" />
   <property name="src.encoding"           value="Windows-31J" />
 
   <!-- データベース関連 -->
@@ -192,7 +193,7 @@
       <mapper type="flatten"/>
     </unzip>
 -->
-    <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p01/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p01.jar" />
+    <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p02/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p02.jar" />
     <property name="noget" value="xxx" />
   </target>
 
@@ -414,6 +415,8 @@
     <filter token="table.doc.dir"               value="${table.doc.dir}" />
     <filter token="torque.schema.property.dir"  value="${resource.dir}" />
     <filter token="torque.schema.property.file" value="${schema.property.file}" />
+    <filter token="torque.cache.property.dir"   value="${my.build.dir}" />
+    <filter token="torque.cache.property.file"  value="${cache.property.file}" />
     <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
     <filter token="torque.sql.dir"              value="${torque.sql.dir}" />
     <filter token="torque.template.path"        value="${torque.template.path}" />
@@ -443,6 +446,12 @@
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="schema-properties" />
+      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
+    </antcall>
+    <echo message="２次キャッシュの上書情報を作成します。" />
+    <antcall target="execAnt">
+      <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
+      <param name="exec.target" value="cache-override-properties" />
       <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
     <antcall target="execAnt">
@@ -525,6 +534,16 @@
         <equals arg1="${hibernate.max_fetch_depth}" arg2="0" />
       </and>
     </condition>
+    <condition property="hibernate.cacheProviderClass" value="org.hibernate.cache.EhCacheProvider" >
+      <not>
+        <isset property="hibernate.cacheProviderClass" />
+      </not>
+    </condition>
+    <condition property="hibernate.cache.avalable" value="false" >
+      <not>
+        <isset property="hibernate.cache.avalable" />
+      </not>
+    </condition>
     <echo message="${hibernate.otherResources}" />
     <hibernatedoclet destdir="${src.dir}"
       excludedtags="@version, @author, @todo"
@@ -533,7 +552,10 @@
       verbose="false"
       fileSetDirs="${hibernate.fileset.dirs}"
       >
-      <hibernate version="3.0"/>
+      <configParam name="cache.avalable" value="${hibernate.cache.avalable}" />
+      <hibernate version="3.0"
+        overrideCacheInfoFile="${my.build.dir}/${cache.property.file}"
+      />
       <hibernatecfg 
           dialect="${hibernate.dialect}"
           jdbcUrl="${hibernate.connection.url}"
@@ -544,10 +566,12 @@
           useOuterjoin="${hibernate.useOuterJoin}"
           destDir="${src.dir}"
           version="3.0"
+          cacheProviderClass="${hibernate.cacheProviderClass}"
           destinationFile="hibernate.cfg.xml"
           otherResources="${hibernate.otherResources}"
       >
         <otherProperty name="max_fetch_depth"                 value="${hibernate.max_fetch_depth}" />
+        <otherProperty name="hibernate.cache.use_query_cache" value="true" />
         <otherProperty name="connection.provider_class"       value="${hibernate.connection.provider_class}" />
         <otherProperty name="connection.pool_size"            value="${hibernate.connection.pool_size}" />
         <otherProperty name="connection.c3p0.min_size"        value="${hibernate.connection.c3p0.min_size}" />
