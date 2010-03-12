@@ -7,6 +7,8 @@
 
 package jp.rough_diamond.framework.transaction.hibernate;
 
+import java.io.Serializable;
+
 import org.hibernate.event.SaveOrUpdateEvent;
 import org.hibernate.event.SaveOrUpdateEventListener;
 import org.hibernate.event.def.DefaultSaveEventListener;
@@ -43,7 +45,30 @@ public class SaveOrUpdateListener {
 		}
 		@Override
 		public void onSaveOrUpdate(SaveOrUpdateEvent event) {
+			if(new Dummy().isUpdate(event)) {
+				FlushListener.notifyUpdateObjects(event.getObject());
+			}
 			SaveOrUpdateListener.onSaveOrUpdate(baseListener, event);
+		}
+		
+		static class Dummy extends DefaultSaveOrUpdateEventListener {
+			private static final long serialVersionUID = 1L;
+			Integer entityState;
+			protected boolean isUpdate(SaveOrUpdateEvent event) {
+				SaveOrUpdateEvent tmp = new SaveOrUpdateEvent(event.getEntityName(), event.getObject(), event.getSession());
+				onSaveOrUpdate(tmp);
+				return (Integer.valueOf(PERSISTENT).equals(entityState));
+			}
+			@Override
+			protected Serializable performSaveOrUpdate(SaveOrUpdateEvent event) {
+				entityState = getEntityState(
+						event.getEntity(),
+						event.getEntityName(),
+						event.getEntry(),
+						event.getSession()
+				);
+				return null;
+			}
 		}
 	}
 	
@@ -73,6 +98,7 @@ public class SaveOrUpdateListener {
 		}
 		@Override
 		public void onSaveOrUpdate(SaveOrUpdateEvent event) {
+			FlushListener.notifyUpdateObjects(event.getObject());
 			SaveOrUpdateListener.onSaveOrUpdate(baseListener, event);
 		}
 	}

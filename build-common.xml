@@ -181,9 +181,9 @@
     <mkdir dir="${framework.lib.root}/dbUnit" />
     <get dest="${framework.lib.root}/dbUnit/dbunit.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p02/dbunit/dbunit-2.1_p02.jar" />
     <mkdir dir="${framework.lib.root}/servletapi" />
+<!--
     <get dest="${framework.lib.root}/servletapi/servlet-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/apache/tomcat/servlet-api/6.0.18/servlet-api-6.0.18.jar" />
     <get dest="${framework.lib.root}/servletapi/jsp-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/apache/tomcat/jsp-api/6.0.18/jsp-api-6.0.18.jar" />
-<!--
     <get dest="${framework.lib.root}/servletapi/tomcat-6.0.18.zip" usetimestamp="true" ignoreerrors="true" src="http://www.meisei-u.ac.jp/mirror/apache/dist/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.zip" />
     <unzip src="${framework.lib.root}/servletapi/tomcat-6.0.18.zip" dest="${framework.lib.root}/servletapi">
       <patternset>

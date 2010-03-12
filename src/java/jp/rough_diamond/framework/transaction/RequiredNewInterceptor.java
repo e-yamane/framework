@@ -38,16 +38,19 @@ public class RequiredNewInterceptor extends TransactionInterceptor {
 			ex = e;
 			throw e;
 		} finally {
-            TransactionManager.popTransactionBeginingInterceptor();
-			if(ex == null && !isRollbackOnly()) {
-				try {
-					cm.commit(mi);
-				} catch(Exception e) {
+			try {
+				if(ex == null && !isRollbackOnly()) {
+					try {
+						cm.commit(mi);
+					} catch(Exception e) {
+						cm.rollback(mi);
+						throw e;
+					}
+				} else {
 					cm.rollback(mi);
-					throw e;
 				}
-			} else {
-				cm.rollback(mi);
+			} finally {
+	            TransactionManager.popTransactionBeginingInterceptor();
 			}
 		}
 		return ret;

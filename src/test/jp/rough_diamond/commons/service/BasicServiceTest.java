@@ -17,6 +17,7 @@ import jp.rough_diamond.commons.di.CompositeDIContainer;
 import jp.rough_diamond.commons.di.DIContainer;
 import jp.rough_diamond.commons.di.DIContainerFactory;
 import jp.rough_diamond.commons.di.MapDIContainer;
+import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.ExtractValue;
@@ -27,6 +28,9 @@ import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
 import jp.rough_diamond.commons.testing.Loader;
+import jp.rough_diamond.framework.service.Service;
+import jp.rough_diamond.framework.service.ServiceLocator;
+import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 import junit.framework.Assert;
 
 /**
@@ -76,6 +80,105 @@ public class BasicServiceTest extends DataLoadingTestCase {
 			assertEquals("コールバックメソッド呼び出し順序が誤っています.", "CallbackListener#postLoad1", 	list.get(0).list.get(index++));
 		} finally {
 			DIContainerFactory.setDIContainer(real);
+		}
+	}
+	
+	public void test更新メソッドを使わずにデータが更新されないこと() throws Exception {
+		ServiceLocator.getService(更新メソッドを使わずにデータが更新されないことを確認するService.class).test1();
+		Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+		assertEquals("ユニット名が誤っています。", "m", u.getName());
+	}
+	
+	public void test更新メソッドを叩いた後のデータが更新されないこと() throws Exception {
+		Unit u1 = ServiceLocator.getService(更新メソッドを使わずにデータが更新されないことを確認するService.class).test2();
+		Unit u2 = BasicService.getService().findByPK(Unit.class, 1L);
+		assertEquals("ユニット名が誤っています。", "xyz", u2.getName());
+		assertEquals("ユニット名が誤っています。", "abc", u1.getName());
+	}
+	
+	public void test更新を２回叩いた場合は後のデータで更新されていること() throws Exception {
+		ServiceLocator.getService(更新メソッドを使わずにデータが更新されないことを確認するService.class).test3();
+		Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+		assertEquals("ユニット名が誤っています。", "abc", u.getName());
+	}
+	
+	public void test新規作成したオブジェクトを挿入後値を書き換えても反映されないこと() throws Exception {
+		ServiceLocator.getService(更新メソッドを使わずにデータが更新されないことを確認するService.class).test4();
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.NAME), "適当データ"));
+		Unit u = (Unit)BasicService.getService().findByExtractor(ex).get(0);
+		assertNull("備考が誤っています。", u.getDescription());
+	}
+	
+	public void test新規作成したオブジェクトを挿入後更新したら更新後の値が反映されること() throws Exception {
+		ServiceLocator.getService(更新メソッドを使わずにデータが更新されないことを確認するService.class).test5();
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.eq(new Property(Unit.NAME), "適当データ"));
+		Unit u = (Unit)BasicService.getService().findByExtractor(ex).get(0);
+		assertEquals("備考が誤っています。", "xyz", u.getDescription());
+	}
+	
+	public void test削除に影響を与えていないこと() throws Exception {
+		BasicService.getService().deleteByPK(Unit.class, 4L);
+		assertNull("削除に失敗しています。", BasicService.getService().findByPK(Unit.class, 4L));
+	}
+	
+	public void testBasicServiceを介さずにsaveOrUpdateを叩いても同様の動作をすること() throws Exception {
+		Unit u1 = ServiceLocator.getService(更新メソッドを使わずにデータが更新されないことを確認するService.class).test6();
+		Unit u2 = BasicService.getService().findByPK(Unit.class, 1L);
+		assertEquals("ユニット名が誤っています。", "xyz", u2.getName());
+		assertEquals("ユニット名が誤っています。", "abc", u1.getName());
+	}
+	
+	public static class 更新メソッドを使わずにデータが更新されないことを確認するService implements Service {
+		public void test1() {
+			Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+			u.setName("xyz");
+		}
+		
+		public Unit test2() throws Exception {
+			Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+			u.setName("xyz");
+			u.save();
+			u.setName("abc");
+			return u;
+		}
+
+		public void test3() throws Exception {
+			Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+			u.setName("xyz");
+			u.save();
+			u.setName("abc");
+			u.save();
+		}
+
+		public void test4() throws Exception {
+			Unit u = new Unit();
+			u.setName("適当データ");
+			u.setBase(u);
+			u.setRate(new ScalableNumber(1L, 0));
+			u.setScale(1);
+			u.save();
+			u.setDescription("xyz");
+		}
+		
+		public void test5() throws Exception {
+			Unit u = new Unit();
+			u.setName("適当データ");
+			u.setBase(u);
+			u.setRate(new ScalableNumber(1L, 0));
+			u.setScale(1);
+			u.save();
+			u.setDescription("xyz");
+			u.save();
+		}
+
+		public Unit test6() throws Exception {
+			Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+			u.setName("xyz");
+			HibernateUtils.getSession().saveOrUpdate(u);
+			u.setName("abc");
+			return u;
 		}
 	}
 	
