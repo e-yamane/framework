@@ -31,7 +31,28 @@ public class BaseTilesRequestProcessor extends TilesRequestProcessor {
 		}
 	}
 
-    @Override
+	@Override
+    protected boolean processRoles(HttpServletRequest request,
+            HttpServletResponse response,
+            ActionMapping mapping) throws IOException, ServletException {
+        Action action = processActionCreate(request, response, mapping);
+        if (action == null) {
+            return super.processRoles(request, response, mapping);
+        }
+        if(!(action instanceof BaseAction)) {
+            return super.processRoles(request, response, mapping);
+        }
+        ActionForm form = processActionForm(request, response, mapping);
+        BaseAction baseAction = (BaseAction)action;
+        ActionForward forward = baseAction.hasRole(form, request, response, mapping);
+        if(forward != null) {
+            processForwardConfig(request, response, forward);
+            return false;
+        }
+		return super.processRoles(request, response, mapping);
+	}	
+
+	@Override
     protected ActionForward processActionPerform(
             HttpServletRequest request, 
             HttpServletResponse response, 

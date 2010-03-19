@@ -53,6 +53,33 @@ abstract public class BaseAction extends DispatchAction {
         }
     }
 
+    protected ActionForward hasRole(ActionForm form, HttpServletRequest request, HttpServletResponse response, ActionMapping mapping) throws ServletException {
+    	//この時点で渡されるformはまだpopulateされていない可能性があるので注意すること
+    	try {
+	        String parameter = mapping.getParameter();
+	        if (parameter == null) {
+	            String message = messages.getMessage("dispatch.handler", mapping.getPath());
+	            log.error(message);
+	            throw new ServletException(message);
+	        }
+	        String name = getMethodName(mapping, form, request, response, parameter);
+	        Method method = getMethod(name);
+	        return hasRole(method) ? null : mapping.findForward("forbiddenAccess");
+    	} catch(Exception e) {
+    		throw new ServletException(e);
+    	}
+    }
+    
+    @Override
+    protected String getMethodName(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String parameter) throws Exception {
+    	String ret = super.getMethodName(mapping, form, request, response, parameter);
+    	return (ret == null) ? "unspecified" : ret;
+    }
+    
     //Struts 1.2.8のメソッドコピー
     @Override
     protected ActionForward dispatchMethod(ActionMapping mapping,
@@ -60,18 +87,9 @@ abstract public class BaseAction extends DispatchAction {
             HttpServletRequest request,
             HttpServletResponse response,
             String name) throws Exception {
-        if (name == null) {
-        	name = "unspecified";
-//            return this.unspecified(mapping, form, request, response);
-        }
-
         Method method = null;
         try {
             method = getMethod(name);
-            //↓追加
-            if(!hasRole(method)) {
-            	return mapping.findForward("forbiddenAccess");
-            }
             NoCache noCache = method.getAnnotation(NoCache.class);
             if(noCache != null) {
                 log.debug("キャッシュ無効リクエストです。");
