@@ -15,6 +15,6 @@ package $bean.packageName;
  * @see ${bean.packageName}.Base${bean.className}
 #end
 **/
-public class $bean.className extends ${parentPackage}Base${bean.className} {
+public class ${bean.className}${bean.classSuffix} extends ${parentPackage}Base${bean.className}${bean.classSuffix} {
     private static final long serialVersionUID = 1L;
 }
