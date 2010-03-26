@@ -23,7 +23,36 @@ import org.apache.struts.tiles.TilesRequestProcessor;
 public class BaseTilesRequestProcessor extends TilesRequestProcessor {
 	private final static Log log = LogFactory.getLog(BaseTilesRequestProcessor.class);
 
+	ThreadLocal<ServletException> populateException = new ThreadLocal<ServletException>();
+	ThreadLocal<Boolean> populated = new ThreadLocal<Boolean>();
+	
 	@Override
+    public void process(HttpServletRequest request,
+            HttpServletResponse response) throws IOException, ServletException {
+		populateException.remove();
+		populated.set(Boolean.FALSE);
+		super.process(request, response);
+    }
+	
+	@Override
+    protected void processPopulate(HttpServletRequest request,
+            HttpServletResponse response,
+            ActionForm form,
+            ActionMapping mapping) throws ServletException {
+		if(populated.get()) {
+			if(populateException.get() != null) {
+				throw populateException.get();
+			}
+		} else {
+			try {
+				super.processPopulate(request, response, form, mapping);
+			} finally {
+				populated.set(Boolean.TRUE);
+			}
+		}
+    }
+    
+   	@Override
 	protected void doForward(String arg0, HttpServletRequest arg1, HttpServletResponse arg2) throws IOException, ServletException {
 		log.debug(">>doForward");
 		if(!VelocityViewer.doVelocity(arg0, getServletContext(), arg1, arg2)) {
@@ -43,6 +72,11 @@ public class BaseTilesRequestProcessor extends TilesRequestProcessor {
             return super.processRoles(request, response, mapping);
         }
         ActionForm form = processActionForm(request, response, mapping);
+        try {
+        	processPopulate(request, response, form, mapping);
+        } catch(ServletException e) {
+        	populateException.set(e);
+        }
         BaseAction baseAction = (BaseAction)action;
         ActionForward forward = baseAction.hasRole(form, request, response, mapping);
         if(forward != null) {

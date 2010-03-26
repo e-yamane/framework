@@ -3,7 +3,7 @@
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/java"/>
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/test"/>
 	<classpathentry excluding="**/.svn/*" kind="src" path="src/testingFramework"/>
-	<classpathentry kind="src" path="src/moreTest"/>
+	<classpathentry excluding="**/.svn/*" kind="src" path="src/moreTest"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/common/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="libs/servletapi/jsp-api.jar"/>
@@ -45,6 +45,7 @@
 	<classpathentry kind="lib" path="libs/hudson/hudson-core-1.300.jar"/>
 	<classpathentry kind="lib" path="libs/hudson/localizer-1.9.jar"/>
 	<classpathentry kind="lib" path="libs/hibernate/ehcache-1.2.3.jar"/>
+	<classpathentry kind="lib" path="libs/mockito/mockito-all-1.8.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

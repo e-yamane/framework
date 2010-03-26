@@ -23,6 +23,35 @@ import org.apache.struts.action.RequestProcessor;
 public class BaseRequestProcessor extends RequestProcessor {
 	private final static Log log = LogFactory.getLog(BaseRequestProcessor.class);
 
+	ThreadLocal<ServletException> populateException = new ThreadLocal<ServletException>();
+	ThreadLocal<Boolean> populated = new ThreadLocal<Boolean>();
+	
+	@Override
+    public void process(HttpServletRequest request,
+            HttpServletResponse response) throws IOException, ServletException {
+		populateException.remove();
+		populated.set(Boolean.FALSE);
+		super.process(request, response);
+    }
+	
+	@Override
+    protected void processPopulate(HttpServletRequest request,
+            HttpServletResponse response,
+            ActionForm form,
+            ActionMapping mapping) throws ServletException {
+		if(populated.get()) {
+			if(populateException.get() != null) {
+				throw populateException.get();
+			}
+		} else {
+			try {
+				super.processPopulate(request, response, form, mapping);
+			} finally {
+				populated.set(Boolean.TRUE);
+			}
+		}
+    }
+
 	@Override
 	protected void doForward(String arg0, HttpServletRequest arg1, HttpServletResponse arg2) throws IOException, ServletException {
 		log.debug(">>doForward");
@@ -43,6 +72,11 @@ public class BaseRequestProcessor extends RequestProcessor {
             return super.processRoles(request, response, mapping);
         }
         ActionForm form = processActionForm(request, response, mapping);
+        try {
+        	processPopulate(request, response, form, mapping);
+        } catch(ServletException e) {
+        	populateException.set(e);
+        }
         BaseAction baseAction = (BaseAction)action;
         ActionForward forward = baseAction.hasRole(form, request, response, mapping);
         if(forward != null) {
