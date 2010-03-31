@@ -11,7 +11,7 @@
 
   <import file="../framework/build-common.xml" />
 
-  <property name="product.version"            value="0.8.1" />
+  <property name="product.version"            value="0.8.2" />
 
   <!-- TorqueŠÖŒW -->
   <property name="torque.gen.patch.root"      value="${framework.root}/../torque-gen-patch" />

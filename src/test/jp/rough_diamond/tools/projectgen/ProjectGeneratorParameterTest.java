@@ -22,7 +22,7 @@ public class ProjectGeneratorParameterTest extends TestCase {
 		param.setProjectRoot("workspace/hoge");
 		assertEquals("Frameworkの相対パスが誤っています。",
 				"../../framework", param.getFrameworkPathRelative());
-		param.setProjectRoot("../workspace/hoge");
+		param.setProjectRoot("../" + f.getCanonicalFile().getParentFile().getName() + "/hoge");
 		assertEquals("Frameworkの相対パスが誤っています。",
 				"../framework", param.getFrameworkPathRelative());
 	}
