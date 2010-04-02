@@ -10,11 +10,13 @@ package jp.rough_diamond.commons.util.mule.transformer;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -222,5 +224,17 @@ public class JAXBElementToObjectTest extends TestCase {
 		assertEquals("要素数が誤っています。", 2, dim[1].length);
 		assertEquals("値が誤っています。", "abc", dim[1][0]);
 		assertEquals("値が誤っています。", "def", dim[1][1]);
+	}
+	
+	public void testXmlCalendarToCalendar() throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+		Date org = sdf.parse("20100402112531000");
+		GregorianCalendar orgCal = (GregorianCalendar)Calendar.getInstance();
+		orgCal.setTime(org);
+		DatatypeFactory df = DatatypeFactory.newInstance();
+		XMLGregorianCalendar xmlCal = df.newXMLGregorianCalendar(orgCal);
+		JAXBElementToObject transformer = new JAXBElementToObject();
+		Calendar destCal = transformer.xmlCalendarToCalendar(xmlCal);
+		assertEquals("返却値が誤っています。", "20100402112531000", sdf.format(destCal.getTime()));
 	}
 }

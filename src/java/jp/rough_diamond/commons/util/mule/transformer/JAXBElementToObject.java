@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import jp.rough_diamond.commons.util.PropertyUtils;
@@ -153,15 +154,7 @@ public class JAXBElementToObject {
 	}
 	
 	void copyDateObject(PropertyDescriptor pd, XMLGregorianCalendar srcVal, Object dest) throws Exception {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, srcVal.getYear());
-		cal.set(Calendar.MONTH, srcVal.getMonth() - 1);
-		cal.set(Calendar.DAY_OF_MONTH, srcVal.getDay());
-		cal.set(Calendar.HOUR_OF_DAY, srcVal.getHour());
-		cal.set(Calendar.MINUTE, srcVal.getMinute());
-		cal.set(Calendar.SECOND, srcVal.getSecond());
-		cal.set(Calendar.MILLISECOND, srcVal.getMillisecond());
-		cal.setTimeZone(srcVal.getTimeZone(srcVal.getTimezone()));
+		Calendar cal = xmlCalendarToCalendar(srcVal);
 		Class paramType = pd.getWriteMethod().getParameterTypes()[0];
 		if(Date.class.isAssignableFrom(paramType)) {
 			pd.getWriteMethod().invoke(dest, cal.getTime());
@@ -170,6 +163,27 @@ public class JAXBElementToObject {
 		}
 	}
 
+	Calendar xmlCalendarToCalendar(XMLGregorianCalendar srcVal) {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, zeroWhenFieldUndefined(srcVal.getYear()));
+		cal.set(Calendar.MONTH, zeroWhenFieldUndefined(srcVal.getMonth(), 1) - 1);
+		cal.set(Calendar.DAY_OF_MONTH, zeroWhenFieldUndefined(srcVal.getDay()));
+		cal.set(Calendar.HOUR_OF_DAY, zeroWhenFieldUndefined(srcVal.getHour()));
+		cal.set(Calendar.MINUTE, zeroWhenFieldUndefined(srcVal.getMinute()));
+		cal.set(Calendar.SECOND, zeroWhenFieldUndefined(srcVal.getSecond()));
+		cal.set(Calendar.MILLISECOND, zeroWhenFieldUndefined(srcVal.getMillisecond()));
+		cal.setTimeZone(srcVal.getTimeZone(zeroWhenFieldUndefined(srcVal.getTimezone())));
+		return cal;
+	}
+
+	int zeroWhenFieldUndefined(int val) {
+		return zeroWhenFieldUndefined(val, 0);
+	}
+	
+	int zeroWhenFieldUndefined(int val, int defaultVal) {
+		return (val == DatatypeConstants.FIELD_UNDEFINED) ? defaultVal : val;
+	}
+	
 	Object createObjectByType(Class<?> parameterType) {
 		try {
 			return parameterType.newInstance();
