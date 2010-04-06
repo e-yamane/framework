@@ -186,7 +186,8 @@ public class WSDL2JavaExt extends Task {
 		serviceEL.appendChild(t);
 		serviceEL.appendChild(outboundEL);
 
-		Element outboundRouterEL = doc.createElementNS(muleNameSpace, "chaining-router");
+		Element outboundRouterEL = doc.createElementNS(muleNameSpace, "custom-outbound-router");
+		outboundRouterEL.setAttribute("class", "jp.rough_diamond.framework.es.DynamicEndPointRouter");
 		t = doc.createTextNode("\n        ");
 		outboundEL.appendChild(t);
 		outboundEL.appendChild(outboundRouterEL);

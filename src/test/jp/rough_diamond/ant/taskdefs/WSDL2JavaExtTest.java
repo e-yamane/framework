@@ -92,7 +92,7 @@ public class WSDL2JavaExtTest extends TestCase {
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_fooIn", iep.getAttribute("path"));
 
-		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
+		xpathStr = "mule:outbound/mule:custom-outbound-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
@@ -110,7 +110,7 @@ public class WSDL2JavaExtTest extends TestCase {
 		exp = ext.getXPathExpression(xpathStr);
 		iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_barIn", iep.getAttribute("path"));
-		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
+		xpathStr = "mule:outbound/mule:custom-outbound-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
@@ -151,7 +151,7 @@ public class WSDL2JavaExtTest extends TestCase {
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MonoOperationServiceConnectorIn", iep.getAttribute("path"));
 
-		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
+		xpathStr = "mule:outbound/mule:custom-outbound-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.monooperationservice.MonoOperationService", oep.getAttribute("clientClass"));
@@ -192,7 +192,7 @@ public class WSDL2JavaExtTest extends TestCase {
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_fooIn", iep.getAttribute("path"));
 
-		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
+		xpathStr = "mule:outbound/mule:custom-outbound-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
@@ -212,7 +212,7 @@ public class WSDL2JavaExtTest extends TestCase {
 		iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MultiOperationServiceConnector_barIn", iep.getAttribute("path"));
 
-		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
+		xpathStr = "mule:outbound/mule:custom-outbound-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.multioperationservice.MultiOperationService", oep.getAttribute("clientClass"));
@@ -253,7 +253,7 @@ public class WSDL2JavaExtTest extends TestCase {
 		Element iep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("pathが誤っています。", "MonoOperationServiceConnectorIn", iep.getAttribute("path"));
 
-		xpathStr = "mule:outbound/mule:chaining-router/cxf:outbound-endpoint";
+		xpathStr = "mule:outbound/mule:custom-outbound-router/cxf:outbound-endpoint";
 		exp = ext.getXPathExpression(xpathStr);
 		Element oep = (Element)exp.evaluate(e, XPathConstants.NODE);
 		assertEquals("クライアントクラスが誤っています。", "hoge.monooperationservice.MonoOperationService", oep.getAttribute("clientClass"));

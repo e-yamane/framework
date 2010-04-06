@@ -47,14 +47,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SayHello }
-     * 
-     */
-    public SayHello createSayHello() {
-        return new SayHello();
-    }
-
-    /**
      * Create an instance of {@link SayHelloResponse }
      * 
      */
@@ -71,19 +63,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SayHello2Response }
-     * 
-     */
-    public SayHello2Response createSayHello2Response() {
-        return new SayHello2Response();
-    }
-
-    /**
      * Create an instance of {@link SayHello3 }
      * 
      */
     public SayHello3 createSayHello3() {
         return new SayHello3();
+    }
+
+    /**
+     * Create an instance of {@link SayHello }
+     * 
+     */
+    public SayHello createSayHello() {
+        return new SayHello();
+    }
+
+    /**
+     * Create an instance of {@link SayHello2Response }
+     * 
+     */
+    public SayHello2Response createSayHello2Response() {
+        return new SayHello2Response();
     }
 
     /**
