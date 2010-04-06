@@ -7,6 +7,12 @@
   <property name="ci.preprocess.name"         value="doCopyTorqueGen" />
   <property name="classes.dir"                value="./bin" />
 
+  <property name="cxf.dest.dir"               value="./src/test" />
+  <property name="cxf.stub.package"           value="jp.rough_diamond.sample.esb.service.stub" />
+  <property name="cxf.mule.server.config"     value="./src/test/mule/mule-server-config.xml" />
+  <property name="cxf.mule.client.config"     value="./src/test/mule/mule-client-config.xml" />
+  <property name="server.endpoint.prefix"     value="server" />
+
   <property name="hibernate.cache.avalable"       value="true" />
 
   <import file="../framework/build-common.xml" />
@@ -73,9 +79,16 @@
     <dirname property="conf.target.dir" file="${filtering.filename}" />
     <mkdir dir="${conf.dir}/tmp" />
     <native2ascii src="${conf.target.dir}" dest="${conf.dir}/tmp" includes="${conf.target.name}" />
-    <filter filtersfile="${conf.dir}/tmp/${conf.target.name}" />
+    <pathconvert property="my.build.dir.unix" targetos="unix">
+      <path location="${my.build.dir}"/>
+    </pathconvert>
+    <echo message="${my.build.dir.unix}" />
+    <filter token="base.dir"   value="${my.build.dir.unix}" />
+    <copy file="${conf.dir}/tmp/${conf.target.name}" tofile="${conf.dir}/tmp/${conf.target.name}.tmp" filtering="true" />
+    <filter filtersfile="${conf.dir}/tmp/${conf.target.name}.tmp" />
     <copy file="${conf.dir}/template/beans.xml" tofile="${src.dir}/beans.xml" filtering="true" overwrite="true" />
     <copy file="${conf.dir}/template/log4j.properties" tofile="${src.dir}/log4j.properties" filtering="true" overwrite="true" />
+    <copy file="${conf.dir}/template/cxfrouting.properties" tofile="${test.src.dir}/cxfrouting.properties" filtering="true" overwrite="true" encoding="UTF-8" />
     <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" />
     <delete dir="${conf.dir}/tmp" />
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />

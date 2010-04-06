@@ -22,10 +22,7 @@
   <bean id="serviceBus" class="jp.rough_diamond.framework.es.ServiceBus">
     <description>ServiceBus(MuleServer Wrapper)</description>
     <property name="config">
-<!--
-      <value>mule-server-config.xml mule-client-config.xml</value>
--->
-      <value>mule/edi-common-config.xml mule/edi-server-config.xml mule/edi-client-config.xml</value>
+      <value>mule/mule-common-config.xml mule/mule-server-config.xml mule/mule-client-config.xml</value>
     </property>
   </bean>
 
