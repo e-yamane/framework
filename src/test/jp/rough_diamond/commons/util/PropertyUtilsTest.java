@@ -8,14 +8,12 @@ package jp.rough_diamond.commons.util;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 import junit.framework.TestCase;
 
 public class PropertyUtilsTest extends TestCase {
-	@SuppressWarnings("unchecked")
 	public void testCollectionToCollection() throws Exception {
 		Bean1 bean1 = new Bean1();
 		bean1.setList(new ArrayList<String>(Arrays.asList(new String[]{"abc", "xyz"})));
@@ -26,7 +24,6 @@ public class PropertyUtilsTest extends TestCase {
 		assertEquals("コピーに失敗しています。", "xyz", bean2.getList().get(1));
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void testCollectionToArray() throws Exception {
 		Bean1 bean1 = new Bean1();
 		bean1.setList(Arrays.asList(new String[]{"abc", "xyz"}));

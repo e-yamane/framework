@@ -9,6 +9,7 @@ package jp.rough_diamond.commons.util.mule.transformer;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -17,8 +18,6 @@ import java.util.Map;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 import jp.rough_diamond.commons.util.mule.transformer.JAXBElementToObject;
 import jp.rough_diamond.commons.util.mule.transformer.test.stub.sampleservice.ArrayOfArrayOfString;
@@ -34,7 +33,6 @@ import jp.rough_diamond.commons.util.mule.transformer.test.stub.sampleservice.St
 import junit.framework.TestCase;
 
 public class JAXBElementToObjectTest extends TestCase {
-	@SuppressWarnings("unchecked")
 	public void testTransformObject() throws Exception {
 		ObjectFactory of = new ObjectFactory();
 		ParentBean base = of.createParentBean();
@@ -88,7 +86,6 @@ public class JAXBElementToObjectTest extends TestCase {
 		assertEquals("ílÇ™åÎÇ¡ÇƒÇ¢Ç‹Ç∑ÅB", "xyz", ret.get(1));
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void testTransformStringArray() throws Exception {
 		ObjectFactory of = new ObjectFactory();
 		ArrayOfString aos = of.createArrayOfString();

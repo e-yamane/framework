@@ -8,10 +8,9 @@
 package jp.rough_diamond.commons.extractor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * フリーフォーマット

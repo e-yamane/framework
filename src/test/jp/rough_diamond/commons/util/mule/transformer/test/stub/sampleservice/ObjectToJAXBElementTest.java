@@ -7,11 +7,10 @@
 package jp.rough_diamond.commons.util.mule.transformer.test.stub.sampleservice;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 import junit.framework.TestCase;
 

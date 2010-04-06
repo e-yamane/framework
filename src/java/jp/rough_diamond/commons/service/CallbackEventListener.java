@@ -10,12 +10,11 @@ package jp.rough_diamond.commons.service;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * コールバックイベントリスナー
@@ -71,7 +70,7 @@ abstract class CallbackEventListener implements Comparable<CallbackEventListener
 	    if(annotation == null) {
 	    	return false;
 	    }
-		List<Class> paramType;
+		List<Class<?>> paramType;
 		if(listener == null) {
 			paramType = Arrays.asList(m.getParameterTypes());
 		} else {
