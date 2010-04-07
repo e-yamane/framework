@@ -911,7 +911,12 @@
     <dirname property="conf.target.dir" file="${filtering.filename}" />
     <mkdir dir="${conf.dir}/tmp" />
     <native2ascii src="${conf.target.dir}" dest="${conf.dir}/tmp" includes="${conf.target.name}" />
-    <filter filtersfile="${conf.dir}/tmp/${conf.target.name}" />
+    <pathconvert property="my.build.dir.unix" targetos="unix">
+      <path location="${my.build.dir}"/>
+    </pathconvert>
+    <filter token="base.dir"   value="${my.build.dir.unix}" />
+    <copy file="${conf.dir}/tmp/${conf.target.name}" tofile="${conf.dir}/tmp/${conf.target.name}.tmp" filtering="true" />
+    <filter filtersfile="${conf.dir}/tmp/${conf.target.name}.tmp" />
     <antcall target="copyMiddlegenProperties" />
     <delete dir="${conf.dir}/tmp" />
   </target>

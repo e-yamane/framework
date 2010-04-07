@@ -73,7 +73,8 @@
   </target>
 -->
 
-  <target name="makeConfig" depends="init-task, filter-check, filter-exists" if="filtering.filename.present" description="EI‚ðŽÀs‚·‚é">
+  <target name="makeConfig" depends="init-task, filter-check, filter-exists, makeConfigBase" if="filtering.filename.present" description="EI‚ðŽÀs‚·‚é">
+<!--
     <antcall target="makeConfigBase" />
     <basename property="conf.target.name" file="${filtering.filename}" />
     <dirname property="conf.target.dir" file="${filtering.filename}" />
@@ -86,6 +87,7 @@
     <filter token="base.dir"   value="${my.build.dir.unix}" />
     <copy file="${conf.dir}/tmp/${conf.target.name}" tofile="${conf.dir}/tmp/${conf.target.name}.tmp" filtering="true" />
     <filter filtersfile="${conf.dir}/tmp/${conf.target.name}.tmp" />
+-->
     <copy file="${conf.dir}/template/beans.xml" tofile="${src.dir}/beans.xml" filtering="true" overwrite="true" />
     <copy file="${conf.dir}/template/log4j.properties" tofile="${src.dir}/log4j.properties" filtering="true" overwrite="true" />
     <copy file="${conf.dir}/template/cxfrouting.properties" tofile="${test.src.dir}/cxfrouting.properties" filtering="true" overwrite="true" encoding="UTF-8" />

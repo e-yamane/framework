@@ -12,7 +12,7 @@ log4j.appender=org.apache.log4j.ConsoleAppender
 log4j.file.path=
 
 #  ログファイルの文字コード
-log4j.encoding=Windows-31J
+log4j.encoding=$param.sourceEncoding
 
 #if($param.isContainOption("USING_ESB"))
 #===========================================================
@@ -33,7 +33,7 @@ server.host=localhost
 server.port=10080
 
 #WSDL格納ディレクトリ(絶対パス)
-wsdl.dir=
+wsdl.dir=@base.dir@/etc/wsdl
 
 #end
 
@@ -45,31 +45,40 @@ wsdl.dir=
 #oracle、postgresql以外は非推奨
 #  Oracle系　　・・・oracle
 #  PostgreSQL系・・・postgresql
-#　MySQL系　　 ・・・mysql
+#  MySQL系　　 ・・・mysql
 #  DB2系　　　 ・・・db2
 #  SQLServer系 ・・・mssql
 #  Derby系     ・・・derby
 torque.database.type=oracle
 
 #自動生成後するJavaプログラムの文字コード
-torque.output.src.encoding=MS932
+torque.output.src.encoding=$param.sourceEncoding
 
 #自動生成するSQLの文字コード
-torque.output.sql.encoding=MS932
+torque.output.sql.encoding=$param.sourceEncoding
 
 #
 #Hibernate設定情報
 #
-#Dialect(see 
+#Dialectの設定
+#  Oracle10以降・・・org.hibernate.dialect.Oracle10gDialect
+#  Oracle9i    ・・・org.hibernate.dialect.Oracle9Dialect (?)
+#  Oracle8     ・・・org.hibernate.dialect.Oracle8iDialect (?)
+#  PostgreSQL  ・・・org.hibernate.dialect.PostgreSQLDialect
+#その他        ・・・see http://docs.jboss.org/hibernate/stable/core/api/org/hibernate/dialect/package-summary.html
 hibernate.dialect=org.hibernate.dialect.SomeDialect
 
 #JDBCDriverクラス名
+# Oracle    ・・・oracle.jdbc.driver.OracleDriver
+# PostgreSQL・・・org.postgresql.Driver
 hibernate.jdbc.driver=DriverClassName(Full)
 
 #JDBCURL
 #  - 実行時にJNDI経由で接続する場合でも
 #    開発用のコマンド（DB-init等）で利用しているので
 #    設定しておくと便利です。
+# Oracle    ・・・ex) jdbc:oracle:thin:@localhost:1521:XE
+# PostgreSQL・・・ex) jdbc:postgresql://localhost:5432/foo
 hibernate.jdbc.url=jdbc:[dbtype]:[jdbctype]:@[host]:[port]:[name]
 
 #データベース接続ユーザー
@@ -85,7 +94,9 @@ hibernate.datasource.url=
 hibernate.show.sql=true or false
 
 #データベースのスキーマ名
-hibernate.schema=AP
+# Oracle10g ・・・ユーザー名の大文字
+# PostgreSQL・・・public
+hibernate.schema=schema Name
 
 #HibernateのConnectionProviderの実装クラス名
 hibernate.connection.provider=org.hibernate.connection.DriverManagerConnectionProvider
@@ -110,10 +121,10 @@ hibernate.timeout=
 #
 
 #Velocityマクロの文字コード
-velocity.input.encoding=Shift_JIS
+velocity.input.encoding=$param.sourceEncoding
 
 #Velocityが出力する際の文字コード
-velocity.output.encoding=Shift_JIS
+velocity.output.encoding=$param.sourceEncoding
 
 #リソースローダーの設定
 #  ファイル取り込み　　　：file
@@ -121,7 +132,7 @@ velocity.output.encoding=Shift_JIS
 velocity.resource.loader=file
 
 #Velocityマクロ格納ディレクトリ（file以外なら未指定でも可）
-velocity.resource.root=
+velocity.resource.root=@base.dir@/webapp/WEB-INF/velocity
 
 #Velocityマクロの更新チェック間隔（秒）
 velocity.file.check.interval=2
