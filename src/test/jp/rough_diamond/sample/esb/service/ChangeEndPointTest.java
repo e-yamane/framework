@@ -48,7 +48,7 @@ public class ChangeEndPointTest extends TestCase {
 		}
 	}
 
-	public void testEndPointを正しく指定した場合にエラーが発生すること() throws Exception {
+	public void testEndPointを正しく指定した場合にエラーが発生しないこと() throws Exception {
 		setEndPoint(true);
 		SampleService service = ServiceLocator.getService(SampleService.class);
 		assertEquals("返却値が誤っています。", "Hello Eiji Yamane.", service.sayHello3("Eiji Yamane"));
