@@ -44,6 +44,8 @@ public class Extractor implements Serializable {
 	private int 	offset = 0;
 	private int		limit = -1;
 	private int		fetchSize = DEFAULT_FETCH_SIZE;
+	private int		fetchDepth = -1;
+
 	private boolean	distinct = false;
 	
 	private boolean isCachable = false;
@@ -151,7 +153,24 @@ public class Extractor implements Serializable {
 		this.fetchSize = fetchSize;
 	}
 
-    /**
+	/**
+	 * このExtractorで生成されるクエリーの返却値のオブジェクトの取得する深さを返却する
+	 * @return the fetchDepth
+	 */
+	public int getFetchDepth() {
+		return fetchDepth;
+	}
+
+	/**
+	 * このExtractorで生成されるクエリーの返却値のオブジェクトの取得する深さを指定する
+	 * 負数の場合は実装クラスのデフォルトの値を使用する
+	 * @param fetchDepth 参照オブジェクトの取得する深さ
+	 */
+	public void setFetchDepth(int fetchDepth) {
+		this.fetchDepth = fetchDepth;
+	}
+
+	/**
      * 内部結合オブジェクトを追加する
      * @param join
      */

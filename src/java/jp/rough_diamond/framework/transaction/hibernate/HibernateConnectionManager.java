@@ -34,6 +34,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Settings;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 
@@ -235,6 +236,15 @@ public class HibernateConnectionManager extends ConnectionManager {
         HibernateConnectionManager hcm = 
             (HibernateConnectionManager)getConnectionManager();
         hcm.rebuildSessionFactory2();
+    }
+    
+    public static Settings getSettings() {
+		HibernateConnectionManager hcm = 
+			(HibernateConnectionManager)getConnectionManager();
+		if(hcm == null) {
+			return null;
+		}
+		return ((SessionFactoryImplementor)hcm.sessionFactory).getSettings();
     }
     
 	private void rebuildSessionFactory2() {

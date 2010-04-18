@@ -59,6 +59,7 @@ import jp.rough_diamond.commons.extractor.Value;
 import jp.rough_diamond.commons.extractor.ValueHoldingCondition;
 import jp.rough_diamond.commons.lang.StringUtils;
 import jp.rough_diamond.commons.util.PropertyUtils;
+import jp.rough_diamond.framework.transaction.hibernate.HibernateConnectionManager;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 
 import org.apache.commons.logging.Log;
@@ -67,6 +68,7 @@ import org.hibernate.EntityMode;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.dialect.PostgreSQLDialect;
@@ -89,11 +91,21 @@ public class Extractor2HQL {
     private StringBuilder builder;
     private int patemeterIndex;
     private boolean usingGroupBy = false;
+    private int defaultMaxFetchDepth;
     
     private Extractor2HQL(Extractor extractor) {
         this.extractor = extractor;
         builder = new StringBuilder();
         patemeterIndex = 0;
+        if(extractor.getFetchDepth() < 0) {
+	        Settings settings = HibernateConnectionManager.getSettings();
+	        if(settings == null) {
+	        	throw new RuntimeException("connectionManagerにはHibernateConnectionManagerを指定してください。");
+	        }
+	        this.defaultMaxFetchDepth = settings.getMaximumFetchDepth();
+        } else {
+        	this.defaultMaxFetchDepth = extractor.getFetchDepth();
+        }
     }
     
     /**
@@ -569,7 +581,7 @@ public class Extractor2HQL {
         if(extractor.getValues().size() == 0) {
             //参照オブジェクトのジョイン
 //            joinedEntity = new HashSet<Class>();
-            makeOuterJoin(extractor.target, getAlias(extractor.target, extractor.targetAlias), isFetch);
+            makeOuterJoin(extractor.target, getAlias(extractor.target, extractor.targetAlias), isFetch, 1);
         }
         aliases.add(getAlias(extractor.target, extractor.targetAlias));
 /*
@@ -599,7 +611,11 @@ public class Extractor2HQL {
         }
     }
     
-    private void makeOuterJoin(Class target, String currentAliase, boolean isFetch) {
+    private void makeOuterJoin(Class target, String currentAliase, boolean isFetch, int depth) {
+    	if(depth > this.defaultMaxFetchDepth) {
+    		return;
+    	}
+    	depth++;
 //        joinedEntity.add(target);
         Map<String, Class> map = getEntityRelationProperty(target);
         for(Map.Entry<String, Class> entry : map.entrySet()) {
@@ -611,7 +627,7 @@ public class Extractor2HQL {
             builder.append(property);
             Class cl = entry.getValue();
             if(!cl.equals(target)) {    //再帰を避ける
-                makeOuterJoin(entry.getValue(), property, isFetch);
+                makeOuterJoin(entry.getValue(), property, isFetch, depth);
             }
         }
     }
