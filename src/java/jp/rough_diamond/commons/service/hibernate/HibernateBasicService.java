@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.EntityMode;
 import org.hibernate.LockMode;
+import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -247,7 +248,24 @@ public class HibernateBasicService extends BasicService {
         }
         if(!msgs.hasError()) {
             for(Object o : objects) {
-                HibernateUtils.getSession().update(o);
+//            	ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(o.getClass());
+//            	String[] props = cm.getPropertyNames();
+//        		System.out.println(o.getClass().getName());
+//            	for(String prop : props) {
+//            		if(cm.getPropertyType(prop).isEntityType()) {
+//                		System.out.println(prop + ":" + isProxy(cm.getPropertyValue(o, prop, HibernateUtils.getSession().getEntityMode())));
+//            		}
+//            	}
+            	try {
+            		HibernateUtils.getSession().update(o);
+            	} catch(NonUniqueObjectException e) {
+            		log.warn("ユニーク例外が発生しました。オブジェクトをクリアして再実行します。");
+            		Session session = HibernateUtils.getSession();
+                	ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(o.getClass());
+                	Object evictTarget = session.get(o.getClass(), cm.getIdentifier(o, session.getEntityMode()));
+                	session.evict(evictTarget);
+                	session.update(o);
+            	}
                 if(!isLogicalDelete) {
                     List<Object> list = new ArrayList<Object>();
                     list.add(o);
@@ -307,7 +325,16 @@ public class HibernateBasicService extends BasicService {
                     List<Object> list = new ArrayList<Object>();
                     list.add(o);
                     fireEvent(CallbackEventType.PRE_REMOVE, list);
-                    HibernateUtils.getSession().delete(o);
+                	try {
+                        HibernateUtils.getSession().delete(o);
+                	} catch(NonUniqueObjectException e) {
+                		log.warn("ユニーク例外が発生しました。オブジェクトをクリアして再実行します。");
+                		Session session = HibernateUtils.getSession();
+                    	ClassMetadata targetCM = HibernateUtils.getSession().getSessionFactory().getClassMetadata(o.getClass());
+                    	Object evictTarget = session.get(o.getClass(), cm.getIdentifier(o, session.getEntityMode()));
+                    	session.evict(evictTarget);
+                        HibernateUtils.getSession().delete(o);
+                	}
                     fireEvent(CallbackEventType.POST_REMOVE, list);
 //                }
             } catch(MessagesIncludingException e) {

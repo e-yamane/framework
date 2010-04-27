@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import jp.rough_diamond.commons.extractor.And;
 import jp.rough_diamond.commons.extractor.Avg;
@@ -461,9 +462,7 @@ public class Extractor2HQL {
     private void makeSelectCouse(LockMode lockMode) {
         builder.append("select ");
         if(extractor.getValues().size() == 0) {
-        	if(lockMode == LockMode.NONE) {
-        		builder.append("distinct ");
-        	} else if(extractor.isDistinct()) {
+        	if(lockMode == LockMode.NONE || extractor.isDistinct()) {
         		builder.append("distinct ");
         	}
             builder.append(getAlias(extractor.target, extractor.targetAlias));
@@ -495,13 +494,38 @@ public class Extractor2HQL {
     		return true;
     	}
     	Property p = (Property)order.label;
-    	if(p.target == null) {
-    		return true;
-    	}
-    	return false;
+    	return isSkipSelect(p);
     }
     
-    static interface ValueMaker<T extends Value> {
+    private boolean isSkipSelect(Property p) {
+    	if(p.target == null || p.target == this.extractor.target) {
+    		//Fetchの深さがしていないか見てみる
+    		int depth = 0;
+    		StringTokenizer tokenizer = new StringTokenizer(p.property, ".");
+    		ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(extractor.target);
+			StringBuilder propertyStack = new StringBuilder(); 
+    		while(tokenizer.hasMoreTokens()) {
+    			String token = tokenizer.nextToken();
+    			propertyStack.append(token);
+    			String property = propertyStack.toString();
+    			log.debug("プロパティ名：" + property);
+    			Type t = cm.getPropertyType(property);
+    			if(t.isComponentType()) {
+    				propertyStack.append(".");
+    				continue;
+    			} else if(t.isEntityType()) {
+    				cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(t.getReturnedClass());
+    				propertyStack.setLength(0);
+    				depth++;
+    			}
+    		}
+    		log.debug("プロパティの深さ：" + depth);
+    		return (depth <= defaultMaxFetchDepth);
+    	}
+    	return false;
+	}
+
+	static interface ValueMaker<T extends Value> {
     	public String makeValue(Extractor2HQL generator, T v);
     }
 
