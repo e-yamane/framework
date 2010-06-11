@@ -6,11 +6,14 @@
  */
 package jp.rough_diamond.commons.util;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class PropertyUtilsTest extends TestCase {
@@ -34,6 +37,26 @@ public class PropertyUtilsTest extends TestCase {
 		assertEquals("コピーに失敗しています。", "xyz", bean2.getList()[1]);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void testDescribeFromDest() throws Exception {
+		Bean3 bean3 = new Bean3();
+		Bean4 bean4 = new Bean4();
+		bean3.setA("123");
+		bean4.setA("456");
+
+		Map map = PropertyUtils.describeFromDest(bean3, bean4);
+		System.out.println(map);
+		assertEquals("返却数が誤っています。", 2, map.size());
+		assertEquals("値が誤っています。", "123", map.get("a"));
+		assertEquals("値が誤っています。", "xyz", map.get("b"));
+		
+		map = PropertyUtils.describeFromDest(bean4, bean3);
+		System.out.println(map);
+		assertEquals("返却数が誤っています。", 2, map.size());
+		assertEquals("値が誤っています。", "456", map.get("a"));
+		assertEquals("値が誤っています。", "abc", map.get("c"));
+	}
+	
 	public static class Bean1 {
 		List<String> list;
 
@@ -55,6 +78,63 @@ public class PropertyUtilsTest extends TestCase {
 
 		public void setList(String[] list) {
 			this.list = list;
+		}
+	}
+	
+	public static class Bean3 {
+		private String a,b,c;
+
+		public String getA() {
+			return a;
+		}
+
+		public void setA(String a) {
+			this.a = a;
+		}
+
+		public String getB() {
+			return "xyz";
+		}
+
+		public void setC(String c) {
+			this.c = c;
+		}
+		
+		public String getX() {
+			throw new RuntimeException("呼び出されています。");
+		}
+		
+		void foo() {
+			b = c;
+			c = b;
+		}
+	}
+	
+	public static class Bean4 {
+		private String a,b,c;
+		public String getA() {
+			return a;
+		}
+
+		public void setA(String a) {
+			this.a = a;
+		}
+
+		public String getC() {
+			return "abc";
+		}
+
+		public void setB(String b) {
+			this.b = b;
+		}
+
+		public String getY() {
+			throw new RuntimeException("呼び出されています。");
+		}
+
+		void foo() {
+			b = c;
+			c = b;
 		}
 	}
 	

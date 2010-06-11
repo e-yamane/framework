@@ -6,12 +6,14 @@
  */
 package jp.rough_diamond.commons.util;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
@@ -40,7 +42,7 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 		stack.push(src);
 		try {
 			log.debug(dest.getClass().getName());
-			Map in = org.apache.commons.beanutils.PropertyUtils.describe(src);
+			Map in = describeFromDest(src, dest);
 			log.debug(in);
 			for(Object o : in.entrySet()) {
 				Map.Entry entry = (Map.Entry)o;
@@ -48,9 +50,6 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 				String propName = (String)entry.getKey();
 				log.debug("copy target propertyName:" + propName);
 				Method m = getSetterMethod(dest, propName);
-				if(m == null) {
-					continue;
-				}
 				if(inValue == null) {
 					m.invoke(dest, (Object)null);
 				} else {
@@ -80,6 +79,20 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 		} finally {
 			stack.pop();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	static Map describeFromDest(Object src, Object dest) throws Exception {
+		PropertyDescriptor[] pds = PropertyUtils.getPropertyDescriptors(dest);
+		Map ret = new HashMap();
+		for(int i = 0 ; i < pds.length ; i++) {
+			String propName = pds[i].getName();
+			Method getter = getGetterMethod(src, propName);
+			if(pds[i].getWriteMethod() != null && getter != null) {
+				ret.put(pds[i].getName(), getter.invoke(src));
+			}
+		}
+		return ret;
 	}
 	
 	@SuppressWarnings("unchecked")
