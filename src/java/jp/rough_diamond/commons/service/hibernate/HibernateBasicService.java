@@ -330,7 +330,6 @@ public class HibernateBasicService extends BasicService {
                 	} catch(NonUniqueObjectException e) {
                 		log.warn("ユニーク例外が発生しました。オブジェクトをクリアして再実行します。");
                 		Session session = HibernateUtils.getSession();
-                    	ClassMetadata targetCM = HibernateUtils.getSession().getSessionFactory().getClassMetadata(o.getClass());
                     	Object evictTarget = session.get(o.getClass(), cm.getIdentifier(o, session.getEntityMode()));
                     	session.evict(evictTarget);
                         HibernateUtils.getSession().delete(o);

@@ -116,7 +116,7 @@ public class Extractor2HQL {
      */
     public static Query extractor2Query(Extractor extractor, LockMode lockMode) {
         Extractor2HQL tmp = new Extractor2HQL(extractor);
-        Query q = tmp.makeQuery(lockMode);
+        Query q = tmp.makeQuery();
         tmp.setParameter(q);
         int offset = extractor.getOffset();
         if(offset > 0) {
@@ -152,7 +152,7 @@ public class Extractor2HQL {
 	public static PreparedStatement extractor2PreparedStatement(Extractor extractor) {
 		try {
 	        Extractor2HQL tmp = new Extractor2HQL(extractor);
-	        Query q = tmp.makeQuery(LockMode.NONE);
+	        Query q = tmp.makeQuery();
 	        SessionImplementor session = (SessionImplementor)HibernateUtils.getSession();
 			SessionFactoryImpl sfi = (SessionFactoryImpl)HibernateUtils.getSession().getSessionFactory();
 			HQLQueryPlan hqp = sfi.getQueryPlanCache().getHQLQueryPlan(q.getQueryString(), false, session.getEnabledFilters());
@@ -308,8 +308,8 @@ public class Extractor2HQL {
         return query;
 	}
 
-    private Query makeQuery(LockMode lockMode) {
-        makeSelectCouse(lockMode);
+    private Query makeQuery() {
+        makeSelectCouse();
         makeFromCouse(true);
         makeWhereCouse();
         makeGroupByCouse();
@@ -459,12 +459,12 @@ public class Extractor2HQL {
         builder.append(targetProperty);
     }
     
-    private void makeSelectCouse(LockMode lockMode) {
+    private void makeSelectCouse() {
         builder.append("select ");
+    	if(extractor.isDistinct()) {
+    		builder.append("distinct ");
+    	}
         if(extractor.getValues().size() == 0) {
-        	if(lockMode == LockMode.NONE || extractor.isDistinct()) {
-        		builder.append("distinct ");
-        	}
             builder.append(getAlias(extractor.target, extractor.targetAlias));
             for(Order<? extends Value> order : extractor.getOrderIterator()) {
             	if(isSkipSelect(order)) {
@@ -475,9 +475,6 @@ public class Extractor2HQL {
             	builder.append(property);
             }
         } else {
-	    	if(extractor.isDistinct()) {
-	    		builder.append("distinct ");
-	    	}
 	        String delimitor = "";
 	        for(ExtractValue v : extractor.getValues()) {
 	            builder.append(delimitor);

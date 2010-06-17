@@ -6,7 +6,11 @@
  */
 package jp.rough_diamond.commons.entity;
 
+import java.util.List;
+
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.InnerJoin;
+import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
@@ -118,5 +122,15 @@ public class UnitTest extends DataLoadingTestCase {
 		assertEquals("エラープロパティ数が誤っています。", 1, msgs.getProperties().size());
 		assertEquals("エラーメッセージ数が誤っています。", 1, msgs.get("Unit.name").size());
 		assertEquals("キーが誤っています。", "errors.maxlength", msgs.get("Unit.name").get(0).getKey());
+	}
+	
+	public void test多分Distinctの仕様変更すると動かなくなるテスト() throws Exception {
+		Extractor ex = new Extractor(Unit.class, "base");
+		ex.addInnerJoin(new InnerJoin(
+				new Property(Unit.class, "base", null),
+				new Property(Unit.class, "child", Unit.BASE)));
+		ex.setDistinct(true);
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却値が誤っています。", 2, list.size());
 	}
 }
