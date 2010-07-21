@@ -15,7 +15,7 @@ import java.util.List;
  * 抽出条件格納オブジェクト
  */
 @SuppressWarnings("unchecked")
-public class Extractor implements Serializable {
+public class Extractor implements Serializable, Value {
 	private static final long serialVersionUID = 1L;
 
     public final static int		DEFAULT_FETCH_SIZE = -1;

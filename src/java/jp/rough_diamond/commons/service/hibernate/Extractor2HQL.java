@@ -117,7 +117,7 @@ public class Extractor2HQL {
     public static Query extractor2Query(Extractor extractor, LockMode lockMode) {
         Extractor2HQL tmp = new Extractor2HQL(extractor);
         Query q = tmp.makeQuery();
-        tmp.setParameter(q);
+        tmp.setParameter(q, tmp.extractor);
         int offset = extractor.getOffset();
         if(offset > 0) {
             q.setFirstResult(offset);
@@ -138,7 +138,7 @@ public class Extractor2HQL {
 	public static Query extractor2CountQuery(Extractor extractor) {
         Extractor2HQL tmp = new Extractor2HQL(extractor);
         Query q = tmp.makeCountQuery();
-        tmp.setParameter(q);
+        tmp.setParameter(q, tmp.extractor);
         return q;
 	}
 
@@ -160,7 +160,7 @@ public class Extractor2HQL {
 			log.debug(sql);
 			PreparedStatement pstmt;
 			pstmt = session.connection().prepareStatement(sql);
-			tmp.setParameter(pstmt);
+			tmp.setParameter(pstmt, tmp.extractor);
 	        return pstmt;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -375,7 +375,12 @@ public class Extractor2HQL {
         }
     }
 
-    private void setParameter(Object query) {
+    private void setParameter(Object query, Extractor extractor) {
+    	for(ExtractValue ev : extractor.getValues()) {
+    		if(ev.value instanceof Extractor) {
+    			setParameter(query, (Extractor)ev.value);
+    		}
+    	}
     	List<Condition<? extends Value>> list = new ArrayList<Condition<? extends Value>>(extractor.getConditionIterator());
     	list.addAll(extractor.getHavingIterator());
         for(Condition<? extends Value> con : list) {
@@ -588,6 +593,17 @@ public class Extractor2HQL {
 				}
 			}
     	});
+    	tmp.put(Extractor.class, new ValueMaker<Extractor>(){
+			@Override
+			public String makeValue(Extractor2HQL generator, Extractor ex) {
+				if(ex.getValues().size() != 1) {
+					throw new RuntimeException("サブクエリーの抽出情報は１つしか許可していません:" + ex.getValues().size());
+				}
+				Extractor2HQL gen = new Extractor2HQL(ex);
+				gen.makeQuery();
+				return String.format("(%s)", gen.builder.toString());
+			}
+    	});
     	VALUE_MAKE_STRATEGY_MAP = Collections.unmodifiableMap(tmp);
     }
     
@@ -772,7 +788,10 @@ public class Extractor2HQL {
     	}
 		@Override
 		public void setParameter(Object query, Extractor2HQL generator, T condition) {
-			if(!(condition.value instanceof Value)) {
+			if(condition.value instanceof Extractor) {
+	        	Extractor ex = (Extractor)condition.value;
+	        	generator.setParameter(query, ex);
+			} else if(!(condition.value instanceof Value)) {
 				setParameter2(query, generator, condition.value);
 			}
 		}
@@ -810,18 +829,27 @@ public class Extractor2HQL {
     	protected String getRightSide(Extractor2HQL generator, T condition) {
         	StringBuilder sb = new StringBuilder();
         	sb.append("(");
-        	String delimiter = "";
-        	for(@SuppressWarnings("unused") Object o : (Collection)condition.value) {
-        		sb.append(delimiter);
-        		sb.append("?");
-        		delimiter = ", ";
+        	List<Object> values = new ArrayList<Object>((Collection)condition.value);
+        	if(values.size() == 1 && values.get(0) instanceof Extractor) {
+        		Extractor ex = (Extractor)values.get(0);
+    			sb.append(VALUE_MAKE_STRATEGY_MAP.get(Extractor.class).makeValue(generator, ex));
+        	} else {
+	        	String delimiter = "";
+	        	for(@SuppressWarnings("unused") Object o : (Collection)condition.value) {
+	        		sb.append(delimiter);
+	        		sb.append("?");
+	        		delimiter = ", ";
+	        	}
         	}
         	sb.append(")");
         	return sb.toString();
     	}
 		@Override
 		public void setParameter(Object query, Extractor2HQL generator, T condition) {
-			if(!(condition.value instanceof Value)) {
+        	List<Object> values = new ArrayList<Object>((Collection)condition.value);
+        	if(values.size() == 1 && values.get(0) instanceof Extractor) {
+        		generator.setParameter(query, (Extractor)values.get(0));
+        	} else if(!(condition.value instanceof Value)) {
             	Collection col = (Collection)condition.value;
             	for(Object o : col) {
             		setParameter2(query, generator, o);

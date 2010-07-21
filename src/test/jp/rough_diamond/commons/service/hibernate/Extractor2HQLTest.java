@@ -27,6 +27,7 @@ import jp.rough_diamond.commons.extractor.Min;
 import jp.rough_diamond.commons.extractor.Order;
 import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.extractor.Sum;
+import jp.rough_diamond.commons.extractor.Value;
 import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.service.annotation.PostLoad;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
@@ -636,6 +637,53 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		ex.setDistinct(true);
 		//select distinct base_unit_id, rate_value from unit where base_unit_id = 1 order by rate_value
 		assertEquals("件数が誤っています。", 3, BasicService.getService().getCountByExtractor(ex));
+	}
+	
+	public void testSubqueryWithWhereCause() throws Exception {
+		//select * from unit where id = (select min(id) from unit);
+		Extractor ex = new Extractor(Unit.class);
+		Extractor sub = new Extractor(Unit.class);
+		sub.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		sub.addExtractValue(new ExtractValue("maxId", new Min(new Property(Unit.ID))));
+		ex.add(Condition.eq(new Property(Unit.ID), sub));
+		List<Unit> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("件数が誤っています。", 1, list.size());
+		assertEquals("IDが誤っています。", 1L, list.get(0).getId().longValue());
+	}
+	
+	public void testSubqueryMultiCause() throws Exception {
+		//select id, select max(id) from unit where base_unit_id = 1 from unit
+		//where base_unit_id in (select id from unit where id = 5)
+		Extractor ex = new Extractor(Unit.class);
+		Extractor sub1 = new Extractor(Unit.class);
+		sub1.add(Condition.eq(new Property(Unit.BASE + "." + Unit.ID), 1L));
+		sub1.addExtractValue(new ExtractValue("maxId", new Max(new Property(Unit.ID))));
+		ex.addExtractValue(new ExtractValue("id", new Property(Unit.ID)));
+		ex.addExtractValue(new ExtractValue("maxId", sub1));
+		Extractor sub2 = new Extractor(Unit.class);
+		sub2.add(Condition.eq(new Property(Unit.ID), 5L));
+		sub2.addExtractValue(new ExtractValue("xxx", new Property(Unit.ID)));
+		ex.add(Condition.in(new Property(Unit.BASE + "." + Unit.ID), sub2));
+		List<Map<String, Object>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("件数が誤っています。", 1, list.size());
+		assertEquals("返却値が誤っています。", Long.valueOf(5L), list.get(0).get("id"));
+		assertEquals("返却値が誤っています。", Long.valueOf(4L), list.get(0).get("maxId"));
+	} 
+	
+	public void testSubqueryHavingCaouse() throws Exception {
+		//select base_unit_id, sum(rate_value) from unit
+		//group by base_unit_id having sum(rate_value) > (select sum(id) from unit where id > 0)
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("id", new Property(Unit.BASE + "." + Unit.ID)));
+		Value sum = new Sum(new Property(Unit.RATE + ScalableNumber.VALUE));
+		ex.addExtractValue(new ExtractValue("sum", sum));
+		Extractor sub = new Extractor(Unit.class);
+		sub.addExtractValue(new ExtractValue("xxx", new Sum(new Property(Unit.ID))));
+		sub.add(Condition.gt(new Property(Unit.ID), 0L));
+		ex.addHaving(Condition.gt(sum, sub));
+		List<Map<String, Object>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("件数が誤っています。", 1, list.size());
+		assertEquals("返却値が誤っています。", Long.valueOf(1L), list.get(0).get("id"));
 	}
 	
 	public void testEntityオブジェクトをwhere句に指定してgetCountByExtractorが正しく動作すること() throws Exception {
