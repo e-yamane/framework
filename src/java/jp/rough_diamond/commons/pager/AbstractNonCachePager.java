@@ -86,19 +86,25 @@ public abstract class AbstractNonCachePager<E> extends AbstractPager<E> {
 	}
 	
 	public void setSelectingPage(int pageNo) {
-		if(pageNo != getCurrentPage()) {
-			if(pageNo > getPageSize()) {
-				gotoPage(getPageSize());
-			} else {
-				gotoPage(pageNo);
-			}
+		if(pageNo > getPageSize()) {
+			gotoPage(getPageSize());
+		} else {
+			gotoPage(pageNo);
 		}
 	}
 
+	private int lastPageNo;
+	@Override
+	protected void preGotoPage(int page) {
+		this.lastPageNo = getCurrentPage();
+	}
+	
 	@Override
 	protected void postGotoPage(int page) {
 		super.postGotoPage(page);
-		setNeedRefresh(true);
+		if(this.lastPageNo != page) {
+			setNeedRefresh(true);
+		}
 	}
     
         
@@ -109,8 +115,9 @@ public abstract class AbstractNonCachePager<E> extends AbstractPager<E> {
     }
     
     public void setSizePerPage(int sizePerPage) {
-        this.sizePerPage = sizePerPage;
-        setNeedRefresh(true);
-        refresh();
+    	if(this.sizePerPage != sizePerPage) {
+            this.sizePerPage = sizePerPage;
+            setNeedRefresh(true);
+    	}
     }
 }
