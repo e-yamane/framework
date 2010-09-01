@@ -9,6 +9,9 @@ package jp.rough_diamond.framework.transaction.hibernate;
 
 import java.io.Serializable;
 
+import jp.rough_diamond.commons.service.annotation.Temporary;
+import jp.rough_diamond.framework.transaction.TransactionManager;
+
 import org.hibernate.event.SaveOrUpdateEvent;
 import org.hibernate.event.SaveOrUpdateEventListener;
 import org.hibernate.event.def.DefaultSaveEventListener;
@@ -29,6 +32,11 @@ public class SaveOrUpdateListener {
 		isSaveingOrUpdating.set(Boolean.TRUE);
 		try {
 			listener.onSaveOrUpdate(event);
+			Object o = event.getObject();
+			//TODO common‚ğQÆ‚µ‚Ä‚¢‚é‘o•ûŒüQÆ‚¾‚©‚ç‚È‚ñ‚Æ‚©‚µ‚½‚¢
+			if(o instanceof Temporary) {
+				TransactionManager.addModifiedTemporaryType(o.getClass());
+			}
 		} finally {
 			isSaveingOrUpdating.remove();
 		}

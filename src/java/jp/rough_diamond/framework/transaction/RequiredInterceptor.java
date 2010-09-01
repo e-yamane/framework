@@ -46,6 +46,7 @@ public class RequiredInterceptor extends TransactionInterceptor {
                 try {
 					if(ex == null && !isRollbackOnly()) {
 						try {
+							removeTemporary();
 							cm.commit(mi);
 						} catch(Exception e) {
 							cm.rollback(mi);

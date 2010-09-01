@@ -7,7 +7,9 @@
 package jp.rough_diamond.framework.transaction;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -90,4 +92,25 @@ abstract public class TransactionManager implements MethodInterceptor {
         TransactionInterceptor ti = (TransactionInterceptor)stack.peek();
         ti.setRollbackOnly();
     }
+
+	/**
+	 * @param class1
+	 */
+	public static void addModifiedTemporaryType(Class<? extends Object> cl) {
+		Set<Class<?>> set = getModifiedTemporaryTypes();
+		set.add(cl);
+	}
+
+	static Set<Class<?>> getModifiedTemporaryTypes() {
+		final String key = TransactionManager.class.getName() + "_temporaryTypes";
+		Map<Object, Object> map = getTransactionContext();
+		Set<Class<?>> ret = (Set<Class<?>>)map.get(key);
+		if(ret == null) {
+			ret = new HashSet<Class<?>>();
+			map.put(key, ret);
+		}
+		return ret;
+	}
+	
+	
 }
