@@ -13,7 +13,7 @@ import jp.rough_diamond.commons.di.DIContainerFactory;
  */
 @SuppressWarnings("unchecked")
 abstract public class ServiceLocatorLogic {
-	private final static String DEFAULT_SERVICE_LOCATOR_NAME = "jp.rough_diamond.framework.service.SimpleServiceLocatorLogic";
+	public final static String DEFAULT_SERVICE_LOCATOR_NAME = "jp.rough_diamond.framework.service.SimpleServiceLocatorLogic";
 
 	public static ServiceLocatorLogic getServiceLocatorLogic() {
 		ServiceLocatorLogic logic = (ServiceLocatorLogic)DIContainerFactory.getDIContainer(
