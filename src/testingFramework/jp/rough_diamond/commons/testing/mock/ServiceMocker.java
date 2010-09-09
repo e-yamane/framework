@@ -23,15 +23,16 @@ import jp.rough_diamond.framework.es.EnterpriseService;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 import jp.rough_diamond.framework.service.ServiceLocatorLogic;
-import jp.rough_diamond.framework.service.SimpleServiceLocatorLogic;
 import static org.mockito.Mockito.*;
 
 public class ServiceMocker {
 	DIContainer orginalDI;
-	ServiceLocatorLogic sll;
+	ServiceLocatorLogicExt 	sll;
+	ServiceLocatorLogic		orginalSLL;
 	Set<Class<? extends Service>> mockServices;
 	
 	public void initialize() {
+		orginalSLL = ServiceLocatorLogic.getServiceLocatorLogic(); 
 		orginalDI = DIContainerFactory.getDIContainer();
 		sll = new ServiceLocatorLogicExt();
 		mockServices = new HashSet<Class<? extends Service>>();
@@ -112,8 +113,8 @@ public class ServiceMocker {
 		return false;
 	}
 
-	class ServiceLocatorLogicExt extends SimpleServiceLocatorLogic {
-		private Map<Class<? extends Service>, Service> mockMap = 
+	class ServiceLocatorLogicExt extends ServiceLocatorLogic {
+		Map<Class<? extends Service>, Service> mockMap = 
 					new HashMap<Class<? extends Service>, Service>();
 		@Override
 		public <T extends Service> T getService(Class<T> cl, Class<? extends T> defaultClass) {
@@ -122,7 +123,7 @@ public class ServiceMocker {
 			if(sll == null) {
 				ret = tmp.getService(cl, defaultClass);
 			} else {
-				ret = super.getService(cl, defaultClass);
+				ret = orginalSLL.getService(cl, defaultClass);
 			}
 			if(isMockTarget(mockServices, ret)) {
 				ret = getMock(cl);

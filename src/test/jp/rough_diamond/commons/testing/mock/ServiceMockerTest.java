@@ -22,7 +22,6 @@ import jp.rough_diamond.framework.service.ServiceLocator;
 import jp.rough_diamond.framework.service.ServiceLocatorLogic;
 import junit.framework.TestCase;
 
-
 /**
  *
  */
@@ -127,6 +126,28 @@ public class ServiceMockerTest extends TestCase {
 		}
 	}
 	
+	public void testServiceMockerを差し替えたときにmockがクリーンアップされること() throws Exception {
+		ServiceMocker slmm = new ServiceMocker();
+		slmm.initialize();
+		try {
+			slmm.mockAllEnterprise();
+			Service2 s2 = ServiceLocator.getService(Service2.class);
+			s2.func("123");
+			assertEquals("呼び出し回数が誤っています。", 1, slmm.getArguments(s2, "func", String.class).length);
+		} finally {
+			slmm.cleanUp();
+		}
+		slmm.initialize();
+		try {
+			slmm.mockAllEnterprise();
+			Service2 s2 = ServiceLocator.getService(Service2.class);
+			s2.func("xyz");
+			assertEquals("呼び出し回数が誤っています。", 1, slmm.getArguments(s2, "func", String.class).length);
+		} finally {
+			slmm.cleanUp();
+		}
+	}
+	
 	public static class Service1 implements Service { }
 	public static class Service11 extends Service1{ }
 	public static class Service2 implements EnterpriseService { 
@@ -136,7 +157,9 @@ public class ServiceMockerTest extends TestCase {
 		public void foo2(String str1, String str2) {
 			
 		}
-		
+		public void func(String str) {
+		}
+
 		public Integer bar() {
 			return 10;
 		}
