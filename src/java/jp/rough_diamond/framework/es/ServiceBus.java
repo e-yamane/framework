@@ -47,6 +47,11 @@ public class ServiceBus {
 		return bus;
 	}
 	
+	public void dispose() {
+		log.debug("MuleServerÇí‚é~ÇµÇ‹Ç∑ÅB");
+		getContext().dispose();
+	}
+
 	private String config;
 	public void setConfig(String config) {
 		this.config = config;

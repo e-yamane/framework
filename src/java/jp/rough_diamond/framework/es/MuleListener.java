@@ -16,7 +16,7 @@ import javax.servlet.ServletContextListener;
  */
 public class MuleListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
-		
+		ServiceBus.getInstance().dispose();
 	}
 
 	public void contextInitialized(ServletContextEvent arg0) {
