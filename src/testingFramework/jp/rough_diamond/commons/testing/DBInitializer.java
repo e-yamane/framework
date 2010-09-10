@@ -50,19 +50,28 @@ abstract public class DBInitializer implements Service {
     
     public final static String TEST_DATA_CONTROLER = "RDF_TEST_DATA_CONTROLER";
     
-    static {
-    	try {
-	        service = ServiceLocator.getService(TmpService.class); 
-	        service.init();
-	        list = new ArrayList<DBInitializer>();
-	        initializerObjects = new HashMap<Class, Set<DBInitializer>>();
-	        modifiedClasses = new HashSet<Class>();
-    	} catch(Exception e) {
-    		throw new ExceptionInInitializerError(e);
+    public DBInitializer() {
+    	init();
+    }
+    
+    static boolean isInit = false;
+    synchronized static void init() {
+    	if(!isInit) {
+	    	try {
+		        service = ServiceLocator.getService(TmpService.class); 
+		        service.init();
+		        list = new ArrayList<DBInitializer>();
+		        initializerObjects = new HashMap<Class, Set<DBInitializer>>();
+		        modifiedClasses = new HashSet<Class>();
+		        isInit = true;
+	    	} catch(Exception e) {
+	    		throw new ExceptionInInitializerError(e);
+	    	}
     	}
     }
     
     static void clearModifiedClasses() {
+    	init();
         modifiedClasses.clear();
     }
     
@@ -72,10 +81,12 @@ abstract public class DBInitializer implements Service {
      * @param cl
      */
     public static void addModifiedClasses(Class cl) {
+    	init();
         modifiedClasses.add(cl);
     }
     
     static void clearModifiedData() throws Exception {
+    	init();
         int minimumIndex = Integer.MAX_VALUE;
         for(Class cl : modifiedClasses) {
             Set<DBInitializer> set = initializerObjects.get(cl);
