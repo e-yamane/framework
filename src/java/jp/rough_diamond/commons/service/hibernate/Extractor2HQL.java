@@ -826,10 +826,25 @@ public class Extractor2HQL {
     
     private static class CollectionValueHoldingStrategy<T extends ValueHoldingCondition> extends ValueHoldingStrategy<T> {
     	@Override
+    	public String makeWhereCouse(Extractor2HQL generator, T condition) {
+    		if(((Collection)condition.value).size() == 0) {
+    			if(condition instanceof In) {
+        			return "1=0";
+    			} else if(condition instanceof NotIn) {
+    				return "1=1";
+    			} else {
+    				throw new RuntimeException("予期しないタイプです。:" + condition.getClass().getName());
+    			}
+    		} else {
+    			return super.makeWhereCouse(generator, condition);
+    		}
+    	}
+    	
+    	@Override
     	protected String getRightSide(Extractor2HQL generator, T condition) {
+        	List<Object> values = new ArrayList<Object>((Collection)condition.value);
         	StringBuilder sb = new StringBuilder();
         	sb.append("(");
-        	List<Object> values = new ArrayList<Object>((Collection)condition.value);
         	if(values.size() == 1 && values.get(0) instanceof Extractor) {
         		Extractor ex = (Extractor)values.get(0);
     			sb.append(VALUE_MAKE_STRATEGY_MAP.get(Extractor.class).makeValue(generator, ex));

@@ -8,6 +8,7 @@
 package jp.rough_diamond.commons.service.hibernate;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -693,6 +694,20 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		ex.addExtractValue(new ExtractValue("value", new Property(Unit.RATE + ScalableNumber.VALUE)));
 		ex.add(Condition.eq(new Property(Unit.BASE), u));
 		assertEquals("件数が誤っています。", 4, BasicService.getService().getCountByExtractor(ex));
+	}
+	
+	public void testIn句に空集合を渡した場合は何もヒットしないこと() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.in(new Property(Unit.ID), new ArrayList<Long>()));
+		assertEquals("件数が誤っています。", 0, BasicService.getService().getCountByExtractor(ex));
+	}
+	
+	public void testNotIn句に空集合を渡した場合は全件ヒットすること() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.add(Condition.notIn(new Property(Unit.ID), new ArrayList<Long>()));
+		assertEquals("件数が誤っています。", 
+				BasicService.getService().findAll(Unit.class).size(), 
+				BasicService.getService().getCountByExtractor(ex));
 	}
 	
 	public static class ReturnType1 {
