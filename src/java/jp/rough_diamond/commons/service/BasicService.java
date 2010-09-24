@@ -624,20 +624,26 @@ abstract public class BasicService implements Service {
 			Object val = m.invoke(o);
     		if(val != null) {
     			Messages tmp = unitPropertyValidate(val, when);
-    			if(!tmp.hasError()) {
-    				continue;
-    			}
         		NestedComponent nc = m.getAnnotation(NestedComponent.class);
-    			for(String property : tmp.getProperties()) {
-    				List<Message> tmpMsgs = tmp.get(property);
-    				property = property.replaceAll("^[^\\.]+\\.", nc.property() + ".");
-    				for(Message msg : tmpMsgs) {
-    					ret.add(property, msg);
-    				}
-    			}
+        		ret.add(replacePropertyName(tmp, nc));
     		}
 		}
     	return ret;
+    }
+    
+    Messages replacePropertyName(Messages msgs, NestedComponent nc) {
+    	Messages ret = new Messages();
+		if(!msgs.hasError()) {
+			return ret;
+		}
+		for(String property : msgs.getProperties()) {
+			List<Message> tmpMsgs = msgs.get(property);
+			property = property.replaceAll("^[^\\.]+\\.", nc.property() + ".");
+			for(Message msg : tmpMsgs) {
+				ret.add(property, msg);
+			}
+		}
+		return ret;
     }
     
     private Messages customValidate(Object o, WhenVerifier when, boolean hasError) throws Exception {
@@ -646,7 +652,7 @@ abstract public class BasicService implements Service {
 		for(Method m : set) {
 			Verifier v = m.getAnnotation(Verifier.class);
 			if(!v.isForceExec() && hasError) {
-				return ret;
+				break;
 			}
 			Object retTmp;
 			if(m.getParameterTypes().length == 0) {
@@ -659,9 +665,15 @@ abstract public class BasicService implements Service {
 			}
             hasError = ret.hasError();
 		}
-		List list = getNestedComponents(o);
-		for(Object nestedComponent : list) {
-			customValidate(nestedComponent, when, hasError);
+		List<PropertyDescriptor> list = getNestedComponentGetters(o.getClass());
+		for(PropertyDescriptor pd : list) {
+			Method m = pd.getReadMethod();
+			Object val = m.invoke(o);
+    		if(val != null) {
+    			Messages tmp = customValidate(val, when, hasError);
+        		NestedComponent nc = m.getAnnotation(NestedComponent.class);
+        		ret.add(replacePropertyName(tmp, nc));
+    		}
 		}
 		return ret;
 	}
