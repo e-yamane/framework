@@ -71,6 +71,8 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.MySQL5InnoDBDialect;
+import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.engine.SessionImplementor;
@@ -900,9 +902,6 @@ public class Extractor2HQL {
     		@Override
         	protected String getLeftSide(Extractor2HQL generator, RegularExp condition) {
 	        	Dialect dialect = HibernateUtils.getDialect();
-	        	if(dialect == null) {
-	        		throw new RuntimeException("dialect can't get.");
-	        	}
 	        	String tmpl = REGEXP_TEMPLATE.get(dialect.getClass());
 	        	log.debug(tmpl);
 	        	if(tmpl == null) {
@@ -916,6 +915,21 @@ public class Extractor2HQL {
         	protected String getRightSide(Extractor2HQL generator, RegularExp condition) {
     			return "0";
     		}
+
+        	@Override
+        	public String makeWhereCouse(Extractor2HQL generator, RegularExp condition) {
+	        	Dialect dialect = HibernateUtils.getDialect();
+	        	if(dialect == null) {
+	        		throw new RuntimeException("dialect can't get.");
+	        	}
+	        	if(dialect instanceof MySQLDialect) {
+	        		String ret = MessageFormat.format("{0} REGEXP {1}", 
+	        				super.getLeftSide(generator, condition), super.getRightSide(generator, condition));
+	        		return ret;
+	        	} else {
+	        		return super.makeWhereCouse(generator, condition);
+	        	}
+        	}
     	});
     	CONDITION_STRATEGY_MAP2 = Collections.unmodifiableMap(tmp);
     }

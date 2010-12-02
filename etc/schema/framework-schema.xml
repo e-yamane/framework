@@ -47,7 +47,7 @@ DTDは、
       <option key="maxCharLength" value="16" />
     </column>
     <column name="DESCRIPTION"                    required="false"  type="VARCHAR"  size="64"   description="単位説明" />
-    <column name="BASE_UNIT_ID"                   required="true"   type="BIGINT"               description="ベース数量尺度" />
+    <column name="BASE_UNIT_ID"                   required="false"   type="BIGINT"               description="ベース数量尺度" />
     <column name="RATE"                           required="true"   type="SCALABLE_NUMBER"      description="変換係数" />
     <column name="SCALE"                          required="true"   type="INTEGER"              description="変換時に保持する小数精度。負数を指定すると整数の切捨て判断する" />
     <column name="VERSION"                        required="true"   domain="optimistickLockKey" description="楽観的ロッキングキー" />

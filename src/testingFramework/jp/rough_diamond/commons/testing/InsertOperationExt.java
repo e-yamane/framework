@@ -83,13 +83,20 @@ public class InsertOperationExt extends AbstractOperation {
 			delimitter = ",";
 		}
 		//ÉfÅ[É^Ç™Ç†ÇÍÇŒñïè¡Ç∑ÇÈ
-		String sql = String.format("delete from %s;insert into %s(%s) select %s from %s", 
-				baseTableName, baseTableName, colSB.toString(), colSB.toString(), testDataTableName);
-		PreparedStatement pstmt = connection.getConnection().prepareStatement(sql);
+		String sql1 = String.format("delete from %s", baseTableName);
+		PreparedStatement pstmt1 = connection.getConnection().prepareStatement(sql1);
     	try {
-    		pstmt.execute();
+    		pstmt1.execute();
     	} finally {
-    		pstmt.close();
+    		pstmt1.close();
+    	}
+		String sql2 = String.format("insert into %s(%s) select %s from %s", 
+				baseTableName, colSB.toString(), colSB.toString(), testDataTableName);
+		PreparedStatement pstmt2 = connection.getConnection().prepareStatement(sql2);
+    	try {
+    		pstmt2.execute();
+    	} finally {
+    		pstmt2.close();
     	}
 	}
 

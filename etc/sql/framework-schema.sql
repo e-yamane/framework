@@ -11,7 +11,7 @@ CREATE TABLE UNIT
     NAME varchar (32) NOT NULL,
     DESCRIPTION varchar (64),
       -- REFERENCES UNIT (ID)
-    BASE_UNIT_ID int8 NOT NULL,
+    BASE_UNIT_ID int8,
         RATE_VALUE int8 NOT NULL,
     RATE_SCALE integer NOT NULL,
     SCALE integer NOT NULL,

@@ -6,8 +6,7 @@
  */
 package jp.rough_diamond.commons.testing;
 
-import jp.rough_diamond.commons.entity.ScalableNumber;
-import jp.rough_diamond.commons.entity.Unit;
+import jp.rough_diamond.commons.entity.Numbering;
 import jp.rough_diamond.commons.service.BasicService;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
@@ -21,32 +20,30 @@ public class DataLoadingTestCaseTest extends DataLoadingTestCase {
 	}
 
 	public void testWhenInsert() throws Exception {
-		Unit u = new Unit();
-		u.setBase(u);
-		u.setName("xxxxx");
-		u.setRate(new ScalableNumber("1"));
-		u.setScale(0);
-		BasicService.getService().insert(u);
+		Numbering n = new Numbering();
+		n.setId("akls;djglakjlkasj");
+		n.setNextNumber(1L);
+		BasicService.getService().insert(n);
 	}
 	
 	public void testWhenUpdate() throws Exception {
-		Unit u = BasicService.getService().findByPK(Unit.class, 1L);
-		u.setName(u.getName() + "xxx");
-		BasicService.getService().update(u);
+		Numbering entiry = BasicService.getService().findByPK(Numbering.class, "hoge");
+		entiry.setNextNumber(System.currentTimeMillis());
+		BasicService.getService().update(entiry);
 	}
 	
 	public void testWhenDelete() throws Exception {
-		Unit u = BasicService.getService().findByPK(Unit.class, 5L);
-		BasicService.getService().delete(u);
+		Numbering entiry = BasicService.getService().findByPK(Numbering.class, "hoge");
+		BasicService.getService().delete(entiry);
 	}
 	
 	public void testWhenDeleteAll() throws Exception {
-		BasicService.getService().deleteAll(Unit.class);
+		BasicService.getService().deleteAll(Numbering.class);
 	}
 	
 	protected void tearDown() throws Exception {
 		try {
-			assertTrue("Unitがロールバック対象になっていません。", DBInitializer.modifiedClasses.contains(Unit.class));
+			assertTrue("Numberingがロールバック対象になっていません。", DBInitializer.modifiedClasses.contains(Numbering.class));
 		} finally {
 			super.tearDown();
 		}

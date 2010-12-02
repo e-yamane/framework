@@ -32,6 +32,7 @@ import org.dbunit.dataset.excel.XlsDataSet;
 import org.dbunit.dataset.xml.XmlDataSet;
 import org.dbunit.ext.oracle.OracleDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
+import org.dbunit.operation.DeleteAllOperation;
 import org.hibernate.Interceptor;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
@@ -152,7 +153,11 @@ abstract public class DBInitializer implements Service {
     }
     
     public void delete() throws Exception {
-        execute(DatabaseOperation.DELETE_ALL, getResourceNames());
+    	if(getDriverName().toUpperCase().indexOf("MYSQL") != -1) {
+    		execute(DatabaseOperation.TRUNCATE_TABLE, getResourceNames());
+    	} else {
+        	execute(DatabaseOperation.DELETE_ALL, getResourceNames());
+    	}
     }
 
     public void load() throws Exception {
@@ -270,15 +275,20 @@ abstract public class DBInitializer implements Service {
 		return f.getPath().replace('\\', '/');
 	}
 	
+	private String getDriverName() {
+		String driverClassName = HibernateUtils.getConfig().getProperty(Environment.DRIVER);
+		return driverClassName;
+	}
+
 	private static Map<String, IDataSet> datasetMap = new HashMap<String, IDataSet>();
     protected void execute(DatabaseOperation operation, String... resourceNames) throws Exception {
     	String schema = HibernateUtils.getConfig().getProperty(Environment.DEFAULT_SCHEMA);
-    	String driverClassName = HibernateUtils.getConfig().getProperty(Environment.DRIVER);
+    	String driverClassName = getDriverName();
     	
 		String[] tmpArray = new String[resourceNames.length];
         System.arraycopy(resourceNames, 0, tmpArray, 0, tmpArray.length);
         List<String> tmp = Arrays.asList(tmpArray);
-        if(DatabaseOperation.DELETE_ALL.equals(operation)) {
+        if(operation instanceof DeleteAllOperation) {
             Collections.reverse(tmp);
         }
         ConnectionManager cm = ConnectionManager.getConnectionManager();
@@ -312,5 +322,4 @@ abstract public class DBInitializer implements Service {
         	}
         }
     }
-
 }

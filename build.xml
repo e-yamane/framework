@@ -14,6 +14,7 @@
   <property name="server.endpoint.prefix"     value="server" />
 
   <property name="hibernate.cache.avalable"       value="true" />
+  <property name="sql.encoding"                   value="UTF-8" />
 
   <import file="../framework/build-common.xml" />
 
@@ -99,29 +100,6 @@
   <target name="makeSchemaAccessor" description="テーブルレイアウト、create table文、Javaソース、マッピングファイル、hibernateConfigを作成する">
     <ant antfile="../framework/build-common.xml" target="makeSchemaAccessor" dir="${my.build.dir}" />
     <antcall target="makeMultipleSQL" />
-  </target>
-
-  <target name="makeMultipleSQL">
-    <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
-    <filter token="torque.sql.dir"              value="${torque.sql.dir}/oracle" />
-    <filter token="torque.database.type"        value="oracle" />
-    <copy file="${framework.root}/build-torque.properties" tofile="torque-gen/build.properties" filtering="true" overwrite="true" />
-    <replace file="torque-gen/build.properties" token="\" value="/" />
-    <echo message="Create Table文を作成します。" />
-    <antcall target="execAnt">
-      <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
-      <param name="exec.target" value="sql" />
-    </antcall>
-    <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
-    <filter token="torque.sql.dir"              value="${torque.sql.dir}/postgresql" />
-    <filter token="torque.database.type"        value="postgresql" />
-    <copy file="${framework.root}/build-torque.properties" tofile="torque-gen/build.properties" filtering="true" overwrite="true" />
-    <replace file="torque-gen/build.properties" token="\" value="/" />
-    <echo message="Create Table文を作成します。" />
-    <antcall target="execAnt">
-      <param name="build.file"  value="${basedir}/torque-gen/build-torque.xml" />
-      <param name="exec.target" value="sql" />
-    </antcall>
   </target>
 
   <target name="newProject" depends="init-task, makeJar" description="新しいプロジェクトを作成する">

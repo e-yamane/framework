@@ -486,6 +486,17 @@
       <param name="exec.target" value="sql" />
       <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
+    <filter token="torque.schema.dir"           value="${torque.schema.dir}" />
+    <filter token="torque.sql.dir"              value="${torque.sql.dir}/mysql" />
+    <filter token="torque.database.type"        value="mysql" />
+    <copy file="${framework.root}/build-torque.properties" tofile="${torque.schema.dir}/build.properties" filtering="true" overwrite="true" />
+    <replace file="${torque.schema.dir}/build.properties" token="\" value="/" />
+    <echo message="Create Table文を作成します。" />
+    <antcall target="execAnt">
+      <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
+      <param name="exec.target" value="sql" />
+      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
+    </antcall>
   </target>
 
   <!-- JavaのソースコードからHibernateのマッピングファイルを作成する -->
@@ -604,6 +615,7 @@
             userid="${hibernate.connection.username}" password="${hibernate.connection.password}"
             schema="${hibernate.schema}">
       <query file="${torque.sql.dir}/preinit.sql" encoding="${sql.encoding}" />
+      <query file="${torque.sql.dir}/preinit.${torque.database.type}.sql" encoding="${sql.encoding}" />
       <query file="${sql.dropalter}"    encoding="${sql.encoding}" />
       <query file="${sql.createtables}" encoding="${sql.encoding}" />
     </dbunit>
@@ -626,6 +638,7 @@
             schema="${hibernate.schema}">
       <query file="${sql.addalter}" encoding="${sql.encoding}" />
       <query file="${torque.sql.dir}/postinit.sql" encoding="${sql.encoding}" />
+      <query file="${torque.sql.dir}/postinit.${torque.database.type}.sql" encoding="${sql.encoding}" />
     </dbunit>
   </target>
 

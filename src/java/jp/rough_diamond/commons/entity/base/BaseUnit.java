@@ -290,7 +290,6 @@ public abstract class BaseUnit  implements Serializable {
      *
      * @return the associated Unit object
      */
-    @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.baseUnitId")
     public jp.rough_diamond.commons.entity.Unit getBase() {
         if(jp.rough_diamond.commons.service.BasicService.isProxy(this.base)) {
             this.base = jp.rough_diamond.commons.service.BasicService.getService().replaceProxy(this.base);
