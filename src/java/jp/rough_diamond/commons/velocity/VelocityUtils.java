@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import jp.rough_diamond.commons.di.DIContainer;
 import jp.rough_diamond.commons.di.DIContainerFactory;
-import jp.rough_diamond.commons.entity.Amount;
+import jp.rough_diamond.commons.entity.Quantity;
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.resource.ResourceManager;
 import jp.rough_diamond.framework.user.User;
@@ -26,7 +26,7 @@ import jp.rough_diamond.framework.user.UserController;
 /**
  * Velocity便利ツール
  */
-public class VelocityUtils {
+public class VelocityUtils extends VelocityUtilsDepracated {
 	private final static Log log = LogFactory.getLog(VelocityUtils.class);
 	/**
 	 * 現在のユーザーオブジェクトを返却する
@@ -69,44 +69,42 @@ public class VelocityUtils {
         } 
     }
 
-	public String formatAmount(Amount amount) {
-		return formatAmount(amount, true, false);
+	public String formatQuantity(Quantity quantity) {
+		return formatQuantity(quantity, true, false);
 	}
 
-	public String formatAmount(Amount amount, boolean isPrefix, boolean isSuffix) {
-		return formatAmount(amount, isPrefix, isSuffix, "#,##0", amount
-				.getUnit().getScale());
+	public String formatQuantity(Quantity quantity, boolean isPrefix, boolean isSuffix) {
+		return formatQuantity(quantity, isPrefix, isSuffix, "#,##0", quantity.getUnit().getScale());
 	}
 
-	public String formatAmount(Amount amount, String formatOfIntegralPart) {
-		return formatAmount(amount, true, false, formatOfIntegralPart, amount
-				.getUnit().getScale());
+	public String formatQuantity(Quantity quantity, String formatOfIntegralPart) {
+		return formatQuantity(quantity, true, false, formatOfIntegralPart, quantity.getUnit().getScale());
 	}
 
-	public String formatAmount(Amount amount, int scale) {
-		return formatAmount(amount, true, false, "#,##0", scale);
+	public String formatQuantity(Quantity quantity, int scale) {
+		return formatQuantity(quantity, true, false, "#,##0", scale);
 	}
 
-	public String formatAmount(Amount amount, boolean isPrefix,
+	public String formatQuantity(Quantity quantity, boolean isPrefix,
 			boolean isSuffix, String formatOfIntegralPart) {
-		return formatAmount(amount, isPrefix, isSuffix, formatOfIntegralPart,
-				amount.getUnit().getScale());
+		return formatQuantity(quantity, isPrefix, isSuffix, formatOfIntegralPart,
+				quantity.getUnit().getScale());
 	}
 
-	public String formatAmount(Amount amount, boolean isPrefix,
+	public String formatQuantity(Quantity quantity, boolean isPrefix,
 			boolean isSuffix, int scale) {
-		return formatAmount(amount, isPrefix, isSuffix, "#,##0", scale);
+		return formatQuantity(quantity, isPrefix, isSuffix, "#,##0", scale);
 	}
 
-	public String formatAmount(Amount amount, String formatOfIntegralPart,
+	public String formatQuantity(Quantity quantity, String formatOfIntegralPart,
 			int scale) {
-		return formatAmount(amount, true, false, formatOfIntegralPart, scale);
+		return formatQuantity(quantity, true, false, formatOfIntegralPart, scale);
 	}
 
 	/**
 	 * 量をフォーマッティングする
 	 * 
-	 * @param amount
+	 * @param quantity
 	 *            量
 	 * @param isPrefix
 	 *            単位名を先頭に付与する
@@ -121,12 +119,12 @@ public class VelocityUtils {
 	 *                isPrefix、isSuffixともにtrueの場合
 	 * @author imai
 	 */
-	public String formatAmount(Amount amount, boolean isPrefix,
+	public String formatQuantity(Quantity quantity, boolean isPrefix,
 			boolean isSuffix, String formatOfIntegralPart, int scale) {
 		if (isPrefix == true && isSuffix == true) {
 			throw new IllegalArgumentException();
 		}
-		Unit unit = amount.getUnit();
+		Unit unit = quantity.getUnit();
 		StringBuilder formatSB = new StringBuilder(formatOfIntegralPart);
 		if (scale > 0) {
 			formatSB.append(".");
@@ -140,7 +138,7 @@ public class VelocityUtils {
 		if (isPrefix) {
 			sb.append(unit.getName());
 		}
-		sb.append(df.format(amount.getQuantity().decimal()));
+		sb.append(df.format(quantity.getAmount().decimal()));
 		if (isSuffix) {
 			sb.append(unit.getName());
 		}
