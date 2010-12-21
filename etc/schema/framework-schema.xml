@@ -40,6 +40,15 @@ DTDは、
     </foreign-key>
   </table>
 
+  <table name="QUANTITY"  description="量" baseClass="java.lang.Number" skipSql="true">
+    <!-- 単位無しを見越してUNIT_IDはnull許可 -->
+    <column name="UNIT_ID"                        required="false"  domain="oid"                description="数量尺度ID" />
+    <column name="A"  javaName="amount"           required="true"   type="SCALABLE_NUMBER"      description="量" />
+    <foreign-key foreignTable="UNIT" name="unit" onUpdate="restrict" onDelete="restrict">
+      <reference local="UNIT_ID" foreign="ID" />
+    </foreign-key>
+  </table>
+
   <table name="UNIT" description="数量尺度">
     <option key="cache" value="read-only" />
     <column name="ID"           primaryKey="true" required="true"   domain="oid"                description="OID" />

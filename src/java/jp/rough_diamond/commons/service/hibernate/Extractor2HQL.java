@@ -71,7 +71,6 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.dialect.PostgreSQLDialect;

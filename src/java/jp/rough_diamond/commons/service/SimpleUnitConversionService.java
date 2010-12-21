@@ -9,7 +9,7 @@ package jp.rough_diamond.commons.service;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import jp.rough_diamond.commons.entity.Amount;
+import jp.rough_diamond.commons.entity.Quantity;
 import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 
@@ -46,31 +46,31 @@ public class SimpleUnitConversionService extends UnitConversionService {
 	private final int defaultRoundingMode;
 	
 	@Override
-	public Amount convertUnit(Amount srcAmount, Unit destUnit, Date d) {
-		return convertUnit(srcAmount, destUnit, defaultRoundingMode, d);
+	public Quantity convertUnit(Quantity srcQuantity, Unit destUnit, Date d) {
+		return convertUnit(srcQuantity, destUnit, defaultRoundingMode, d);
 	}
 
 	@Override
-	public Amount convertUnit(Amount srcAmount, Unit destUnit, int roundingMode, Date d) throws NotConversionException {
-		if(srcAmount.getUnit() == null && destUnit != null) {
+	public Quantity convertUnit(Quantity srcQuantity, Unit destUnit, int roundingMode, Date d) throws NotConversionException {
+		if(srcQuantity.getUnit() == null && destUnit != null) {
 			throw new NotConversionException();
 		}
-		if(srcAmount.getUnit() == null && destUnit == null) {
-			return new Amount(srcAmount.getQuantity(), null);
+		if(srcQuantity.getUnit() == null && destUnit == null) {
+			return new Quantity(srcQuantity.getAmount(), null);
 		}
-		if(srcAmount.getUnit() != null && destUnit == null) {
-			return new Amount(srcAmount.getQuantity(), null);
+		if(srcQuantity.getUnit() != null && destUnit == null) {
+			return new Quantity(srcQuantity.getAmount(), null);
 		}
-		if(srcAmount.getUnit().equals(destUnit)) {
-			return new Amount(srcAmount.getQuantity(), destUnit);
+		if(srcQuantity.getUnit().equals(destUnit)) {
+			return new Quantity(srcQuantity.getAmount(), destUnit);
 		}
-		if(!srcAmount.getUnit().getBase().equals(destUnit.getBase())) {
+		if(!srcQuantity.getUnit().getBase().equals(destUnit.getBase())) {
 			throw new NotConversionException();
 		}
 		//[å≥ÇÃêî] Å~ [å≥ÇÃíPà ÇÃåWêî] / [ïœä∑å„ÇÃíPà ÇÃåWêî]
-		BigDecimal bd = srcAmount.getQuantity().decimal().multiply(
-				srcAmount.getUnit().getRate().decimal()).divide(
+		BigDecimal bd = srcQuantity.getAmount().decimal().multiply(
+				srcQuantity.getUnit().getRate().decimal()).divide(
 						destUnit.getRate().decimal(), destUnit.getScale(), roundingMode);
-		return new Amount(new ScalableNumber(bd), destUnit);
+		return new Quantity(new ScalableNumber(bd), destUnit);
 	}
 }

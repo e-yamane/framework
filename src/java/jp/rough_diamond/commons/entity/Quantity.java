@@ -4,6 +4,8 @@
  *  Information Systems Institute, Ltd.  -- http://www.isken.co.jp/
  *  All rights reserved.
  */
+
+
 package jp.rough_diamond.commons.entity;
 
 import java.math.BigDecimal;
@@ -13,27 +15,27 @@ import jp.rough_diamond.commons.service.UnitConversionService;
 
 /**
  * 量のHibernateマッピングクラス
- * @deprecated	Quantityを使用してください
 **/
-public class Amount extends jp.rough_diamond.commons.entity.base.BaseAmount {
+public class Quantity extends jp.rough_diamond.commons.entity.base.BaseQuantity {
     private static final long serialVersionUID = 1L;
-    public Amount() { }
-    public Amount(BigDecimal bd, Unit unit) {
+
+    public Quantity() { }
+    public Quantity(BigDecimal bd, Unit unit) {
     	this(new ScalableNumber(bd), unit);
     }
     
-    public Amount(ScalableNumber sn, Unit unit) {
-    	setQuantity(sn);
+    public Quantity(ScalableNumber sn, Unit unit) {
+    	setAmount(sn);
     	setUnit(unit);
     }
-    
+
     /**
      * UnitConversionServiceへのラッパーメソッド
      * @param destUnit
      * @return
      * @throws UnitConversionService.NotConversionException
      */
-	public Amount convertUnit(Unit destUnit) throws UnitConversionService.NotConversionException{
+    public Quantity convertUnit(Unit destUnit) throws UnitConversionService.NotConversionException{
     	return UnitConversionService.getService().convertUnit(this, destUnit);
     }
 
@@ -44,7 +46,7 @@ public class Amount extends jp.rough_diamond.commons.entity.base.BaseAmount {
      * @return
      * @throws UnitConversionService.NotConversionException
      */
-    public Amount convertUnit(Unit destUnit, Date d) throws UnitConversionService.NotConversionException{
+    public Quantity convertUnit(Unit destUnit, Date d) throws UnitConversionService.NotConversionException{
     	return UnitConversionService.getService().convertUnit(this, destUnit, d);
     }
 
@@ -55,7 +57,7 @@ public class Amount extends jp.rough_diamond.commons.entity.base.BaseAmount {
      * @return
      * @throws UnitConversionService.NotConversionException
      */
-    public Amount convertUnit(Unit destUnit, int roundingMode) throws UnitConversionService.NotConversionException{
+    public Quantity convertUnit(Unit destUnit, int roundingMode) throws UnitConversionService.NotConversionException{
     	return UnitConversionService.getService().convertUnit(this, destUnit, roundingMode);
     }
 
@@ -67,33 +69,34 @@ public class Amount extends jp.rough_diamond.commons.entity.base.BaseAmount {
      * @return
      * @throws UnitConversionService.NotConversionException
      */
-    public Amount convertUnit(Unit destUnit, int roundingMode, Date d) throws UnitConversionService.NotConversionException{
+    public Quantity convertUnit(Unit destUnit, int roundingMode, Date d) throws UnitConversionService.NotConversionException{
     	return UnitConversionService.getService().convertUnit(this, destUnit, roundingMode, d);
     }
-    
-	@Override
+
+    @Override
 	public double doubleValue() {
-		return (getQuantity() == null) ? 0.0D : getQuantity().doubleValue();
+		return (getAmount() == null) ? 0.0D : getAmount().doubleValue();
 	}
 
 	@Override
 	public float floatValue() {
-		return (getQuantity() == null) ? 0.0F : getQuantity().floatValue();
+		return (getAmount() == null) ? 0.0F : getAmount().floatValue();
 	}
 	@Override
 	public int intValue() {
-		return (getQuantity() == null) ? 0 : getQuantity().intValue();
+		return (getAmount() == null) ? 0 : getAmount().intValue();
 	}
 	@Override
 	public long longValue() {
-		return (getQuantity() == null) ? 0L : getQuantity().longValue();
+		return (getAmount() == null) ? 0L : getAmount().longValue();
 	}
+
 	/**
 	 * getQuantity().decimal()のショートカットメソッド
 	 * getQuantity()==nullの場合はBigDecimal.ZEROを返却
 	 * @return
 	 */
 	public BigDecimal decimal() {
-		return (getQuantity() == null) ? BigDecimal.ZERO : getQuantity().decimal();
+		return (getAmount() == null) ? BigDecimal.ZERO : getAmount().decimal();
 	}
 }
