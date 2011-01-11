@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="Shift_JIS"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <project name="common-project" basedir="." default="makeBean">
   <dirname property="my.build.dir" file="${ant.file}" />
 
-  <!-- ƒtƒŒ[ƒ€ƒ[ƒNƒfƒBƒŒƒNƒgƒŠŠÖ˜A -->
+  <!-- ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¯ãƒ¼ã‚¯ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªé–¢é€£ -->
   <property name="framework.vendor"                 value="Rough Diamond Co.,Ltd" />
   <property name="framework.root"                   value="${my.build.dir}/../framework" />
   <property name="framework.work.classes.dir"       value="${framework.root}/work/classes" />
@@ -29,7 +29,7 @@
   <property name="cache.property.file"    value="overrideCache.properties" />
   <property name="src.encoding"           value="Windows-31J" />
 
-  <!-- ƒf[ƒ^ƒx[ƒXŠÖ˜A -->
+  <!-- ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹é–¢é€£ -->
   <property name="export.dir"             value="./etc/export" />
   <property name="table.doc.dir"          value="${my.build.dir}/doc/table" />
   <property name="torque.schema.dir"      value="${my.build.dir}/etc/schema" />
@@ -39,7 +39,7 @@
   <property name="sql.dropalter"          value="${torque.sql.dir}/*-schema-dropfk.sql" />
   <property name="sql.schema"             value="${torque.schema.dir}/*-schema.xml" />
 
-  <!-- ƒeƒXƒgŠÖ˜A -->
+  <!-- ãƒ†ã‚¹ãƒˆé–¢é€£ -->
   <property name="test.root.dir"          value="${my.build.dir}/test" />
   <property name="test.work.dir"          value="${test.root.dir}/work" />
   <property name="test.classes.dir"       value="${test.work.dir}/classes" />
@@ -57,16 +57,16 @@
   <property name="test.initialized.flag"  value="${test.work.dir}/.testInitialized" />
   <property name="test.web.root"          value="${test.work.dir}/webresource" />
 
-  <!-- ƒRƒ“ƒpƒCƒ‹Žü‚è -->
+  <!-- ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«å‘¨ã‚Š -->
   <property name="compile.debug" value="on"/>
   <property name="compile.optimize" value="off"/>
   <property name="compile.deprecation" value="off"/>
   <property name="compile.java.version" value="1.6" />
 
-  <!-- ƒ‰ƒCƒuƒ‰ƒŠŽæ“¾æ -->
+  <!-- ãƒ©ã‚¤ãƒ–ãƒ©ãƒªå–å¾—å…ˆ -->
   <property name="lib.publisher" value="http://www.ibiblio.org/maven" />
 
-  <!-- JavaDoco—Íæ -->
+  <!-- JavaDocå‡ºåŠ›å…ˆ -->
   <property name="javadoc.dir" value="${my.build.dir}/doc/api" />
 
   <path id="real.src.path.default">
@@ -84,7 +84,7 @@
     </fileset>
   </path>
 
-  <!-- servletAPI‚Ìƒo[ƒWƒ‡ƒ“‚ÅˆÙ‚È‚é -->
+  <!-- servletAPIã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã§ç•°ãªã‚‹ -->
   <path id="servletapi.path">
     <fileset dir="${other.lib.dir}">
       <include name="servlet-api.jar" />
@@ -173,7 +173,7 @@
     </jar>
   </target>
 
-  <target name="get-deps" unless="noget" description="•K—v‚Èƒ‰ƒCƒuƒ‰ƒŠ‚ðŽæ“¾‚·‚é">
+  <target name="get-deps" unless="noget" description="å¿…è¦ãªãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’å–å¾—ã™ã‚‹">
     <mkdir dir="${framework.lib.root}/cglib" />
     <get dest="${framework.lib.root}/cglib/cglib-2.1.3.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/cglib/tags/2.1.3_p01/cglib/cglib-2.1.3_p01.jar" />
     <mkdir dir="${framework.lib.root}/cobertura" />
@@ -217,12 +217,12 @@
     </taskdef>
   </target>
 
-  <target name="clearTestData" depends="init-task" description="ƒeƒXƒgƒf[ƒ^‚ðƒNƒŠƒA‚·‚é">
+  <target name="clearTestData" depends="init-task" description="ãƒ†ã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹">
     <java classname="jp.rough_diamond.tools.TestDataEraser" classpathref="classpath.all" fork="yes">
     </java>
   </target>
 
-  <target name="makeBean" depends="init-task" description="JavaBeans‚ðì¬‚·‚é">
+  <target name="makeBean" depends="init-task" description="JavaBeansã‚’ä½œæˆã™ã‚‹">
     <condition property="bean.def.xml" value="beanDef/beanDef.xml" >
       <not>
         <isset property="bean.def.xml" />
@@ -234,14 +234,14 @@
       </not>
     </condition>
     <beanGen root="${src.dir}" input="${bean.def.xml}" encoding="${src.encoding}" />
-    <echo message="Eclipseã‚ÅŽÀs‚µ‚Ä‚¢‚éê‡‚ÍAF5‚ð‰Ÿ‚µ‚ÄÅVó‘Ô‚É‚µ‚Ä‚­‚¾‚³‚¢B" />
+    <echo message="Eclipseä¸Šã§å®Ÿè¡Œã—ã¦ã„ã‚‹å ´åˆã¯ã€F5ã‚’æŠ¼ã—ã¦æœ€æ–°çŠ¶æ…‹ã«ã—ã¦ãã ã•ã„ã€‚" />
   </target>
 
-  <target name="copyTorque-gen" description="Torque-Gen‚Ìƒpƒbƒ`‚ð“–‚Ä‚½‚à‚Ì‚ð“–ŠYƒvƒƒWƒFƒNƒg‚ÖƒRƒs[‚·‚é">
+  <target name="copyTorque-gen" description="Torque-Genã®ãƒ‘ãƒƒãƒã‚’å½“ã¦ãŸã‚‚ã®ã‚’å½“è©²ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã¸ã‚³ãƒ”ãƒ¼ã™ã‚‹">
     <ant antfile="../torque-gen-patch/build.xml" target="copyTorque-gen" />
   </target>
 
-  <target name="makeClientStub" depends="init-task" description="WSDL‚ðƒT[ƒo‚©‚çŽæ“¾‚µƒXƒ^ƒuƒ‚ƒWƒ…[ƒ‹‚ðì¬‚·‚é">
+  <target name="makeClientStub" depends="init-task" description="WSDLã‚’ã‚µãƒ¼ãƒã‹ã‚‰å–å¾—ã—ã‚¹ã‚¿ãƒ–ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’ä½œæˆã™ã‚‹">
     <antcall target="getWSDL" />
     <antcall target="wsdl2java" />
   </target>
@@ -264,7 +264,7 @@
   </target>
 
   <target name="filter-nonexists-msg" unless="filtering.filename.present" >
-    <echo message="${filtering.filename}‚ª‘¶Ý‚µ‚Ü‚¹‚ñB" />
+    <echo message="${filtering.filename}ãŒå­˜åœ¨ã—ã¾ã›ã‚“ã€‚" />
   </target>
 
   <target name="getWSDL" >
@@ -328,7 +328,7 @@
       version="${mule.version}" />
   </target>
 
-  <target name="makeCXFService" depends="init-task" description="ƒT[ƒrƒX‚Ì’è‹`‚ÉŠî‚Ã‚¢‚ÄƒT[ƒo‘¤‚Å•K—v‚ÈƒŠƒ\[ƒX‚ðì¬‚·‚é">
+  <target name="makeCXFService" depends="init-task" description="ã‚µãƒ¼ãƒ“ã‚¹ã®å®šç¾©ã«åŸºã¥ã„ã¦ã‚µãƒ¼ãƒå´ã§å¿…è¦ãªãƒªã‚½ãƒ¼ã‚¹ã‚’ä½œæˆã™ã‚‹">
     <condition property="cxf.service.file" value="${my.build.dir}/etc/serviceDef/services.xml" >
       <not>
         <isset property="cxf.service.file" />
@@ -405,7 +405,7 @@
     </exec>
   </target>
 
-  <target name="makeSchemaAccessor" description="ƒe[ƒuƒ‹ƒŒƒCƒAƒEƒgAcreate table•¶AJavaƒ\[ƒXAƒ}ƒbƒsƒ“ƒOƒtƒ@ƒCƒ‹AhibernateConfig‚ðì¬‚·‚é">
+  <target name="makeSchemaAccessor" description="ãƒ†ãƒ¼ãƒ–ãƒ«ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã€create tableæ–‡ã€Javaã‚½ãƒ¼ã‚¹ã€ãƒžãƒƒãƒ”ãƒ³ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã€hibernateConfigã‚’ä½œæˆã™ã‚‹">
     <condition property="torque.template.path" value="${my.build.dir}/torque-gen/templates">
       <not>
         <isset property="torque.template.path" />
@@ -424,31 +424,31 @@
 
     <copy file="${framework.root}/build-torque.properties" tofile="${torque.schema.dir}/build.properties" filtering="true" overwrite="true" />
     <replace file="${torque.schema.dir}/build.properties" token="\" value="/" />
-    <echo message="Create Table•¶‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="Create Tableæ–‡ã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="sql" />
       <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
-    <echo message="ƒe[ƒuƒ‹ƒŒƒCƒAƒEƒg‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="ãƒ†ãƒ¼ãƒ–ãƒ«ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="doc" />
       <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
-    <echo message="DAOƒNƒ‰ƒX‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="DAOã‚¯ãƒ©ã‚¹ã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="hibernate-java" />
       <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
-    <echo message="ƒXƒL[ƒ}ƒvƒƒpƒeƒB‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="ã‚¹ã‚­ãƒ¼ãƒžãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="schema-properties" />
       <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
     </antcall>
-    <echo message="‚QŽŸƒLƒƒƒbƒVƒ…‚Ìã‘î•ñ‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="ï¼’æ¬¡ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã®ä¸Šæ›¸æƒ…å ±ã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="cache-override-properties" />
@@ -458,9 +458,9 @@
       <param name="build.file"  value="${basedir}/build.xml" />
       <param name="exec.target" value="hibernatedoclet" />
     </antcall>
-    <echo message="ƒvƒƒpƒeƒBƒtƒ@ƒCƒ‹‚É‘Î‚µ‚Änative2ascii‚ðŽÀs‚µ‚Ü‚·B" />
+    <echo message="ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ãƒ•ã‚¡ã‚¤ãƒ«ã«å¯¾ã—ã¦native2asciiã‚’å®Ÿè¡Œã—ã¾ã™ã€‚" />
     <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" encoding="${src.encoding}" />
-    <echo message="Eclipseã‚ÅŽÀs‚µ‚Ä‚¢‚éê‡‚ÍAF5‚ð‰Ÿ‚µ‚ÄÅVó‘Ô‚É‚µ‚Ä‚­‚¾‚³‚¢B" />
+    <echo message="Eclipseä¸Šã§å®Ÿè¡Œã—ã¦ã„ã‚‹å ´åˆã¯ã€F5ã‚’æŠ¼ã—ã¦æœ€æ–°çŠ¶æ…‹ã«ã—ã¦ãã ã•ã„ã€‚" />
   </target>
 
   <target name="makeMultipleSQL">
@@ -469,7 +469,7 @@
     <filter token="torque.database.type"        value="oracle" />
     <copy file="${framework.root}/build-torque.properties" tofile="${torque.schema.dir}/build.properties" filtering="true" overwrite="true" />
     <replace file="${torque.schema.dir}/build.properties" token="\" value="/" />
-    <echo message="Create Table•¶‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="Create Tableæ–‡ã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="sql" />
@@ -480,7 +480,7 @@
     <filter token="torque.database.type"        value="postgresql" />
     <copy file="${framework.root}/build-torque.properties" tofile="${torque.schema.dir}/build.properties" filtering="true" overwrite="true" />
     <replace file="${torque.schema.dir}/build.properties" token="\" value="/" />
-    <echo message="Create Table•¶‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="Create Tableæ–‡ã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="sql" />
@@ -491,7 +491,7 @@
     <filter token="torque.database.type"        value="mysql" />
     <copy file="${framework.root}/build-torque.properties" tofile="${torque.schema.dir}/build.properties" filtering="true" overwrite="true" />
     <replace file="${torque.schema.dir}/build.properties" token="\" value="/" />
-    <echo message="Create Table•¶‚ðì¬‚µ‚Ü‚·B" />
+    <echo message="Create Tableæ–‡ã‚’ä½œæˆã—ã¾ã™ã€‚" />
     <antcall target="execAnt">
       <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
       <param name="exec.target" value="sql" />
@@ -499,7 +499,7 @@
     </antcall>
   </target>
 
-  <!-- Java‚Ìƒ\[ƒXƒR[ƒh‚©‚çHibernate‚Ìƒ}ƒbƒsƒ“ƒOƒtƒ@ƒCƒ‹‚ðì¬‚·‚é -->
+  <!-- Javaã®ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã‹ã‚‰Hibernateã®ãƒžãƒƒãƒ”ãƒ³ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã™ã‚‹ -->
   <target name="hibernatedoclet" depends="init-task">
     <property file="./middlegen.properties" />
     <condition property="hibernate.otherResources" value="" >
@@ -594,7 +594,7 @@
     </hibernatedoclet>
   </target>
 
-  <target name="DB-init" depends="init-task" description="Ž©“®¶¬‚³‚ê‚½Create Table•¶‚ðŽÀs‚·‚é">
+  <target name="DB-init" depends="init-task" description="è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸCreate Tableæ–‡ã‚’å®Ÿè¡Œã™ã‚‹">
     <antcall target="DB-clear-1" />
     <antcall target="DB-clear-2" />
   </target>
@@ -642,7 +642,7 @@
     </dbunit>
   </target>
 
-  <target name="DB-export" depends="init-task" description="DB‚ðƒGƒNƒXƒ|[ƒg‚·‚é">
+  <target name="DB-export" depends="init-task" description="DBã‚’ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã™ã‚‹">
     <mkdir dir="${export.dir}" />
     <property file="./middlegen.properties" />
     <echo message="${sql.schema}" />
@@ -653,7 +653,7 @@
     </dbunit>
   </target>
 
-  <target name="DB-export-excel" depends="init-task" description="DB‚ðExcel‚ÖƒGƒNƒXƒ|[ƒg‚·‚é">
+  <target name="DB-export-excel" depends="init-task" description="DBã‚’Excelã¸ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã™ã‚‹">
     <mkdir dir="${export.dir}" />
     <property file="./middlegen.properties" />
     <dbunit driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" 
@@ -663,7 +663,7 @@
     </dbunit>
   </target>
 
-  <target name="DB-recover" depends="init-task" description="ƒGƒNƒXƒ|[ƒg‚µ‚½ƒf[ƒ^‚ðƒCƒ“ƒ|[ƒg‚·‚é">
+  <target name="DB-recover" depends="init-task" description="ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆã™ã‚‹">
     <antcall target="DB-clear-1" />
     <property file="./middlegen.properties" />
     <dbunit driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" 
@@ -674,7 +674,7 @@
     <antcall target="DB-clear-2" />
   </target>
 
-  <target name="doContinuousIntegration" depends="init-task" description="Œp‘±“IƒCƒ“ƒeƒOƒŒ[ƒVƒ‡ƒ“‚ðs‚¤">
+  <target name="doContinuousIntegration" depends="init-task" description="ç¶™ç¶šçš„ã‚¤ãƒ³ãƒ†ã‚°ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã‚’è¡Œã†">
     <property name="filtering.filename" value="${conf.dir}/filtering.ci.properties" />
     <antcall target="ci-preprocess" />
     <antcall target="makeCIConfig" />
@@ -787,7 +787,7 @@
     </java>
   </target>
 
-  <target name="test" description="JUnit+cobertura‚ÅƒeƒXƒg‚ðŽÀs‚·‚é" depends="test.prepare, test.compile">
+  <target name="test" description="JUnit+coberturaã§ãƒ†ã‚¹ãƒˆã‚’å®Ÿè¡Œã™ã‚‹" depends="test.prepare, test.compile">
     <taskdef classpath="${other.lib.dir}/cobertura.jar" resource="tasks.properties">
       <classpath refid="classpath.all" />
     </taskdef>
@@ -895,7 +895,7 @@
     <taskdef classpathref="framework.path" resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties" />
   </target>
 
-  <target name="javadoc" description="JavaDoc‚ð¶¬‚·‚é" if="javadoc.title">
+  <target name="javadoc" description="JavaDocã‚’ç”Ÿæˆã™ã‚‹" if="javadoc.title">
     <delete dir="${javadoc.dir}" />
     <mkdir dir="${javadoc.dir}" />
     <javadoc

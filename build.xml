@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Shift_JIS"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <project name="Framework" basedir="." default="dummy">
   <property name="lib.dir"                    value="./libs" />
@@ -20,7 +20,7 @@
 
   <property name="product.version"            value="0.8.2" />
 
-  <!-- TorqueŠÖŒW -->
+  <!-- Torqueé–¢ä¿‚ -->
   <property name="torque.gen.patch.root"      value="${framework.root}/../torque-gen-patch" />
   <property name="torque.patch.base.lib.dir"  value="${torque.gen.patch.root}/base/lib" />
   <property name="torque.patch.patch.lib.dir" value="${torque.gen.patch.root}/patch/lib" />
@@ -62,19 +62,19 @@
     </copy>
   </target>
 
-  <target name="makeOkumuraConfig" description="‰œ‘ºŠJ”­ŠÂ‹«—p‚Ìbeans.xml‚ðì¬‚·‚é">
+  <target name="makeOkumuraConfig" description="å¥¥æ‘é–‹ç™ºç’°å¢ƒç”¨ã®beans.xmlã‚’ä½œæˆã™ã‚‹">
     <property name="filtering.filename" value="${conf.dir}/filtering.okumura.properties" />
     <antcall target="makeConfig" />
   </target>
 
 <!--
-  <target name="makeReleaseConfig" description="ƒŠƒŠ[ƒXƒ‚ƒWƒ…[ƒ‹—p‚Ìbeans.xml‚ðì¬‚·‚é">
+  <target name="makeReleaseConfig" description="ãƒªãƒªãƒ¼ã‚¹ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ç”¨ã®beans.xmlã‚’ä½œæˆã™ã‚‹">
     <property name="filtering.filename" value="${conf.dir}/filtering.release.properties" />
     <antcall target="makeConfig" />
   </target>
 -->
 
-  <target name="makeConfig" depends="init-task, filter-check, filter-exists, makeConfigBase" if="filtering.filename.present" description="EI‚ðŽÀs‚·‚é">
+  <target name="makeConfig" depends="init-task, filter-check, filter-exists, makeConfigBase" if="filtering.filename.present" description="EIã‚’å®Ÿè¡Œã™ã‚‹">
 <!--
     <antcall target="makeConfigBase" />
     <basename property="conf.target.name" file="${filtering.filename}" />
@@ -94,15 +94,15 @@
     <copy file="${conf.dir}/template/cxfrouting.properties" tofile="${test.src.dir}/cxfrouting.properties" filtering="true" overwrite="true" encoding="UTF-8" />
     <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" />
     <delete dir="${conf.dir}/tmp" />
-    <echo message="Eclipseã‚ÅŽÀs‚µ‚Ä‚¢‚éê‡‚ÍAF5‚ð‰Ÿ‚µ‚ÄÅVó‘Ô‚É‚µ‚Ä‚­‚¾‚³‚¢B" />
+    <echo message="Eclipseä¸Šã§å®Ÿè¡Œã—ã¦ã„ã‚‹å ´åˆã¯ã€F5ã‚’æŠ¼ã—ã¦æœ€æ–°çŠ¶æ…‹ã«ã—ã¦ãã ã•ã„ã€‚" />
   </target>
 
-  <target name="makeSchemaAccessor" description="ƒe[ƒuƒ‹ƒŒƒCƒAƒEƒgAcreate table•¶AJavaƒ\[ƒXAƒ}ƒbƒsƒ“ƒOƒtƒ@ƒCƒ‹AhibernateConfig‚ðì¬‚·‚é">
+  <target name="makeSchemaAccessor" description="ãƒ†ãƒ¼ãƒ–ãƒ«ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã€create tableæ–‡ã€Javaã‚½ãƒ¼ã‚¹ã€ãƒžãƒƒãƒ”ãƒ³ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã€hibernateConfigã‚’ä½œæˆã™ã‚‹">
     <ant antfile="../framework/build-common.xml" target="makeSchemaAccessor" dir="${my.build.dir}" />
     <antcall target="makeMultipleSQL" />
   </target>
 
-  <target name="newProject" depends="init-task, makeJar" description="V‚µ‚¢ƒvƒƒWƒFƒNƒg‚ðì¬‚·‚é">
+  <target name="newProject" depends="init-task, makeJar" description="æ–°ã—ã„ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹">
 <!--
     <copy file="${framework.dist.dir}/rd-framework-${product.version}.jar" todir="${lib.dir}/common/" />
 -->
@@ -114,7 +114,7 @@
 -->
   </target>
 
-  <target name="makeJar" depends="compile" description="Jarƒtƒ@ƒCƒ‹‚ðì¬‚·‚é">
+  <target name="makeJar" depends="compile" description="Jarãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã™ã‚‹">
     <jar destfile="${framework.dist.dir}/rd-framework-${product.version}.jar" basedir="${framework.classes.dir}">
       <manifest>
         <attribute name="Implementation-Vendor"   value="${framework.vendor}"/>
@@ -123,7 +123,7 @@
       </manifest>
     </jar>
     <copy file="${framework.dist.dir}/rd-framework-${product.version}.jar" tofile="${framework.dist.dir}/rd-framework.jar" />
-    <!-- ‰ºˆÊŒÝŠ·« ‚»‚Ì‚¤‚¿Á‚· -->
+    <!-- ä¸‹ä½äº’æ›æ€§ ãã®ã†ã¡æ¶ˆã™ -->
     <copy file="${framework.lib.root}/cglib/cglib-2.1.3.jar" tofile="${framework.dist.dir}/cglib-2.1.3.jar" />
   </target>
 
@@ -140,7 +140,7 @@
     </antcall>
   </target>
 
-  <target name="copyTorque-gen" description="Torque-Gen‚Ìƒpƒbƒ`‚ð“–‚Ä‚½‚à‚Ì‚ð“–ŠYƒvƒƒWƒFƒNƒg‚ÖƒRƒs[‚·‚é">
+  <target name="copyTorque-gen" description="Torque-Genã®ãƒ‘ãƒƒãƒã‚’å½“ã¦ãŸã‚‚ã®ã‚’å½“è©²ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã¸ã‚³ãƒ”ãƒ¼ã™ã‚‹">
     <ant antfile="${torque.gen.patch.root}/build.xml" target="dist" inheritAll="false"/>
     <mkdir dir="${framework.root}/torque-gen/lib" />
     <delete>
