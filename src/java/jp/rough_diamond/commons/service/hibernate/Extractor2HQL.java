@@ -129,6 +129,16 @@ public class Extractor2HQL {
         }
         if(extractor.getValues().size() == 0) {
         	q.setLockMode(getAlias(extractor.target, extractor.targetAlias), lockMode);
+        } else {
+        	Type[] returnTypes = q.getReturnTypes();
+        	List<ExtractValue> evs = extractor.getValues();
+        	for(int i = 0 ; i < evs.size() ; i++) {
+        		ExtractValue ev = evs.get(i);
+        		if(ev.returnType != null) {
+        			Type t = TypeFactory.basic(ev.returnType.getName());
+           			returnTypes[i] = (t == null) ? returnTypes[i] : t;
+        		}
+        	}
         }
         if(extractor.getFetchSize() != Extractor.DEFAULT_FETCH_SIZE) {
         	q.setFetchSize(extractor.getFetchSize());
@@ -265,7 +275,7 @@ public class Extractor2HQL {
 			Map<String, Object> ret = new LinkedHashMap<String, Object>();
 			Object value = target;
 			if((values.get(0).value instanceof SummaryFunction) && value == null) {
-				value = 0L;
+				value = translateZeroValue(values.get(0));
 			} else if(value.getClass().isArray()) {
 				value = Array.get(value, 0);
 			}
@@ -274,14 +284,26 @@ public class Extractor2HQL {
 		}
     	
     }
-
+    
+    private static Object translateZeroValue(ExtractValue value) {
+    	try {
+	    	if(value.returnType == null) {
+	    		return 0L;
+	    	} else {
+	    		return value.returnType.getConstructor(String.class).newInstance("0");
+	    	}
+    	} catch(Exception e) {
+    		throw new RuntimeException(e);
+    	}
+    }
+    
     private static class MultiStrategy implements MakeMapStrategy {
     	private final static MakeMapStrategy INSTANCE = new MultiStrategy();
 		public Map<String, Object> getMap(Object target, List<ExtractValue> values) {
 			Object[] row = (Object[])target;
 			Map<String, Object> rowMap = new LinkedHashMap<String, Object>();
 			for(int i = 0 ; i < values.size() ; i++) {
-				Object value = ((values.get(i).value instanceof SummaryFunction) && row[i] == null) ? 0L : row[i]; 
+				Object value = ((values.get(i).value instanceof SummaryFunction) && row[i] == null) ? translateZeroValue(values.get(i)) : row[i]; 
 				rowMap.put(values.get(i).key, value);
 			}
 			return rowMap;

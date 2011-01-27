@@ -16,7 +16,7 @@ public class ExtractValue {
      * @deprecated 本プロパティは以降使用しません
      * 将来的に削除する予定です
      */
-    @Deprecated
+	@Deprecated
     public final Class target;
     /**
      * @deprecated 本プロパティは使用しません
@@ -37,6 +37,12 @@ public class ExtractValue {
     public final Value value;
     
     /**
+     * この値のタイプを指定します。
+     * 省略した場合、永続化フレームワークの指定する戻り値で返却されます。
+     */
+    public final Class<?> returnType;
+    
+    /**
      * 抽出値を指定する
      * @param key
      * @param target
@@ -46,6 +52,10 @@ public class ExtractValue {
      */
     @Deprecated
     public ExtractValue(String key, Class target, String aliase, String property) {
+    	this(key, target, aliase, property, null);
+    }
+    
+    public ExtractValue(String key, Class target, String aliase, String property, Class<?> returnType) {
         key.getClass();             //NOP NullPointerExceptionを送出させるため
         target.getClass();          //NOP NullPointerExceptionを送出させるため
         this.key = key;
@@ -53,13 +63,19 @@ public class ExtractValue {
         this.aliase = aliase;
         this.property = property;
         this.value = new Property(target, aliase, property);
+        this.returnType = returnType;
     }
     
     public ExtractValue(String key, Value value) {
+    	this(key, value, null);
+    }
+    
+    public ExtractValue(String key, Value value, Class<?> returnType) {
     	this.key = key;
     	this.value = value;
         this.target = null;
         this.aliase = null;
         this.property = null;
+        this.returnType = returnType;
     }
 }

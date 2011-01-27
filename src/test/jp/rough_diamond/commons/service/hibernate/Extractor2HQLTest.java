@@ -8,6 +8,7 @@
 package jp.rough_diamond.commons.service.hibernate;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -230,6 +231,22 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("値が誤っています。", 1L,			list.get(0).get("val").longValue());
 		assertEquals("値が誤っています。", 1000L,		list.get(1).get("val").longValue());
 		assertEquals("値が誤っています。", 1609344000L,	list.get(2).get("val").longValue());
+	}
+	
+	public void testExtractValueで指定した戻り値型で値が返却されること() throws Exception {
+		Value sum = new Sum(new FreeFormat("?*power(10, ?)", 
+				new Property(Unit.RATE + ScalableNumber.VALUE), new Property(Unit.RATE + ScalableNumber.SCALE)));
+		Extractor ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("val", sum));
+		List<Map<String, ? extends Number>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("型が誤っています。", Long.class, list.get(0).get("val").getClass());
+		System.out.println(list.get(0).get("val"));
+		
+		ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("val", sum, BigDecimal.class));
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("型が誤っています。", BigDecimal.class, list.get(0).get("val").getClass());
+		System.out.println(list.get(0).get("val"));
 	}
 	
 	public void testSumInFreeFormat() throws Exception {
