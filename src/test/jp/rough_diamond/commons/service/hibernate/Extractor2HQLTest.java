@@ -247,6 +247,11 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		list = BasicService.getService().findByExtractor(ex);
 		assertEquals("Œ^‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", BigDecimal.class, list.get(0).get("val").getClass());
 		System.out.println(list.get(0).get("val"));
+		
+		ex.setReturnType(BigDecimal.class);
+		List<BigDecimal> list2 = BasicService.getService().findByExtractor(ex);
+		assertEquals("Œ^‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", BigDecimal.class, list2.get(0).getClass());
+		System.out.println(list2.get(0));
 	}
 	
 	public void testSumInFreeFormat() throws Exception {

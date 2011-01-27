@@ -228,6 +228,12 @@ public class Extractor2HQL {
     }
    
     static <T> T makeInstance(Class<T> returnType, Map<String, Object> map) {
+    	if(map.size() == 1) {
+    		List<?> list = new ArrayList<Object>(map.values());
+    		if(returnType.isInstance(list.get(0))) {
+    			return (T)list.get(0);
+    		}
+    	}
     	T ret = tryingConstructorInjection(returnType, map);
     	if(ret == null) {
     		ret = tryingSetterInjection(returnType, map);
