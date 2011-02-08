@@ -27,7 +27,9 @@ public class FileInputStreamDeletingWhenGC extends FileInputStream {
     @Override
     protected void finalize() throws IOException {
         super.finalize();
-        log.debug(f.getCanonicalPath() + "‚ğíœ‚µ‚Ü‚·B");
+        if(log.isDebugEnabled()) {
+        	log.debug(f.getCanonicalPath() + "‚ğíœ‚µ‚Ü‚·B");
+        }
         boolean ret = f.delete();
         //FindBugs‚ª“{‚é‚Ì‚Å“{‚è‚ğ’Á‚ß‚é‚¨‚Ü‚¶‚È‚¢
         if(ret) ret = !ret;

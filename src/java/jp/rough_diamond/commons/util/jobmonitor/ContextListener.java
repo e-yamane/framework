@@ -31,7 +31,9 @@ public class ContextListener implements ServletContextListener {
 	
 	void startMonitor(ServletContextEvent sce) {
 		String monitorName = getMonitorName(sce);
-		log.debug("Job Monitor DI Name:" + monitorName);
+		if(log.isDebugEnabled()) {
+			log.debug("Job Monitor DI Name:" + monitorName);
+		}
 		monitor = (JobMonitor)DIContainerFactory.getDIContainer(
 				).getObject(monitorName);
 		monitor.start();

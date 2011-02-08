@@ -127,13 +127,17 @@ public class JAXBElementToObject {
 				log.warn(pd.getName() + "プロパティが変換後オブジェクトに存在しません。スキップします。");
 				continue;
 			} else if(destPD.getWriteMethod() == null) {
-				log.debug(pd.getName() + "プロパティのsetterが存在しません。スキップします。");
+				if(log.isDebugEnabled()) {
+					log.debug(pd.getName() + "プロパティのsetterが存在しません。スキップします。");
+				}
 				continue;
 			}
 			Method m = PropertyUtils.getGetterMethod(src, pd.getName()); 
 			Object srcVal = m.invoke(src);
 			if(srcVal == null) {
-				log.debug(pd.getName() + "プロパティはnullです。強制的にnullをセットします。");
+				if(log.isDebugEnabled()) {
+					log.debug(pd.getName() + "プロパティはnullです。強制的にnullをセットします。");
+				}
 				destPD.getWriteMethod().invoke(dest, (Object)null);
 				continue;
 			}

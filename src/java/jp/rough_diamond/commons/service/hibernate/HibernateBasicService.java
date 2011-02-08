@@ -298,7 +298,9 @@ public class HibernateBasicService extends BasicService {
         log.debug(hql);
         Query query = session.createQuery(hql);
         int ret = query.executeUpdate();
-        log.debug("íœŒ”F" + ret);
+        if(log.isDebugEnabled()) {
+        	log.debug("íœŒ”F" + ret);
+        }
     }
 
     @Override
@@ -408,7 +410,9 @@ public class HibernateBasicService extends BasicService {
 	protected boolean compareUniqueObject(Object target, Object org) {
 		ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(target.getClass());
 		Object pk = cm.getIdentifier(target, EntityMode.POJO);
-		log.debug(pk + ":" + org);
+		if(log.isDebugEnabled()) {
+			log.debug(pk + ":" + org);
+		}
 		return pk.equals(org);
 	}
 

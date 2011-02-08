@@ -300,7 +300,9 @@ abstract public class DBInitializer implements Service {
         }
         for(String name : tmp) {
         	try {
-        		log.debug(name + ":" + operation.getClass().getName());
+        		if(log.isDebugEnabled()) {
+        			log.debug(name + ":" + operation.getClass().getName());
+        		}
         		IDataSet dataset = datasetMap.get(name);
         		if(dataset == null) {
 	        		if(name.endsWith("xls")) {

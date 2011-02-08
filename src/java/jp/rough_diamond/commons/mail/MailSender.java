@@ -215,10 +215,14 @@ public class MailSender {
     private String translateString(String src) {
         try {
             sun.misc.HexDumpEncoder encoder = new sun.misc.HexDumpEncoder();
-            log.trace(encoder.encodeBuffer(src.getBytes("iso-2022-jp")));
+            if(log.isTraceEnabled()) {
+            	log.trace(encoder.encodeBuffer(src.getBytes("iso-2022-jp")));
+            }
             String ret = src.replace((char)0xFF0D, (char)0x2212);
             ret = ret.replace((char)0xFF5E, (char)0x301C);
-            log.trace(encoder.encodeBuffer(ret.getBytes("iso-2022-jp")));
+            if(log.isTraceEnabled()) {
+            	log.trace(encoder.encodeBuffer(ret.getBytes("iso-2022-jp")));
+            }
             return ret;
         } catch(java.io.UnsupportedEncodingException uee) {
         	log.warn(uee.getMessage(), uee);

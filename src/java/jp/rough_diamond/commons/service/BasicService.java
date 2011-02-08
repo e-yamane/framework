@@ -585,13 +585,17 @@ abstract public class BasicService implements Service {
 	    		if(nn != null) {
 	    			Object val = m.invoke(o);
 	    			if(val == null) {
-                        log.debug("必須属性エラー:" + nn.property());
+	    				if(log.isDebugEnabled()) {
+	    					log.debug("必須属性エラー:" + nn.property());
+	    				}
 	    				ret.add(nn.property(), new Message("errors.required", ResourceManager.getResource().getString(nn.property())));
 	    				//必須エラーなので長さのチェックは不要
 	    				continue;
 	    			} else if(val instanceof String) {
 	    				if(getLength((String)val) == 0) {
-                            log.debug("必須属性エラー:" + nn.property());
+	    					if(log.isDebugEnabled()) {
+	    						log.debug("必須属性エラー:" + nn.property());
+	    					}
 		    				ret.add(nn.property(), new Message("errors.required", ResourceManager.getResource().getString(nn.property())));
 		    				//必須エラーなので長さのチェックは不要
 		    				continue;
@@ -602,7 +606,9 @@ abstract public class BasicService implements Service {
 	    		if(mcl != null) {
 	    			Object val = m.invoke(o);
 	    			if(val != null && val.toString().length() > mcl.length()) {
-                        log.debug("最大文字長超過エラー:" + mcl.property());
+	    				if(log.isDebugEnabled()) {
+	    					log.debug("最大文字長超過エラー:" + mcl.property());
+	    				}
 	    				ret.add(mcl.property(), new Message("errors.maxcharlength", ResourceManager.getResource().getString(mcl.property()), "" + mcl.length()));
 	    				//文字列長超過の場合はバイト数のチェックは行いません
 	    				continue;
@@ -612,7 +618,9 @@ abstract public class BasicService implements Service {
 	    		if(ml != null) {
 	    			Object val = m.invoke(o);
 	    			if(getLength(val) > ml.length()) {
-                        log.debug("最大長超過エラー:" + ml.property());
+	    				if(log.isDebugEnabled()) {
+	    					log.debug("最大長超過エラー:" + ml.property());
+	    				}
 	    				ret.add(ml.property(), new Message("errors.maxlength", ResourceManager.getResource().getString(ml.property()), "" + ml.length()));
 	    			}
 	    		}
@@ -837,7 +845,9 @@ abstract public class BasicService implements Service {
     private boolean verifyVerifyMethod(Method m) {
     	Class returnType = m.getReturnType();
     	if(returnType == Void.TYPE) {
-    		log.warn("検証メソッド" + m.toString() + "は戻り値を返却しません。");
+    		if(log.isInfoEnabled()) {
+    			log.info("検証メソッド" + m.toString() + "は戻り値を返却しません。");
+    		}
     	} else if(!Messages.class.isAssignableFrom(returnType)) {
     		log.warn("検証メソッド" + m.toString() + "は適切な返却値を持たないため検証メソッドとは認識しません。");
     		//例外あげるべきかなぁ・・・

@@ -61,8 +61,10 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 	}
 
 	Object transform(Object src, Class<?> parameterType, Object factory) {
-		log.debug("srcType:" + src.getClass().getName());
-		log.debug("destType:" + parameterType.getName());
+		if(log.isDebugEnabled()) {
+			log.debug("srcType:" + src.getClass().getName());
+			log.debug("destType:" + parameterType.getName());
+		}
 		if(parameterType.isAssignableFrom(src.getClass())) {
 			log.debug("変換が不要なオブジェクトなので変換処理は行いません。");
 			return src;
@@ -110,7 +112,9 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 			Class<?> pdType = pd.getPropertyType();
 			PropertyDescriptor srcPD = PropertyUtils.getPropertyDescriptor(src, pd.getName());
 			if(srcPD == null) {
-				log.warn(pd.getName() + "プロパティが変換前オブジェクトに存在しません。スキップします。");
+				if(log.isDebugEnabled()) {
+					log.warn(pd.getName() + "プロパティが変換前オブジェクトに存在しません。スキップします。");
+				}
 				continue;
 			}
 			if(srcPD.getName().equals("class")) {
@@ -219,7 +223,7 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 			DatatypeFactory dtf = DatatypeFactory.newInstance();
 			XMLGregorianCalendar xCal = dtf.newXMLGregorianCalendar(gCal);
 			PropertyUtils.setProperty(dest, pd.getName(), xCal);
-		} else {
+		} else if(log.isDebugEnabled()){
 			log.debug(pd.getName() + "プロパティが変換前オブジェクトでは日付ではありません。");
 		}
 	}

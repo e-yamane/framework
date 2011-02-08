@@ -203,9 +203,7 @@ public class SessionHistoricalFilter implements Filter {
         try {
             oos.writeObject(coldSession);
         } catch(NotSerializableException nse) {
-            log.debug("Serialize不可能なオブジェクトが存在します。");
-            log.debug("メモリ上に確保します。");
-            log.debug("履歴は残せません。");
+            log.debug("Serialize不可能なオブジェクトが存在します。メモリ上に確保します。履歴は残せません。");
             String sessionId = session.getId();
             Map map = (Map)unserializedSessionMap.get(sessionId);
             if(map == null) {

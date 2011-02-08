@@ -539,7 +539,9 @@ public class Extractor2HQL {
     			String token = tokenizer.nextToken();
     			propertyStack.append(token);
     			String property = propertyStack.toString();
-    			log.debug("プロパティ名：" + property);
+    			if(log.isDebugEnabled()) {
+    				log.debug("プロパティ名：" + property);
+    			}
     			Type t = cm.getPropertyType(property);
     			if(t.isComponentType()) {
     				propertyStack.append(".");
@@ -550,7 +552,9 @@ public class Extractor2HQL {
     				depth++;
     			}
     		}
-    		log.debug("プロパティの深さ：" + depth);
+    		if(log.isDebugEnabled()) {
+    			log.debug("プロパティの深さ：" + depth);
+    		}
     		return (depth <= defaultMaxFetchDepth);
     	}
     	return false;

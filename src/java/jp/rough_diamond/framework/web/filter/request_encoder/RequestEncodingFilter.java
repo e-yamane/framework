@@ -65,7 +65,9 @@ public class RequestEncodingFilter implements Filter {
         if(encoding == null) {
             throw new ServletException("don't specfic 'encoding'.");
         }
-        log.info("encoding:" + encoding);
+        if(log.isInfoEnabled()) {
+        	log.info("encoding:" + encoding);
+        }
     }
     
     private String      encoding;

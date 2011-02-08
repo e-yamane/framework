@@ -74,13 +74,17 @@ public class HibernateConnectionManager extends ConnectionManager {
 	}
 	
 	private void init2() {
-		log.debug("セッションファクトリーを初期化します。:" + this);
+		if(log.isDebugEnabled()) {
+			log.debug("セッションファクトリーを初期化します。:" + this);
+		}
 		config = new Configuration();
 		if(getHibernateConfigName() == null) {
 			log.debug("デフォルト設定ファイルで初期化します。");
 			config.configure();
 		} else {
-			log.debug("設定ファイル名：" + getHibernateConfigName());
+			if(log.isDebugEnabled()) {
+				log.debug("設定ファイル名：" + getHibernateConfigName());
+			}
 			config.configure(getHibernateConfigName());
 		}
 		String addingPropertyFileName = getAddingPropertyFileName();
@@ -269,15 +273,21 @@ public class HibernateConnectionManager extends ConnectionManager {
 		tl.get().push(session);
         
 		String methodName = mi.getMethod().getName();
-		log.info("トランザクションを開始します : " + mi.getMethod().getDeclaringClass().getName() + "#" + methodName);
+		if(log.isInfoEnabled()) {
+			log.info("トランザクションを開始します : " + mi.getMethod().getDeclaringClass().getName() + "#" + methodName);
+		}
 		accessCounter++;
-		log.info("transaction accessCounter : " + accessCounter);
+		if(log.isInfoEnabled()) {
+			log.info("transaction accessCounter : " + accessCounter);
+		}
 	}
 
     public void rollback(MethodInvocation mi) {
         init();
 		String methodName = mi.getMethod().getName();
-		log.info("ロールバックします : " + mi.getMethod().getDeclaringClass().getName() + "#" + methodName);
+		if(log.isInfoEnabled()) {
+			log.info("ロールバックします : " + mi.getMethod().getDeclaringClass().getName() + "#" + methodName);
+		}
 
 		Session session = (Session)((Stack)tl.get()).pop();
 		try {
@@ -295,8 +305,9 @@ public class HibernateConnectionManager extends ConnectionManager {
 	public void commit(MethodInvocation mi) throws VersionUnmuchException {
         init();
 		String methodName = mi.getMethod().getName();
-		log.info("コミットします : " + mi.getMethod().getDeclaringClass().getName() + "#" + methodName);
-		log.debug(log.getClass().getName());
+		if(log.isInfoEnabled()) {
+			log.info("コミットします : " + mi.getMethod().getDeclaringClass().getName() + "#" + methodName);
+		}
 
 		Session session = (Session)((Stack)tl.get()).peek();
 		Transaction t = (Transaction)((Map)transactionMap.get()).get(session);

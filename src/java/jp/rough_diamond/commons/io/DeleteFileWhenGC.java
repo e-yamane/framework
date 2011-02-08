@@ -40,7 +40,9 @@ public class DeleteFileWhenGC extends File {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        log.debug(getName() + "‚ğíœ‚µ‚Ü‚·B");
+        if(log.isDebugEnabled()) {
+        	log.debug(getName() + "‚ğíœ‚µ‚Ü‚·B");
+        }
         boolean ret = delete();
         //FindBugs‚ª“{‚é‚Ì‚Å“{‚è‚ğ’Á‚ß‚é‚¨‚Ü‚¶‚È‚¢
         if(ret) ret = !ret;

@@ -57,7 +57,9 @@ public class ServiceFinder implements
 				}
 				MuleMessage msg = makeMessage(args);
 				msg.addProperties(ServiceBus.getInstance().popParameters());
-				log.debug(String.format("serviceName=%s, inboundName=%s", serviceName, inboundName));
+				if(log.isDebugEnabled()) {
+					log.debug(String.format("serviceName=%s, inboundName=%s", serviceName, inboundName));
+				}
 				MuleMessage result = client.sendDirect(serviceName, inboundName, msg);
 				ExceptionPayload exceptionPayload = result.getExceptionPayload();
 				if(exceptionPayload != null) {

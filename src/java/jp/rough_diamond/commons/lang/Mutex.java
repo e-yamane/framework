@@ -129,7 +129,9 @@ public class Mutex {
      * @return Mutex
      */
     public static Mutex getMutex(Object mutexKey, boolean isReentrant, long timeout) throws BusyException {
-        log.debug("Mutex取得要求：" + mutexKey);
+    	if(log.isDebugEnabled()) {
+    		log.debug("Mutex取得要求：" + mutexKey);
+    	}
         if(mutexKey instanceof String) {
             mutexKey = ((String)mutexKey).intern();
         }

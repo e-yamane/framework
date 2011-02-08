@@ -34,21 +34,27 @@ class InterceptorImpl implements Interceptor {
 
     public boolean onFlushDirty(Object arg0, Serializable arg1, Object[] arg2,
             Object[] arg3, String[] arg4, Type[] arg5) throws CallbackException {
-        log.debug("更新します。:" + arg0.getClass().getName());
+    	if(log.isDebugEnabled()) {
+    		log.debug("更新します。:" + arg0.getClass().getName());
+    	}
         DBInitializer.addModifiedClasses(arg0.getClass());
         return org.onFlushDirty(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
     public boolean onSave(Object arg0, Serializable arg1, Object[] arg2,
             String[] arg3, Type[] arg4) throws CallbackException {
-        log.debug("永続化します。:" + arg0.getClass().getName());
+    	if(log.isDebugEnabled()) {
+    		log.debug("永続化します。:" + arg0.getClass().getName());
+    	}
         DBInitializer.addModifiedClasses(arg0.getClass());
         return org.onSave(arg0, arg1, arg2, arg3, arg4);
     }
 
     public void onDelete(Object arg0, Serializable arg1, Object[] arg2,
             String[] arg3, Type[] arg4) throws CallbackException {
-        log.debug("削除します。:" + arg0.getClass().getName());
+    	if(log.isDebugEnabled()) {
+    		log.debug("削除します。:" + arg0.getClass().getName());
+    	}
         DBInitializer.addModifiedClasses(arg0.getClass());
         org.onDelete(arg0, arg1, arg2, arg3, arg4);
     }

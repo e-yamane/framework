@@ -235,10 +235,14 @@ public class SVParser implements Iterable<String[]> {
             try {
                 while(iterator.hasMoreTokens()) {
                     Token token = iterator.nextToken();
-                    log.trace("kind   :" + token.tokenKind);
-                    log.trace("content:" + token.token);
+                    if(log.isTraceEnabled()) {
+	                    log.trace("kind   :" + token.tokenKind);
+	                    log.trace("content:" + token.token);
+                    }
                     State state = getCurrentState();
-                    log.trace("state  :" + state.getClass().getName());
+                    if(log.isTraceEnabled()) {
+                    	log.trace("state  :" + state.getClass().getName());
+                    }
                     Method m = (Method)METHOD_MAP.get(token.tokenKind);
                     if(m == null) {
                         throw new ParseException("", -1);
@@ -440,8 +444,10 @@ public class SVParser implements Iterable<String[]> {
             private void prepareToken() throws IOException {
                 while(line != null) {
                     for( ; targetIndex < targetLength ; targetIndex++) {
-                        log.trace("target      :" + (int)line.charAt(targetIndex) + 
-                                                    "(" + line.charAt(targetIndex) + ")");
+                    	if(log.isTraceEnabled()) {
+	                        log.trace("target      :" + (int)line.charAt(targetIndex) + 
+	                                                    "(" + line.charAt(targetIndex) + ")");
+                    	}
                         if(isSpecialText(separator, SEPARATOR) ||
                            isSpecialText(quote, QUOTE) ||
                            isSpecialText(lineSeparator, LINE_SEPARATOR) ||
@@ -496,9 +502,11 @@ public class SVParser implements Iterable<String[]> {
                    (targetIndex == lastIndex)) {
                     return null;
                 }
-                log.debug(line);
-                log.debug(lastIndex);
-                log.debug(targetIndex);
+                if(log.isDebugEnabled()) {
+	                log.debug(line);
+	                log.debug(lastIndex);
+	                log.debug(targetIndex);
+                }
                 return new Token(line.substring(
                             lastIndex, targetIndex), STRING);
             }

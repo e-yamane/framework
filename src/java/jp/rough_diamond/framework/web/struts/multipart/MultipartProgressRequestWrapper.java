@@ -29,18 +29,27 @@ public class MultipartProgressRequestWrapper extends HttpServletRequestWrapper {
 	}
 	
 	public static void putRequest(String id, MultipartProgressRequestWrapper request) {
-		log.debug("id:" + id);
+		loggingId(id);
 		REQUEST_MAP.put(id, request);
 	}
 	
 	public static MultipartProgressRequestWrapper getRequest(String id) {
-		log.debug("id:" + id);
+		loggingId(id);
 		return REQUEST_MAP.get(id);
 	}
 	
 	public static void removeRequest(String id) {
-		log.debug("id:" + id);
+		loggingId(id);
 		REQUEST_MAP.remove(id);
+	}
+
+	/**
+	 * @param id
+	 */
+	private static void loggingId(String id) {
+		if(log.isDebugEnabled()) {
+			log.debug("id:" + id);
+		}
 	}
 	
 	public MultipartProgressRequestWrapper(HttpServletRequest arg0) {

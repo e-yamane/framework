@@ -77,8 +77,10 @@ public abstract class AbstractPager<E> implements Pager<E> {
             currentPage = page;
             postGotoPage(page);
         } else {
-            log.info("ページ番号：" + page);
-            log.info("最大ページ数：" + getPageSize());
+        	if(log.isInfoEnabled()) {
+	            log.info("ページ番号：" + page);
+	            log.info("最大ページ数：" + getPageSize());
+        	}
             throw new IllegalArgumentException("ページ遷移に失敗");
         }
     }

@@ -94,7 +94,9 @@ public class BaseTilesRequestProcessor extends TilesRequestProcessor {
             ActionForm form, 
             ActionMapping mapping) throws IOException, ServletException {
 
-    	log.info("processActionPerform:[" + action.getClass() + "|" + request.getParameter("command") + "]");
+		if(log.isInfoEnabled()) {
+			log.info("processActionPerform:[" + action.getClass() + "|" + request.getParameter("command") + "]");
+		}
         request.setAttribute("currentForm", form);
         request.setAttribute("currentFormName", mapping.getName());
         request.setAttribute("currentPath", mapping.getPath());

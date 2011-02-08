@@ -48,7 +48,7 @@ public class ServiceBus {
 	}
 	
 	public void dispose() {
-		log.debug("MuleServerを停止します。");
+		log.info("MuleServerを停止します。");
 		getContext().dispose();
 	}
 
@@ -74,7 +74,7 @@ public class ServiceBus {
 		Thread t = new Thread(new Runnable() {
 			public void run() {
 				try {
-					log.debug("MuleServerを開始します。");
+					log.info("MuleServerを開始します。");
 					MuleServer server;
 					if(config == null) {
 						server = new MuleServer();

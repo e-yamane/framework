@@ -48,7 +48,9 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 				Map.Entry entry = (Map.Entry)o;
 				Object inValue = entry.getValue();
 				String propName = (String)entry.getKey();
-				log.debug("copy target propertyName:" + propName);
+				if(log.isDebugEnabled()) {
+					log.debug("copy target propertyName:" + propName);
+				}
 				Method m = getSetterMethod(dest, propName);
 				if(inValue == null) {
 					m.invoke(dest, (Object)null);
@@ -97,7 +99,9 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 	
 	@SuppressWarnings("unchecked")
 	private static void copyCollection2Array(Object src, Object dest, String propName, Collection inValue) throws Exception {
-		log.debug(propName + "のcopyCollection2Arrayを試みます");
+		if(log.isDebugEnabled()) {
+			log.debug(propName + "のcopyCollection2Arrayを試みます");
+		}
 		Method m = getSetterMethod(dest, propName);
 		Class<?> type = m.getParameterTypes()[0].getComponentType();
 		Object o = Array.newInstance(type, inValue.size());
@@ -128,11 +132,15 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 
 	@SuppressWarnings("unchecked")
 	private static boolean doneCollectionCopy(Object src, Object dest, String propName, Collection inValue) throws Exception {
-		log.debug(propName + "のdoneCollectionCopyを試みます");
+		if(log.isDebugEnabled()) {
+			log.debug(propName + "のdoneCollectionCopyを試みます");
+		}
 		Method m = getSetterMethod(dest, propName);
 		Type t = m.getGenericParameterTypes()[0];
 		if(!(t instanceof ParameterizedType)) {
-			log.debug(propName + "では、コレクションのコピーは行えません");
+			if(log.isDebugEnabled()) {
+				log.debug(propName + "では、コレクションのコピーは行えません");
+			}
 			return false;
 		}
 		ParameterizedType pt = (ParameterizedType)t;
@@ -149,12 +157,16 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 			} else {
 				destVal = genericType.newInstance();
 			}
-			log.debug(val.getClass().getName() + "から" + destVal.getClass().getName() + "へコピーします");
+			if(log.isDebugEnabled()) {
+				log.debug(val.getClass().getName() + "から" + destVal.getClass().getName() + "へコピーします");
+			}
 			copyProperties(val, destVal);
 			destCol.add(destVal);
 		}
 		m.invoke(dest, destCol);
-		log.debug(propName + "では、コレクションのコピーが完了しました。");
+		if(log.isDebugEnabled()) {
+			log.debug(propName + "では、コレクションのコピーが完了しました。");
+		}
 		return true;
 	}
 	

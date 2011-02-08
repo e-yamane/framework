@@ -67,10 +67,11 @@ public class ExcelParser {
 	
 	@SuppressWarnings("unchecked")
 	private <T> List<T[]> getRows(Class<T> type, GetCellValue strategy) {
-		log.debug("getPhysicalNumberOfRows:" + sheet.getPhysicalNumberOfRows());
-		log.debug("getFirstRowNum         :" + sheet.getFirstRowNum());
-		log.debug("getLastRowNum          :" + sheet.getLastRowNum());
-		
+		if(log.isDebugEnabled()) {
+			log.debug("getPhysicalNumberOfRows:" + sheet.getPhysicalNumberOfRows());
+			log.debug("getFirstRowNum         :" + sheet.getFirstRowNum());
+			log.debug("getLastRowNum          :" + sheet.getLastRowNum());
+		}		
 		List<T[]> ret = new ArrayList<T[]>();
 		for(int i = 1 ; i <= sheet.getLastRowNum() ; i++) {
 			List<T> row = new ArrayList<T>();
@@ -117,25 +118,37 @@ public class ExcelParser {
 			log.debug("CELL_TYPE_BLANK");
 			return "";
 		case HSSFCell.CELL_TYPE_BOOLEAN:
-			log.debug("CELL_TYPE_BOOLEAN:" + cell.getBooleanCellValue());
+			if(log.isDebugEnabled()){
+				log.debug("CELL_TYPE_BOOLEAN:" + cell.getBooleanCellValue());
+			}
 			return cell.getBooleanCellValue();
 		case HSSFCell.CELL_TYPE_ERROR:
-			log.debug("CELL_TYPE_ERROR:" + cell.getErrorCellValue());
+			if(log.isDebugEnabled()) {
+				log.debug("CELL_TYPE_ERROR:" + cell.getErrorCellValue());
+			}
 			return cell.getErrorCellValue();
 		case HSSFCell.CELL_TYPE_FORMULA:
-			log.debug("CELL_TYPE_FORMULA:" + cell.getCellFormula());
+			if(log.isDebugEnabled()) {
+				log.debug("CELL_TYPE_FORMULA:" + cell.getCellFormula());
+			}
 			return cell.getCellFormula();
 		case HSSFCell.CELL_TYPE_STRING:
-			log.debug("CELL_TYPE_STRING:" + cell.getStringCellValue());
+			if(log.isDebugEnabled()) {
+				log.debug("CELL_TYPE_STRING:" + cell.getStringCellValue());
+			}
 			return cell.getStringCellValue();
 		case HSSFCell.CELL_TYPE_NUMERIC:
 			short dataFormat = cell.getCellStyle().getDataFormat();
 			log.debug(dataFormat);
 			if(HSSFDateUtil.isInternalDateFormat(dataFormat) || dataFormat == 56) {
-				log.debug("CELL_TYPE_NUMERIC(DATE):" + cell.getDateCellValue());
+				if(log.isDebugEnabled()) {
+					log.debug("CELL_TYPE_NUMERIC(DATE):" + cell.getDateCellValue());
+				}
 				return cell.getDateCellValue();
 			} else {
-				log.debug("CELL_TYPE_NUMERIC(Number):" + cell.getNumericCellValue());
+				if(log.isDebugEnabled()) {
+					log.debug("CELL_TYPE_NUMERIC(Number):" + cell.getNumericCellValue());
+				}
 				return cell.getNumericCellValue();
 			}
 		default:

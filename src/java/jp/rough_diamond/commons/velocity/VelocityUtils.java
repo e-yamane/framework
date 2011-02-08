@@ -132,7 +132,7 @@ public class VelocityUtils extends VelocityUtilsDepracated {
 			Arrays.fill(array, '0');
 			formatSB.append(array);
 		}
-		log.debug(formatSB.toString());
+		log.debug(formatSB);
 		DecimalFormat df = new DecimalFormat(formatSB.toString());
 		StringBuilder sb = new StringBuilder();
 		if (isPrefix) {

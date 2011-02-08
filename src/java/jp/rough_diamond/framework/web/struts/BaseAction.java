@@ -99,7 +99,9 @@ abstract public class BaseAction extends DispatchAction {
             }
             ContentType ct = method.getAnnotation(ContentType.class);
             if(ct != null) {
-            	log.debug("ContentType:" + ct.value());
+            	if(log.isDebugEnabled()) {
+            		log.debug("ContentType:" + ct.value());
+            	}
             	response.setContentType(ct.value());
             }
             //Å™í«â¡

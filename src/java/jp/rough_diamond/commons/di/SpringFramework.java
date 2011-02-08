@@ -84,11 +84,15 @@ public class SpringFramework
 
 	@SuppressWarnings("unchecked")
 	public <T> T getObject(Class<T> type, Object key) {
-		log.debug("getObject calling[" + key + "]");
+		if(log.isDebugEnabled()) {
+			log.debug("getObject calling[" + key + "]");
+		}
 		try {
 			return (T)factory.getBean((String)key);
 		} catch(Exception ex) {
-			log.debug(key + " is not bean.", ex);
+			if(log.isDebugEnabled()) {
+				log.debug(key + " is not bean.", ex);
+			}
 			return null;
 		} catch(Throwable t) {
 			log.error(key + " is not bean.", t);
