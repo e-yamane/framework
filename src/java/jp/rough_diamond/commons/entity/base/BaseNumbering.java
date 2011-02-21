@@ -24,7 +24,6 @@ public abstract class BaseNumbering  implements Serializable {
     **/
     public BaseNumbering() {
     }
-
     /**
      * ‚h‚c
     **/ 
@@ -151,7 +150,6 @@ public abstract class BaseNumbering  implements Serializable {
     **/ 
     private Long nextNumber;
     public final static String NEXT_NUMBER = "nextNumber";
-
     /**
      * Œ»İŠ„‚è“–‚Ä‚Ä‚¢‚é”Ô†‚ğæ“¾‚·‚é
      * @hibernate.property

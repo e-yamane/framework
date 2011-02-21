@@ -239,7 +239,7 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		Extractor ex = new Extractor(Unit.class);
 		ex.addExtractValue(new ExtractValue("val", sum));
 		List<Map<String, ? extends Number>> list = BasicService.getService().findByExtractor(ex);
-		assertEquals("Œ^‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", Long.class, list.get(0).get("val").getClass());
+		assertTrue("Œ^‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", list.get(0).get("val") instanceof Number);
 		System.out.println(list.get(0).get("val"));
 		
 		ex = new Extractor(Unit.class);

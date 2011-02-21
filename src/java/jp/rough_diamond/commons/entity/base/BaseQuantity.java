@@ -21,7 +21,6 @@ public abstract class BaseQuantity extends java.lang.Number implements Serializa
     **/
     public BaseQuantity() {
     }
-
     /**
      * —Ê
     **/ 

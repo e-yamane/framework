@@ -25,7 +25,6 @@ public abstract class BaseUnit  implements Serializable {
     **/
     public BaseUnit() {
     }
-
     /**
      * OID
     **/ 
@@ -151,7 +150,6 @@ public abstract class BaseUnit  implements Serializable {
     **/ 
     private String name;
     public final static String NAME = "name";
-
     /**
      * 数量尺度名を取得する
      * @hibernate.property
@@ -179,7 +177,6 @@ public abstract class BaseUnit  implements Serializable {
     **/ 
     private String description;
     public final static String DESCRIPTION = "description";
-
     /**
      * 単位説明を取得する
      * @hibernate.property
@@ -233,7 +230,6 @@ public abstract class BaseUnit  implements Serializable {
     **/ 
     private Integer scale;
     public final static String SCALE = "scale";
-
     /**
      * 変換時に保持する小数精度。負数を指定すると整数の切捨て判断するを取得する
      * @hibernate.property
@@ -258,7 +254,6 @@ public abstract class BaseUnit  implements Serializable {
     **/ 
     private Long version;
     public final static String VERSION = "version";
-
     /**
      * 楽観的ロッキングキーを取得する
      * @hibernate.version

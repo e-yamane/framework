@@ -494,12 +494,21 @@ public class Extractor2HQL {
     }
     
     private void makeSelectCouse() {
-        builder.append("select ");
-    	if(extractor.isDistinct()) {
-    		builder.append("distinct ");
-    	}
         if(extractor.getValues().size() == 0) {
-            builder.append(getAlias(extractor.target, extractor.targetAlias));
+        	Class target = extractor.target;
+        	ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(target);
+//        	while(cm == null && target != Object.class) {
+//        		target = target.getSuperclass();
+//        		cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(target);
+//        	}
+        	if(cm == null) {
+        		return;
+        	}
+        	builder.append("select ");
+        	if(extractor.isDistinct()) {
+        		builder.append("distinct ");
+        	}
+            builder.append(getAlias(target, extractor.targetAlias));
             for(Order<? extends Value> order : extractor.getOrderIterator()) {
             	if(isSkipSelect(order)) {
             		continue;
@@ -509,6 +518,10 @@ public class Extractor2HQL {
             	builder.append(property);
             }
         } else {
+            builder.append("select ");
+        	if(extractor.isDistinct()) {
+        		builder.append("distinct ");
+        	}
 	        String delimitor = "";
 	        for(ExtractValue v : extractor.getValues()) {
 	            builder.append(delimitor);
@@ -645,7 +658,12 @@ public class Extractor2HQL {
     private void makeFromCouse(boolean isFetch) {
         Set<String> aliases = new HashSet<String>();
         builder.append(" from ");
-        builder.append(getAlias(extractor.target, null));
+        ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(extractor.target);
+        if(cm == null) {
+        	builder.append(extractor.target.getName());
+        } else {
+            builder.append(getAlias(extractor.target, null));
+        }
         builder.append(" as ");
         builder.append(getAlias(extractor.target, extractor.targetAlias));
         if(extractor.getValues().size() == 0) {
@@ -703,8 +721,11 @@ public class Extractor2HQL {
     }
 
     private Map<String, Class> getEntityRelationProperty(Class target) {
-        ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(target);
         Map<String, Class> ret = new HashMap<String, Class>();
+        ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(target);
+        if(cm == null) {
+        	return ret;
+        }
         String[] names = cm.getPropertyNames();
         for(String name : names) {
             Type t = cm.getPropertyType(name);

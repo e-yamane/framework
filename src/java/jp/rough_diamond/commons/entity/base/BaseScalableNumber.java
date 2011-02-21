@@ -21,13 +21,11 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
     **/
     public BaseScalableNumber() {
     }
-
     /**
      * 量(整数)
     **/ 
     private Long value;
     public final static String VALUE = "value";
-
     /**
      * 量(整数)を取得する
      * @hibernate.property
@@ -52,7 +50,6 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
     **/ 
     private Integer scale;
     public final static String SCALE = "scale";
-
     /**
      * 小数点位置。正の数なら左へ、負の数なら右へ移動させるを取得する
      * @hibernate.property

@@ -21,13 +21,11 @@ public abstract class BaseUpdateTimestamp  implements Serializable {
     **/
     public BaseUpdateTimestamp() {
     }
-
     /**
      * “o˜^“ú
     **/ 
     private Date registererDate;
     public final static String REGISTERER_DATE = "registererDate";
-
     /**
      * “o˜^“ú‚ğæ“¾‚·‚é
      * @hibernate.property
@@ -52,7 +50,6 @@ public abstract class BaseUpdateTimestamp  implements Serializable {
     **/ 
     private Date lastModifiedDate;
     public final static String LAST_MODIFIED_DATE = "lastModifiedDate";
-
     /**
      * ÅIXV“ú‚ğæ“¾‚·‚é
      * @hibernate.property
