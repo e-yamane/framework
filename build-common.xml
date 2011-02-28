@@ -193,9 +193,11 @@
       <mapper type="flatten"/>
     </unzip>
 -->
-    <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p02/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p02.jar" />
+    <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p03/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p03.jar" />
+    <get dest="${framework.lib.root}/xdoclet/xdoclet.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet/tags/1.2.3_p01/xdoclet/xdoclet-1.2.3_p01.jar" />
     <property name="noget" value="xxx" />
   </target>
+
 
   <target name="init-task" depends="get-deps, ant-extention-check, ant-extention-make">
     <taskdef name="propertyChecker" classpathref="framework.path"
@@ -411,6 +413,11 @@
         <isset property="torque.template.path" />
       </not>
     </condition>
+    <condition property="torque.threadCount" value="0">
+      <not>
+        <isset property="torque.threadCount" />
+      </not>
+    </condition>
     <filter token="src.dir"                     value="${src.dir}" />
     <filter token="table.doc.dir"               value="${table.doc.dir}" />
     <filter token="torque.schema.property.dir"  value="${resource.dir}" />
@@ -424,43 +431,45 @@
 
     <copy file="${framework.root}/build-torque.properties" tofile="${torque.schema.dir}/build.properties" filtering="true" overwrite="true" />
     <replace file="${torque.schema.dir}/build.properties" token="\" value="/" />
-    <echo message="Create Table文を作成します。" />
-    <antcall target="execAnt">
-      <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
-      <param name="exec.target" value="sql" />
-      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
-    </antcall>
-    <echo message="テーブルレイアウトを作成します。" />
-    <antcall target="execAnt">
-      <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
-      <param name="exec.target" value="doc" />
-      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
-    </antcall>
-    <echo message="DAOクラスを作成します。" />
-    <antcall target="execAnt">
-      <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
-      <param name="exec.target" value="hibernate-java" />
-      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
-    </antcall>
-    <echo message="スキーマプロパティを作成します。" />
-    <antcall target="execAnt">
-      <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
-      <param name="exec.target" value="schema-properties" />
-      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
-    </antcall>
-    <echo message="２次キャッシュの上書情報を作成します。" />
-    <antcall target="execAnt">
-      <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
-      <param name="exec.target" value="cache-override-properties" />
-      <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
-    </antcall>
-    <antcall target="execAnt">
-      <param name="build.file"  value="${basedir}/build.xml" />
-      <param name="exec.target" value="hibernatedoclet" />
-    </antcall>
-    <echo message="プロパティファイルに対してnative2asciiを実行します。" />
-    <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" encoding="${src.encoding}" />
+    <tstamp><format property="start" pattern="yyyyMMddHHmmssSSS"/></tstamp>
+    <parallel failonany="true" threadCount="${torque.threadCount}" >
+      <antcall target="execAnt">
+        <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
+        <param name="exec.target" value="sql" />
+        <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
+      </antcall>
+      <antcall target="execAnt">
+        <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
+        <param name="exec.target" value="doc" />
+        <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
+      </antcall>
+      <antcall target="execAnt">
+        <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
+        <param name="exec.target" value="hibernate-java" />
+        <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
+      </antcall>
+      <antcall target="execAnt">
+        <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
+        <param name="exec.target" value="schema-properties" />
+        <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
+      </antcall>
+      <antcall target="execAnt">
+        <param name="build.file"  value="${framework.root}/torque-gen/build-torque.xml" />
+        <param name="exec.target" value="cache-override-properties" />
+        <param name="param1"      value="-Dtorque.build.properties=${torque.schema.dir}/build.properties" />
+      </antcall>
+    </parallel>
+    <parallel failonany="true" threadCount="${torque.threadCount}" >
+      <antcall target="execAnt">
+        <param name="build.file"  value="${basedir}/build.xml" />
+        <param name="exec.target" value="hibernatedoclet" />
+      </antcall>
+      <native2ascii src="${resource.dir}" dest="${src.dir}" includes="**/*.properties" encoding="${src.encoding}" />
+    </parallel>
     <echo message="Eclipse上で実行している場合は、F5を押して最新状態にしてください。" />
+    <tstamp><format property="finish" pattern="yyyyMMddHHmmssSSS"/></tstamp>
+    <echo message="${finish}" />
+    <echo message="${start}" />
   </target>
 
   <target name="makeMultipleSQL">
@@ -502,6 +511,11 @@
   <!-- JavaのソースコードからHibernateのマッピングファイルを作成する -->
   <target name="hibernatedoclet" depends="init-task">
     <property file="./middlegen.properties" />
+    <condition property="torque.threadCount" value="0">
+      <not>
+        <isset property="torque.threadCount" />
+      </not>
+    </condition>
     <condition property="hibernate.otherResources" value="" >
       <not>
         <isset property="hibernate.otherResources" />
@@ -564,6 +578,7 @@
       fileSetDirs="${hibernate.fileset.dirs}"
       >
       <configParam name="cache.avalable" value="${hibernate.cache.avalable}" />
+      <configParam name="threadCount" value="${torque.threadCount}" />
       <hibernate version="3.0"
         overrideCacheInfoFile="${my.build.dir}/${cache.property.file}"
       />
