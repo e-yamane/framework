@@ -6,6 +6,7 @@
  */
 package jp.rough_diamond.commons.di;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,6 +15,10 @@ import java.util.List;
  */
 public class CompositeDIContainer extends AbstractDIContainer {
 	private List<DIContainer> containers;
+	public CompositeDIContainer(DIContainer... containers) {
+		this(Arrays.asList(containers));
+	}
+	
 	public CompositeDIContainer(List<DIContainer> containers) {
 		this.containers = containers;
 	}

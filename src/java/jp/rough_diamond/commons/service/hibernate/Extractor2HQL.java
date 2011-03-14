@@ -30,6 +30,7 @@ import jp.rough_diamond.commons.extractor.Avg;
 import jp.rough_diamond.commons.extractor.CombineCondition;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Count;
+import jp.rough_diamond.commons.extractor.DateToString;
 import jp.rough_diamond.commons.extractor.Desc;
 import jp.rough_diamond.commons.extractor.Eq;
 import jp.rough_diamond.commons.extractor.ExtractValue;
@@ -399,6 +400,8 @@ public class Extractor2HQL {
             builder.append(property);
             if(order instanceof Desc) {
                 builder.append(" desc");
+            } else {
+                builder.append(" asc");
             }
             delimitor = ",";
         }
@@ -648,6 +651,12 @@ public class Extractor2HQL {
 				Extractor2HQL gen = new Extractor2HQL(ex);
 				gen.makeQuery();
 				return String.format("(%s)", gen.builder.toString());
+			}
+    	});
+    	tmp.put(DateToString.class, new ValueMaker<DateToString>(){
+			@Override
+			public String makeValue(Extractor2HQL generator, DateToString v) {
+				return DateToStringConvertor.getConvertor(HibernateUtils.getDialect().getClass()).convert(generator, v);
 			}
     	});
     	VALUE_MAKE_STRATEGY_MAP = Collections.unmodifiableMap(tmp);

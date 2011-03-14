@@ -6,23 +6,52 @@
  */
 package jp.rough_diamond.commons.testing;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.h2.Driver;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.H2Dialect;
+import org.hibernate.dialect.function.StandardSQLFunction;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.ManyToOne;
+import org.hibernate.mapping.Table;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.type.Type;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 import jp.rough_diamond.commons.di.AbstractDIContainer;
+import jp.rough_diamond.commons.di.CompositeDIContainer;
 import jp.rough_diamond.commons.di.DIContainer;
 import jp.rough_diamond.commons.di.DIContainerFactory;
+import jp.rough_diamond.commons.di.MapDIContainer;
 import jp.rough_diamond.commons.service.BasicService;
+import jp.rough_diamond.commons.service.hibernate.H2DialectExt;
+import jp.rough_diamond.commons.util.PropertyUtils;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceFinder;
 import jp.rough_diamond.framework.service.ServiceLocator;
 import jp.rough_diamond.framework.service.ServiceLocatorLogic;
 import jp.rough_diamond.framework.service.SimpleServiceLocatorLogic;
+import jp.rough_diamond.framework.transaction.ConnectionManager;
+import jp.rough_diamond.framework.transaction.hibernate.HibernateConnectionManager;
+import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 import junit.framework.TestCase;
 
 /**
@@ -33,6 +62,7 @@ public abstract class DataLoadingTestCase extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+    	initializer.initialize();
         setUpDB();
     }
 
@@ -58,6 +88,7 @@ public abstract class DataLoadingTestCase extends TestCase {
 	        DIContainerFactory.setDIContainer(ext.org);
     	}
         DBInitializer.clearModifiedData();
+        initializer.cleanUp();
     }
     
     static class DIContainerExt extends AbstractDIContainer {
@@ -133,5 +164,84 @@ public abstract class DataLoadingTestCase extends TestCase {
 				}
         	};
         }
+    }
+
+    static Initializer initializer = Initializer.INIT;
+    static enum Initializer {
+    	INIT {
+			@Override
+			void initialize() {
+				try {
+					orgDI = DIContainerFactory.getDIContainer();
+					replaceDI = orgDI;
+					String useInMemoryDB = (String)DIContainerFactory.getDIContainer().getObject("useInMemoryDBWhenTest");
+					Boolean b = Boolean.valueOf(useInMemoryDB);
+					if(!b) {
+						return;
+					}
+					ConnectionManager cm = ConnectionManager.getConnectionManager();
+					if(!(cm instanceof HibernateConnectionManager)) {
+						return;
+					}
+					HibernateConnectionManager hcm = (HibernateConnectionManager)cm;
+					InMemoryHibernateConnectionManager hcm2 = new InMemoryHibernateConnectionManager();
+					PropertyUtils.copyProperties(hcm, hcm2);
+					Map<Object, Object> map = new HashMap<Object, Object>();
+					map.put(ConnectionManager.CONNECTION_MANAGER_KEY, hcm2);
+					replaceDI = new CompositeDIContainer(new MapDIContainer(map),
+							DIContainerFactory.getDIContainer());
+					DIContainerFactory.setDIContainer(replaceDI);
+				} finally {
+					initializer = NULL;
+				}
+			}
+		},
+    	NULL {
+			@Override
+			void initialize() {
+				DIContainerFactory.setDIContainer(replaceDI);
+			}
+		},
+    	;
+		static DIContainer replaceDI;
+		static DIContainer orgDI;
+    	abstract void initialize();
+    	void cleanUp() {
+			DIContainerFactory.setDIContainer(orgDI);
+    	}
+    }
+    
+    static class InMemoryHibernateConnectionManager extends HibernateConnectionManager {
+    	@Override
+    	protected Configuration addingProperties() {
+    		Configuration cfg = super.addingProperties();
+    		cfg.setProperty(Environment.DRIVER, 				"org.h2.Driver");
+    		cfg.setProperty(Environment.URL, 					"jdbc:h2:mem:mymemdb");
+    		cfg.setProperty(Environment.USER, 					"SA");
+    		cfg.setProperty(Environment.PASS, 					"");
+    		cfg.setProperty(Environment.DIALECT, 				H2DialectExt.class.getName());
+    		cfg.setProperty(Environment.DEFAULT_SCHEMA, 		"PUBLIC");
+    		cfg.setProperty(Environment.HBM2DDL_AUTO, 			"create");
+    		cfg.setProperty(Environment.STATEMENT_BATCH_SIZE, 	"0");
+    		return cfg;
+    	}
+    	
+    	@Override
+    	protected Configuration newConfiguration() {
+    		return new Configuration() {
+    			@Override
+    			public String[] generateSchemaCreationScript(Dialect dialect) throws HibernateException {
+    				String[] ret = super.generateSchemaCreationScript(dialect);
+    				for(int i = 0 ; i < ret.length ; i++) {
+    					if(ret[i].indexOf("foreign key") >= 0 && !ret[i].endsWith("on delete cascade")) {
+    						ret[i] = ret[i] + " on delete cascade";
+    					}
+    				}
+    				return ret;
+    				
+    			}
+    			
+    		};
+    	}
     }
 }

@@ -77,16 +77,17 @@ public class HibernateConnectionManager extends ConnectionManager {
 		if(log.isDebugEnabled()) {
 			log.debug("セッションファクトリーを初期化します。:" + this);
 		}
-		config = new Configuration();
-		if(getHibernateConfigName() == null) {
-			log.debug("デフォルト設定ファイルで初期化します。");
-			config.configure();
-		} else {
-			if(log.isDebugEnabled()) {
-				log.debug("設定ファイル名：" + getHibernateConfigName());
-			}
-			config.configure(getHibernateConfigName());
+		loadConfigration();
+		addingProperties();
+		if(getInterceptor() != null) {
+			config.setInterceptor(getInterceptor());
 		}
+		setListeners();
+		buildSessionFactory();
+        log.debug("セッションスタックを初期化します。");
+	}
+
+	protected Configuration addingProperties() {
 		String addingPropertyFileName = getAddingPropertyFileName();
 		if(!StringUtils.isBlank(addingPropertyFileName)) {
 			InputStream is = null;
@@ -124,16 +125,31 @@ public class HibernateConnectionManager extends ConnectionManager {
 				}
 			}
 		}
-		
-		if(getInterceptor() != null) {
-			config.setInterceptor(getInterceptor());
+		return config;
+	}
+
+	/**
+	 * 
+	 */
+	protected Configuration loadConfigration() {
+		config = newConfiguration();
+		if(getHibernateConfigName() == null) {
+			log.debug("デフォルト設定ファイルで初期化します。");
+			config.configure();
+		} else {
+			if(log.isDebugEnabled()) {
+				log.debug("設定ファイル名：" + getHibernateConfigName());
+			}
+			config.configure(getHibernateConfigName());
 		}
-		setListeners();
-		buildSessionFactory();
-        log.debug("セッションスタックを初期化します。");
+		return config;
 	}
 	
-	private void buildSessionFactory() {
+	protected Configuration newConfiguration() {
+		return new Configuration();
+	}
+	
+	protected void buildSessionFactory() {
 		sessionFactory = config.buildSessionFactory();
 	}
 	
@@ -251,7 +267,7 @@ public class HibernateConnectionManager extends ConnectionManager {
 		return ((SessionFactoryImplementor)hcm.sessionFactory).getSettings();
     }
     
-	private void rebuildSessionFactory2() {
+	protected void rebuildSessionFactory2() {
 		buildSessionFactory();
     }
 

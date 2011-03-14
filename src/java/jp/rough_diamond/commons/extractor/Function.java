@@ -8,10 +8,11 @@
 package jp.rough_diamond.commons.extractor;
 
 /**
- * èWåvä÷êî
+ *
  */
-abstract public class SummaryFunction extends Function {
-	protected SummaryFunction(Value value) {
-		super(value);
+public class Function implements Value {
+	public final Value value;
+	protected Function(Value value) {
+		this.value = value;
 	}
 }

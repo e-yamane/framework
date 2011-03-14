@@ -193,7 +193,7 @@
       <mapper type="flatten"/>
     </unzip>
 -->
-    <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p03/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p03.jar" />
+    <get dest="${framework.lib.root}/xdoclet/xdoclet-hibernate-module.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet-hibernate-module/tags/1.2.3_p04/xdoclet-hibernate-module/xdoclet-hibernate-module-1.2.3_p04.jar" />
     <get dest="${framework.lib.root}/xdoclet/xdoclet.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/xdoclet/tags/1.2.3_p01/xdoclet/xdoclet-1.2.3_p01.jar" />
     <property name="noget" value="xxx" />
   </target>
