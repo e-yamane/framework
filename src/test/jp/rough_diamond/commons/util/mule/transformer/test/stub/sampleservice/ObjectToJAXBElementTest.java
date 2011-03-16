@@ -103,7 +103,6 @@ public class ObjectToJAXBElementTest extends TestCase {
 		assertEquals("’l‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", "444", map2.get("333"));
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void testTransformFromNestedGenerics() throws Exception {
 		Map<String, List<jp.rough_diamond.commons.util.mule.transformer.test.ChildBean>> map = 
 			new HashMap<String, List<jp.rough_diamond.commons.util.mule.transformer.test.ChildBean>>();

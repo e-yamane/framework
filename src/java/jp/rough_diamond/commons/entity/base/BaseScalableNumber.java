@@ -31,6 +31,9 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
      * @hibernate.property
      *    column="VALUE"
      *    not-null="true"
+     * @hibernate.column
+     *    name="VALUE"
+     *    not-null="true"
      * @return 量(整数)
     **/
     @jp.rough_diamond.commons.service.annotation.NotNull(property="ScalableNumber.value")
@@ -54,6 +57,9 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
      * 小数点位置。正の数なら左へ、負の数なら右へ移動させるを取得する
      * @hibernate.property
      *    column="SCALE"
+     *    not-null="true"
+     * @hibernate.column
+     *    name="SCALE"
      *    not-null="true"
      * @return 小数点位置。正の数なら左へ、負の数なら右へ移動させる
     **/

@@ -32,6 +32,7 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
      * —Ê‚ðŽæ“¾‚·‚é
      * @hibernate.component
      *    prefix="Q_"
+     *    not-null="true"
      * @return —Ê
     **/
     @jp.rough_diamond.commons.service.annotation.NotNull(property="Amount.quantity")

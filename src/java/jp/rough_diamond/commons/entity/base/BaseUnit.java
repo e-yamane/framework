@@ -156,6 +156,10 @@ public abstract class BaseUnit  implements Serializable {
      *    column="NAME"
      *    not-null="true"
      *    length="32"
+     * @hibernate.column
+     *    name="NAME"
+     *    length="32"
+     *    not-null="true"
      * @return 数量尺度名
     **/
     @jp.rough_diamond.commons.service.annotation.MaxLength(length=32, property="Unit.name")
@@ -183,6 +187,10 @@ public abstract class BaseUnit  implements Serializable {
      *    column="DESCRIPTION"
      *    not-null="false"
      *    length="64"
+     * @hibernate.column
+     *    name="DESCRIPTION"
+     *    length="64"
+     *    not-null="false"
      * @return 単位説明
     **/
     @jp.rough_diamond.commons.service.annotation.MaxLength(length=64, property="Unit.description")
@@ -209,6 +217,7 @@ public abstract class BaseUnit  implements Serializable {
      * 変換係数を取得する
      * @hibernate.component
      *    prefix="RATE_"
+     *    not-null="true"
      * @return 変換係数
     **/
     @jp.rough_diamond.commons.service.annotation.NotNull(property="Unit.rate")
@@ -234,6 +243,9 @@ public abstract class BaseUnit  implements Serializable {
      * 変換時に保持する小数精度。負数を指定すると整数の切捨て判断するを取得する
      * @hibernate.property
      *    column="SCALE"
+     *    not-null="true"
+     * @hibernate.column
+     *    name="SCALE"
      *    not-null="true"
      * @return 変換時に保持する小数精度。負数を指定すると整数の切捨て判断する
     **/

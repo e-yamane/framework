@@ -32,9 +32,12 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="NEXT_NUMBER"
-            not-null="true"
-        />
+        >
+            <column
+                name="NEXT_NUMBER" 
+                not-null="true"
+            />
+        </property>
 
         <!--
             To add non XDoclet property mappings, create a file named

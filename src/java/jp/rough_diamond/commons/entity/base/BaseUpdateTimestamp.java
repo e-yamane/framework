@@ -31,6 +31,9 @@ public abstract class BaseUpdateTimestamp  implements Serializable {
      * @hibernate.property
      *    column="REGISTERER_DATE"
      *    not-null="true"
+     * @hibernate.column
+     *    name="REGISTERER_DATE"
+     *    not-null="true"
      * @return 登録日時
     **/
     @jp.rough_diamond.commons.service.annotation.NotNull(property="UpdateTimestamp.registererDate")
@@ -54,6 +57,9 @@ public abstract class BaseUpdateTimestamp  implements Serializable {
      * 最終更新日を取得する
      * @hibernate.property
      *    column="LAST_MODIFIED_DATE"
+     *    not-null="true"
+     * @hibernate.column
+     *    name="LAST_MODIFIED_DATE"
      *    not-null="true"
      * @return 最終更新日
     **/

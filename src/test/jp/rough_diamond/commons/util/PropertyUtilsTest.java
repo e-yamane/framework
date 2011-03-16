@@ -6,14 +6,12 @@
  */
 package jp.rough_diamond.commons.util;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class PropertyUtilsTest extends TestCase {

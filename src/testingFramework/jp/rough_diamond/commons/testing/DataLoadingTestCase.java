@@ -6,35 +6,20 @@
  */
 package jp.rough_diamond.commons.testing;
 
-import java.sql.Types;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.h2.Driver;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.H2Dialect;
-import org.hibernate.dialect.function.StandardSQLFunction;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.ManyToOne;
-import org.hibernate.mapping.Table;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.type.Type;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 import jp.rough_diamond.commons.di.AbstractDIContainer;
 import jp.rough_diamond.commons.di.CompositeDIContainer;
@@ -51,7 +36,6 @@ import jp.rough_diamond.framework.service.ServiceLocatorLogic;
 import jp.rough_diamond.framework.service.SimpleServiceLocatorLogic;
 import jp.rough_diamond.framework.transaction.ConnectionManager;
 import jp.rough_diamond.framework.transaction.hibernate.HibernateConnectionManager;
-import jp.rough_diamond.framework.transaction.hibernate.HibernateUtils;
 import junit.framework.TestCase;
 
 /**
@@ -228,20 +212,21 @@ public abstract class DataLoadingTestCase extends TestCase {
     	
     	@Override
     	protected Configuration newConfiguration() {
-    		return new Configuration() {
-    			@Override
-    			public String[] generateSchemaCreationScript(Dialect dialect) throws HibernateException {
-    				String[] ret = super.generateSchemaCreationScript(dialect);
-    				for(int i = 0 ; i < ret.length ; i++) {
-    					if(ret[i].indexOf("foreign key") >= 0 && !ret[i].endsWith("on delete cascade")) {
-    						ret[i] = ret[i] + " on delete cascade";
-    					}
-    				}
-    				return ret;
-    				
-    			}
-    			
-    		};
+    		return new ConfigurationExt();
     	}
+    }
+    
+    static class ConfigurationExt extends Configuration {
+		private static final long serialVersionUID = 6832918783093002571L;
+		@Override
+		public String[] generateSchemaCreationScript(Dialect dialect) throws HibernateException {
+			String[] ret = super.generateSchemaCreationScript(dialect);
+			for(int i = 0 ; i < ret.length ; i++) {
+				if(ret[i].indexOf("foreign key") >= 0 && !ret[i].endsWith("on delete cascade")) {
+					ret[i] = ret[i] + " on delete cascade";
+				}
+			}
+			return ret;
+		}
     }
 }

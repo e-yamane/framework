@@ -38,20 +38,26 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="NAME"
-            length="32"
-            not-null="true"
-        />
+        >
+            <column
+                name="NAME" 
+                length="32"
+                not-null="true"
+            />
+        </property>
 
         <property
             name="description"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="DESCRIPTION"
-            length="64"
-            not-null="false"
-        />
+        >
+            <column
+                name="DESCRIPTION" 
+                length="64"
+                not-null="false"
+            />
+        </property>
 
         <component
             name="rate"
@@ -63,18 +69,24 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="RATE_VALUE"
-            not-null="true"
-        />
+        >
+            <column
+                name="RATE_VALUE" 
+                not-null="true"
+            />
+        </property>
 
         <property
             name="scale"
             type="java.lang.Integer"
             update="true"
             insert="true"
-            column="RATE_SCALE"
-            not-null="true"
-        />
+        >
+            <column
+                name="RATE_SCALE" 
+                not-null="true"
+            />
+        </property>
 
         </component>
 
@@ -83,9 +95,12 @@
             type="java.lang.Integer"
             update="true"
             insert="true"
-            column="SCALE"
-            not-null="true"
-        />
+        >
+            <column
+                name="SCALE" 
+                not-null="true"
+            />
+        </property>
 
         <many-to-one
             name="base"

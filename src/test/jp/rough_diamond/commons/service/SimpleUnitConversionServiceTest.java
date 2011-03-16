@@ -17,6 +17,7 @@ import jp.rough_diamond.commons.testing.DataLoadingTestCase;
 import jp.rough_diamond.commons.testing.Loader;
 import jp.rough_diamond.framework.service.ServiceLocator;
 
+@SuppressWarnings("deprecation")
 public class SimpleUnitConversionServiceTest extends DataLoadingTestCase {
 	SimpleUnitConversionService service = ServiceLocator.getService(SimpleUnitConversionService.class);
 	BasicService bService = BasicService.getService();
