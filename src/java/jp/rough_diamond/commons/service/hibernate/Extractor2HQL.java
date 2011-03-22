@@ -164,7 +164,7 @@ public class Extractor2HQL {
 	public static PreparedStatement extractor2PreparedStatement(Extractor extractor) {
 		try {
 	        Extractor2HQL tmp = new Extractor2HQL(extractor);
-	        Query q = tmp.makeQuery();
+	        Query q = tmp.makeQuery(false);
 	        SessionImplementor session = (SessionImplementor)HibernateUtils.getSession();
 			SessionFactoryImpl sfi = (SessionFactoryImpl)HibernateUtils.getSession().getSessionFactory();
 			HQLQueryPlan hqp = sfi.getQueryPlanCache().getHQLQueryPlan(q.getQueryString(), false, session.getEnabledFilters());
@@ -338,13 +338,19 @@ public class Extractor2HQL {
         return query;
 	}
 
-    private Query makeQuery() {
+	private Query makeQuery() {
+		return makeQuery(true);
+	}
+	
+    private Query makeQuery(boolean withOrderBy) {
         makeSelectCouse();
         makeFromCouse(true);
         makeWhereCouse();
         makeGroupByCouse();
         makeHavingCouse();
-        makeOrderByCouse();
+        if(withOrderBy) {
+        	makeOrderByCouse();
+        }
         String hql = builder.toString();
         log.debug(hql);
         Query query = HibernateUtils.getSession().createQuery(hql);
