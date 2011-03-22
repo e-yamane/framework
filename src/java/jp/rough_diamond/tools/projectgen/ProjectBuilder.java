@@ -440,7 +440,8 @@ public class ProjectBuilder {
 		mapForOption.put(ApplicationOption.USING_DATABASE, Collections.unmodifiableList(Arrays.asList(
 				new LibCopyInfo("${libDir}", "libs/hibernate/*.jar"),
 				new LibCopyInfo("etc/otherlib", "libs/dbUnit/*.jar"),
-				new LibCopyInfo("etc/otherlib", "libs/POI/*.jar")
+				new LibCopyInfo("etc/otherlib", "libs/POI/*.jar"),
+				new LibCopyInfo("etc/otherlib", "libs/H2/*.jar")
 		)));
 		mapForOption.put(ApplicationOption.USING_ESB, Collections.unmodifiableList(Arrays.asList(
 				new LibCopyInfo("${libDir}", "libs/cxf/*.jar"),

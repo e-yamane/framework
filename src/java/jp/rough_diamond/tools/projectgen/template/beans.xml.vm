@@ -19,6 +19,10 @@
       </map>
     </property>
   </bean>
+  <bean id="useInMemoryDBWhenTest" class="java.lang.String">
+    <description>JUnitでテストを行う際にH2を用いてテストを行う</description>
+    <constructor-arg index="0" type="java.lang.String"><value>@useInMemoryDBWhenTest@</value></constructor-arg>
+  </bean>
 #end
 
 #if($param.isContainOption("USING_ESB"))

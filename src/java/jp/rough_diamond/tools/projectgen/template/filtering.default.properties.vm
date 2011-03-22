@@ -65,12 +65,18 @@ torque.output.sql.encoding=$param.sourceEncoding
 #  Oracle9i    ・・・org.hibernate.dialect.Oracle9Dialect (?)
 #  Oracle8     ・・・org.hibernate.dialect.Oracle8iDialect (?)
 #  PostgreSQL  ・・・org.hibernate.dialect.PostgreSQLDialect
+#  MySQL       ・・・org.hibernate.dialect.MySQLDialect
+#              ・・・org.hibernate.dialect.MySQLInnoDBDialect
+#              ・・・org.hibernate.dialect.MySQL5Dialect
+#              ・・・org.hibernate.dialect.MySQL5InnoDBDialect
+#              ・・・org.hibernate.dialect.MySQLMyISAMDialect
 #その他        ・・・see http://docs.jboss.org/hibernate/stable/core/api/org/hibernate/dialect/package-summary.html
 hibernate.dialect=org.hibernate.dialect.SomeDialect
 
 #JDBCDriverクラス名
 # Oracle    ・・・oracle.jdbc.driver.OracleDriver
 # PostgreSQL・・・org.postgresql.Driver
+# MySQL     ・・・com.mysql.jdbc.Driver
 hibernate.jdbc.driver=DriverClassName(Full)
 
 #JDBCURL
@@ -79,6 +85,7 @@ hibernate.jdbc.driver=DriverClassName(Full)
 #    設定しておくと便利です。
 # Oracle    ・・・ex) jdbc:oracle:thin:@localhost:1521:XE
 # PostgreSQL・・・ex) jdbc:postgresql://localhost:5432/foo
+# MySQL     ・・・ex) jdbc:mysql://localhost:3306/foo
 hibernate.jdbc.url=jdbc:[dbtype]:[jdbctype]:@[host]:[port]:[name]
 
 #データベース接続ユーザー
@@ -96,6 +103,7 @@ hibernate.show.sql=true or false
 #データベースのスキーマ名
 # Oracle10g ・・・ユーザー名の大文字
 # PostgreSQL・・・public
+# MySQL     ・・・データベース名
 hibernate.schema=schema Name
 
 #HibernateのConnectionProviderの実装クラス名
@@ -113,6 +121,10 @@ hibernate.max.statement=10
 #セッションタイムアウト間隔
 #（一定期間DBにアクセスがない場合に接続をリセットするまでの間隔）
 hibernate.timeout=
+
+# trueの場合はJUnitでテストを行う際にH2を用いてテストを行う
+useInMemoryDBWhenTest=false
+
 #end
 
 #if($param.isContainOption("USING_RDF_WEB_FR"))

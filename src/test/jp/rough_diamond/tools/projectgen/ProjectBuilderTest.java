@@ -1420,7 +1420,7 @@ public class ProjectBuilderTest extends TestCase {
 			ProjectBuilder pb = new ProjectBuilder(param);
 			pb.mkdirs();
 			List<LibCopyInfo> ret = pb.getLibCopyInfos();
-			assertEquals("•Ô‹p”‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 24, ret.size());
+			assertEquals("•Ô‹p”‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 25, ret.size());
 		} finally {
 			IOUtils.deleteDir(rootDir);
 		}
