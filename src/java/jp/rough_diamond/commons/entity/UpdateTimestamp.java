@@ -12,6 +12,7 @@ import java.util.Date;
 
 import jp.rough_diamond.commons.service.annotation.PrePersist;
 import jp.rough_diamond.commons.service.annotation.PreUpdate;
+import jp.rough_diamond.commons.util.DateManager;
 
 /**
  * 更新日時情報のHibernateマッピングクラス
@@ -19,19 +20,19 @@ import jp.rough_diamond.commons.service.annotation.PreUpdate;
 public class UpdateTimestamp extends jp.rough_diamond.commons.entity.base.BaseUpdateTimestamp {
     private static final long serialVersionUID = 1L;
     public UpdateTimestamp() {
-    	setRegistererDate(new Date());		//dummy
-    	setLastModifiedDate(new Date());	//dummy
+    	setRegistererDate(DateManager.DM.newDate());		//dummy
+    	setLastModifiedDate(DateManager.DM.newDate());	//dummy
     }
     
     @PrePersist
     public void refreshRegistererDate() {
-    	Date ts = new Date();
+    	Date ts = DateManager.DM.newDate();
     	setRegistererDate(ts);
     	setLastModifiedDate(ts);
     }
     
     @PreUpdate
     public void refreshLastModifiedDate() {
-    	setLastModifiedDate(new Date());
+    	setLastModifiedDate(DateManager.DM.newDate());
     }
 }

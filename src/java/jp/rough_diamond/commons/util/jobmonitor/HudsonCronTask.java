@@ -11,6 +11,8 @@ import hudson.scheduler.CronTabList;
 import java.util.Calendar;
 import java.util.Date;
 
+import jp.rough_diamond.commons.util.DateManager;
+
 import antlr.ANTLRException;
 
 public class HudsonCronTask implements CrontabTask {
@@ -24,7 +26,7 @@ public class HudsonCronTask implements CrontabTask {
 	}
 	
 	public void executeWhenPastNextTimestamp() {
-		executeWhenPastNextTimestamp(new Date());
+		executeWhenPastNextTimestamp(DateManager.DM.newDate());
 	}
 
 	void executeWhenPastNextTimestamp(Date cur) {
@@ -49,7 +51,7 @@ public class HudsonCronTask implements CrontabTask {
 		}
 		
 		public Date getNextTimestamp() {
-			return getNextTimestamp(new Date());
+			return getNextTimestamp(DateManager.DM.newDate());
 		}
 		
 		Date getNextTimestamp(Date d) {

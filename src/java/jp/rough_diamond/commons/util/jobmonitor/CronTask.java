@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jp.rough_diamond.commons.util.DateManager;
+
 @Deprecated
 public class CronTask implements CrontabTask {
 	final Schedule schedule;
@@ -24,7 +26,7 @@ public class CronTask implements CrontabTask {
 	}
 	
 	public void executeWhenPastNextTimestamp() {
-		executeWhenPastNextTimestamp(new Date());
+		executeWhenPastNextTimestamp(DateManager.DM.newDate());
 	}
 
 	void executeWhenPastNextTimestamp(Date cur) {
@@ -87,7 +89,7 @@ public class CronTask implements CrontabTask {
 		}
 		
 		public Date getNextTimestamp() {
-			return getNextTimestamp(new Date());
+			return getNextTimestamp(DateManager.DM.newDate());
 		}
 		
 		Date getNextTimestamp(Date d) {

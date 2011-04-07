@@ -24,6 +24,11 @@ public class DateManagerTest extends TestCase {
 		Class.forName(DateManager.class.getName());
 	}
 	
+	@Override
+	protected void tearDown() throws Exception {
+		DateManager.DM.setDate(null);
+	}
+	
 	public void testNoneSetting() throws Exception {
 		long system = System.currentTimeMillis();
 		long wrapped = DateManager.DM.currentTimeMillis();

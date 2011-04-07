@@ -11,6 +11,7 @@ import java.util.Date;
 import jp.rough_diamond.commons.entity.Amount;
 import jp.rough_diamond.commons.entity.Quantity;
 import jp.rough_diamond.commons.entity.Unit;
+import jp.rough_diamond.commons.util.DateManager;
 import jp.rough_diamond.framework.service.Service;
 import jp.rough_diamond.framework.service.ServiceLocator;
 
@@ -55,7 +56,7 @@ abstract public class UnitConversionService implements Service {
 	 */
 	@Deprecated
 	public Amount convertUnit(Amount srcAmount, Unit destUnit, int roundingMode) throws NotConversionException {
-		return convertUnit(srcAmount, destUnit, roundingMode, new Date());
+		return convertUnit(srcAmount, destUnit, roundingMode, DateManager.DM.newDate());
 	}
 
 	/**
@@ -87,7 +88,7 @@ abstract public class UnitConversionService implements Service {
 	 */
 	@Deprecated
 	public Amount convertUnit(Amount srcAmount, Unit destUnit) throws NotConversionException {
-		return convertUnit(srcAmount, destUnit, new Date());
+		return convertUnit(srcAmount, destUnit, DateManager.DM.newDate());
 	}
 
 	/**
@@ -111,7 +112,7 @@ abstract public class UnitConversionService implements Service {
 	 * @throws NotConversionException 	•ÏŠ·Ž¸”s
 	 */
 	public Quantity convertUnit(Quantity srcQuantity, Unit destUnit, int roundingMode) throws NotConversionException {
-		return convertUnit(srcQuantity, destUnit, roundingMode, new Date());
+		return convertUnit(srcQuantity, destUnit, roundingMode, DateManager.DM.newDate());
 	}
 
 	/**
@@ -135,7 +136,7 @@ abstract public class UnitConversionService implements Service {
 	 * @throws NotConversionException •ÏŠ·Ž¸”s
 	 */
 	public Quantity convertUnit(Quantity srcAmount, Unit destUnit) throws NotConversionException {
-		return convertUnit(srcAmount, destUnit, new Date());
+		return convertUnit(srcAmount, destUnit, DateManager.DM.newDate());
 	}
 
 	/**

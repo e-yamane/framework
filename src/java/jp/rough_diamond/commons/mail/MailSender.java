@@ -27,6 +27,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
+import jp.rough_diamond.commons.util.DateManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -145,7 +147,7 @@ public class MailSender {
         try {
             for(int i = 0 ; i < msgs.length ; i++) {
                 Message msg = msgs[i];
-                msg.setSentDate(new Date());
+                msg.setSentDate(DateManager.DM.newDate());
                 try {
                     t.sendMessage(msg, msg.getAllRecipients());
                 } catch(SendFailedException sfe) {
