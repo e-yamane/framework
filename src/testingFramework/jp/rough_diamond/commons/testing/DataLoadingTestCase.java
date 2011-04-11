@@ -46,11 +46,11 @@ public abstract class DataLoadingTestCase extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-    	initializer.initialize();
         setUpDB();
     }
 
     public static void setUpDB() throws Exception {
+    	initializer.initialize();
         DBInitializer.clearModifiedClasses();
         DIContainer org = DIContainerFactory.getDIContainer();
         DIContainerFactory.setDIContainer(new DIContainerExt(org));
