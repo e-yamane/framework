@@ -194,7 +194,6 @@ public abstract class BaseUnit  implements Serializable {
      * @return íPà ê‡ñæ
     **/
     @jp.rough_diamond.commons.service.annotation.MaxLength(length=64, property="Unit.description")
-    @jp.rough_diamond.commons.service.annotation.MaxCharLength(length=16, property="Unit.description")
     public String getDescription() {
         return description;
     }
