@@ -179,7 +179,7 @@
     <mkdir dir="${framework.lib.root}/cobertura" />
     <get dest="${framework.lib.root}/cobertura/cobertura.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/cobertura/tags/1.9.2_p01/cobertura/cobertura-1.9.2_p01.jar" />
     <mkdir dir="${framework.lib.root}/dbUnit" />
-    <get dest="${framework.lib.root}/dbUnit/dbunit.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p04/dbunit/dbunit-2.1_p04.jar" />
+    <get dest="${framework.lib.root}/dbUnit/dbunit.jar" usetimestamp="true" ignoreerrors="true" src="http://dev.rough-diamond.jp/svn/framework/patches/dbunit/tags/2.1_p05/dbunit/dbunit-2.1_p05.jar" />
     <mkdir dir="${framework.lib.root}/servletapi" />
 <!--
     <get dest="${framework.lib.root}/servletapi/servlet-api.jar" usetimestamp="true" ignoreerrors="true" src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/apache/tomcat/servlet-api/6.0.18/servlet-api-6.0.18.jar" />
