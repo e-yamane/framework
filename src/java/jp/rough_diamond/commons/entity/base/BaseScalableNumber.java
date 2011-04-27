@@ -79,4 +79,6 @@ public abstract class BaseScalableNumber extends java.lang.Number implements Ser
 
     
 //ForeignProperties.vm finish.
+
+
 }

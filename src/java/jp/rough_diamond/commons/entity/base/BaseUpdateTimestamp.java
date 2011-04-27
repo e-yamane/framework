@@ -79,4 +79,6 @@ public abstract class BaseUpdateTimestamp  implements Serializable {
 
     
 //ForeignProperties.vm finish.
+
+
 }
