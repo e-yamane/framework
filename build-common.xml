@@ -576,6 +576,7 @@
       mergedir="${classes.dir}"
       verbose="false"
       fileSetDirs="${hibernate.fileset.dirs}"
+      encoding="${src.encoding}"
       >
       <configParam name="cache.avalable" value="${hibernate.cache.avalable}" />
       <configParam name="threadCount" value="${torque.threadCount}" />
