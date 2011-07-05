@@ -154,6 +154,24 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		assertEquals("件数が誤っています。", 1, BasicService.getService().getCountByExtractor(ex));
 	}
 	
+	public void testFreeFormatに集計関数が使用されていなければ全体がGroupByに適用される事() throws Exception {
+		//select id / 2, sum(id) from Unit group by id / 2 order by id / 2
+		Extractor ex = new Extractor(Unit.class);
+		Value v = new FreeFormat("? / ?", new Property(Unit.ID), 2);
+		ex.addExtractValue(new ExtractValue("id", v));
+		Sum sum = new Sum(new Property(Unit.ID));
+		ex.addExtractValue(new ExtractValue("sum", sum));
+		ex.addOrder(Order.asc(v));
+		List<Map<String, Number>> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 3, list.size());
+		assertEquals("値が誤っています。", 0, list.get(0).get("id").intValue());
+		assertEquals("値が誤っています。", 1, list.get(0).get("sum").intValue());
+		assertEquals("値が誤っています。", 1, list.get(1).get("id").intValue());
+		assertEquals("値が誤っています。", 5, list.get(1).get("sum").intValue());
+		assertEquals("値が誤っています。", 2, list.get(2).get("id").intValue());
+		assertEquals("値が誤っています。", 9, list.get(2).get("sum").intValue());
+	}
+	
 	public void testQueryUsingCount() throws Exception {
 		//select base_unit_id, count(*) from unit where id <= 5 group by base_unit_id order by base_unit_id
 		Extractor ex = new Extractor(Unit.class);

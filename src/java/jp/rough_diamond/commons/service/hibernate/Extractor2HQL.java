@@ -387,8 +387,14 @@ public class Extractor2HQL {
 			delimitor = ", ";
 		} else if(value instanceof FreeFormat) {
 			FreeFormat ff = (FreeFormat)value;
-			for(Object o : ff.values) {
-				delimitor = makeGroupByCouse(o, delimitor);
+			if(ff.includeSummaryFunction()) {
+				for(Object o : ff.values) {
+					delimitor = makeGroupByCouse(o, delimitor);
+				}
+			} else {
+				builder.append(delimitor);
+				builder.append(VALUE_MAKE_STRATEGY_MAP.get(value.getClass()).makeValue(this, (Value)value));
+				delimitor = ", ";
 			}
 		}
 		return delimitor;

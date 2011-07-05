@@ -31,4 +31,20 @@ public class FreeFormat implements Value {
 	public FreeFormat(String format, Object... values) {
 		this(format, Arrays.asList(values));
 	}
+
+	/**
+	 * @return
+	 */
+	public boolean includeSummaryFunction() {
+		for(Object o : values) {
+			if(o instanceof SummaryFunction) {
+				return true;
+			} else if(o instanceof FreeFormat) {
+				FreeFormat ff = (FreeFormat)o;
+				boolean ret = ff.includeSummaryFunction();
+				if(ret) return ret;
+			}
+		}
+		return false;
+	}
 }
