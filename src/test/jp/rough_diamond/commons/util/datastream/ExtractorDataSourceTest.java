@@ -51,6 +51,6 @@ public class ExtractorDataSourceTest {
 		for(Unit node : ds) {
 			assertEquals("ID‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", ids[index++], node.getId().longValue());
 		}
-		assertEquals("Œ”‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 7, index);
+		assertEquals("Œ”‚ªŒë‚Á‚Ä‚¢‚Ü‚·B", 5, index);
 	}
 }
