@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import jp.rough_diamond.commons.di.CompositeDIContainer;
 import jp.rough_diamond.commons.di.DIContainer;
@@ -23,7 +24,10 @@ import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
 import jp.rough_diamond.commons.extractor.Property;
+import jp.rough_diamond.commons.resource.Message;
+import jp.rough_diamond.commons.resource.Messages;
 import jp.rough_diamond.commons.service.annotation.PostLoad;
+import jp.rough_diamond.commons.service.annotation.Verifier;
 import jp.rough_diamond.commons.testdata.NumberingLoader;
 import jp.rough_diamond.commons.testdata.UnitLoader;
 import jp.rough_diamond.commons.testing.DataLoadingTestCase;
@@ -49,6 +53,59 @@ public class BasicServiceTest extends DataLoadingTestCase {
 		FindResult<Unit> fr = BasicService.getService().findByExtractorWithCount(e);
 		assertEquals("全体件数が誤ってます。", 5, fr.count);
 		assertEquals("取得件数が誤っています。", 1, fr.list.size());
+	}
+	
+	public void testVerifierCallback() throws Exception {
+		List<Object> list2 = new ArrayList<Object>();
+		list2.add(new VerifierCallbackListener());
+		DIContainer real = DIContainerFactory.getDIContainer();
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		map.put(BasicService.PERSISTENCE_EVENT_LISTENERS, list2);
+		MapDIContainer wrapper = new MapDIContainer(map);
+		DIContainerFactory.setDIContainer(new CompositeDIContainer(
+				Arrays.asList(new DIContainer[]{wrapper, real})));
+		System.out.println(DIContainerFactory.getDIContainer().getClass().getName());
+		try {
+			SortedSet<CallbackEventListener> listeners = BasicService.getService().getEventListener(Unit.class, CallbackEventType.VERIFIER);
+			assertEquals("返却数が誤っています。", 4, listeners.size());
+			
+			
+			Unit u = BasicService.getService().findByPK(Unit.class, 1L);
+			Messages msgs = u.validateObject();
+			assertFalse("エラーが発生しています。", msgs.hasError());
+
+			u.setName("verify");
+			msgs = u.validateObject();
+			System.out.println(msgs);
+			assertFalse("エラーが発生しています。", msgs.hasError());
+
+			u.setName("verify1");
+			msgs = u.validateObject();
+			System.out.println(msgs);
+			assertTrue("エラーが発生していません。", msgs.hasError());
+
+			u.setName("verify2");
+			msgs = u.validateObject();
+			System.out.println(msgs);
+			assertTrue("エラーが発生していません。", msgs.hasError());
+
+			u.setName("verify3");
+			msgs = u.validateObject();
+			System.out.println(msgs);
+			assertTrue("エラーが発生していません。", msgs.hasError());
+
+			u.setName("verify4");
+			msgs = u.validateObject();
+			System.out.println(msgs);
+			assertTrue("エラーが発生していません。", msgs.hasError());
+
+			u.setName("verify5");
+			msgs = u.validateObject();
+			System.out.println(msgs);
+			assertFalse("エラーが発生していませす。", msgs.hasError());
+		} finally {
+			DIContainerFactory.setDIContainer(real);
+		}
 	}
 	
 	public void testEventCallback() throws Exception {
@@ -179,6 +236,44 @@ public class BasicServiceTest extends DataLoadingTestCase {
 			HibernateUtils.getSession().saveOrUpdate(u);
 			u.setName("abc");
 			return u;
+		}
+	}
+	
+	public static class VerifierCallbackListener {
+		@Verifier
+		public Messages verifyUnit(Unit unit) {
+			Messages ret = new Messages();
+			if(unit.getName().equals("verify1")) {
+				ret.add("unit.name", new Message("errors.duplicate", "1"));
+			}
+			return ret;
+		}
+		
+		@Verifier
+		public Messages verifyUnit(Unit unit, CallbackEventType eventType) {
+			Messages ret = new Messages();
+			if(unit.getName().equals("verify2")) {
+				ret.add("unit.name", new Message("errors.duplicate", "2"));
+			}
+			return ret;
+		}
+
+		@Verifier
+		public Messages verifyUnit(Unit unit, WhenVerifier when) {
+			Messages ret = new Messages();
+			if(unit.getName().equals("verify3")) {
+				ret.add("unit.name", new Message("errors.duplicate", "3"));
+			}
+			return ret;
+		}
+
+		@Verifier
+		public Messages verifyUnit(Unit unit, CallbackEventType eventType, WhenVerifier when) {
+			Messages ret = new Messages();
+			if(unit.getName().equals("verify4")) {
+				ret.add("unit.name", new Message("errors.duplicate", "4"));
+			}
+			return ret;
 		}
 	}
 	

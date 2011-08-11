@@ -12,9 +12,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -529,14 +529,25 @@ abstract public class BasicService implements Service {
 	private Map<Class, List<PropertyDescriptor>> nestedComponentGetterMap =
     		new HashMap<Class, List<PropertyDescriptor>>();
     
-    private Map<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>> eventListenrsCache = 
-                            new HashMap<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>>();
+    private Map<List<?>, Map<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>>> eventListenrsCache =
+    				new IdentityHashMap<List<?>, Map<Class,Map<CallbackEventType,SortedSet<CallbackEventListener>>>>();
     
-    SortedSet<CallbackEventListener> getEventListener(Class cl, CallbackEventType eventType) {
-        Map<CallbackEventType, SortedSet<CallbackEventListener>> map = eventListenrsCache.get(cl);
+	Map<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>> getEventListenerCache() {
+		List<?> listeners = getPersistenceEventListeners();
+		Map<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>> ret = 
+															eventListenrsCache.get(listeners);
+		if(ret == null) {
+			ret = new HashMap<Class, Map<CallbackEventType, SortedSet<CallbackEventListener>>>();
+			eventListenrsCache.put(listeners, ret);
+		}
+		return ret;
+	}
+
+	SortedSet<CallbackEventListener> getEventListener(Class cl, CallbackEventType eventType) {
+        Map<CallbackEventType, SortedSet<CallbackEventListener>> map = getEventListenerCache().get(cl);
         if(map == null) {
             map = new HashMap<CallbackEventType, SortedSet<CallbackEventListener>>();
-            eventListenrsCache.put(cl, map);
+            getEventListenerCache().put(cl, map);
         }
         SortedSet<CallbackEventListener> set = map.get(eventType);
         if(set == null) {
@@ -545,7 +556,7 @@ abstract public class BasicService implements Service {
         }
         return set;
     }
-    
+
     SortedSet<CallbackEventListener> findEventListener(Class cl, CallbackEventType eventType) {
         Class annotationType = eventType.getAnnotation();
         SortedSet<CallbackEventListener> set = new TreeSet<CallbackEventListener>();
@@ -568,10 +579,11 @@ abstract public class BasicService implements Service {
         return set;
     }
     
-    final static String PERSISTENCE_EVENT_LISTENERS = "persistenceEventListeners";
+    final static List<?> NULL_LISTENERS = new ArrayList<Object>();
+    public final static String PERSISTENCE_EVENT_LISTENERS = "persistenceEventListeners";
     List<?> getPersistenceEventListeners() {
     	List list = (List<?>)DIContainerFactory.getDIContainer().getObject(PERSISTENCE_EVENT_LISTENERS);
-    	return (list == null) ? new ArrayList<Object>() : list;
+    	return (list == null) ? NULL_LISTENERS : list;
     }
     
     protected Messages unitPropertyValidate(Object o, WhenVerifier when) throws Exception {
@@ -656,24 +668,16 @@ abstract public class BasicService implements Service {
     
     private Messages customValidate(Object o, WhenVerifier when, boolean hasError) throws Exception {
     	Messages ret = new Messages();
-		Set<Method> set = getVerifier(o, when);
-		for(Method m : set) {
-			Verifier v = m.getAnnotation(Verifier.class);
+    	SortedSet<CallbackEventListener> listeners = getEventListener(o.getClass(), CallbackEventType.VERIFIER);
+    	for(CallbackEventListener listener : listeners) {
+			Verifier v = listener.method.getAnnotation(Verifier.class);
 			if(!v.isForceExec() && hasError) {
 				break;
 			}
-			Object retTmp;
-			if(m.getParameterTypes().length == 0) {
-				retTmp = m.invoke(o); 
-			} else {
-				retTmp = m.invoke(o, when);
-			}
-			if(retTmp != null) {
-				ret.add((Messages)retTmp);
-			}
-            hasError = ret.hasError();
-		}
-		List<PropertyDescriptor> list = getNestedComponentGetters(o.getClass());
+			ret.add(listener.validate(o, when));
+			hasError = ret.hasError();
+    	}
+    	List<PropertyDescriptor> list = getNestedComponentGetters(o.getClass());
 		for(PropertyDescriptor pd : list) {
 			Method m = pd.getReadMethod();
 			Object val = m.invoke(o);
@@ -801,68 +805,6 @@ abstract public class BasicService implements Service {
             throw new RuntimeException();
         }
     }
-    
-	private Map<Class, SortedSet<Method>> verifierMap = new HashMap<Class, SortedSet<Method>>();
-	
-	SortedSet<Method> getVerifier(Object o, WhenVerifier when) {
-		SortedSet<Method> tmp = getVerifier(o);
-		SortedSet<Method> ret = new TreeSet<Method>(VerifierSorter.INSTANCE);
-		for(Method m : tmp) {
-			Verifier v = m.getAnnotation(Verifier.class);
-			for(WhenVerifier w : v.when()) {
-				if(w == when) {
-					ret.add(m);
-					break;
-				}
-			}
-		}
-		return ret;
-	}
-	
-	SortedSet<Method> getVerifier(Object o) {
-		Class cl = o.getClass();
-		SortedSet<Method> ret = verifierMap.get(cl);
-		if(ret == null) {
-			SortedSet<Method> tmp = findVerifier(cl);
-			verifierMap.put(cl, tmp);
-			ret = tmp;
-		}
-		return ret;
-	}
-	
-    private SortedSet<Method> findVerifier(Class cl) {
-    	SortedSet<Method> ret = new TreeSet<Method>(VerifierSorter.INSTANCE);
-    	Method[] methods = cl.getMethods();
-    	for(Method m : methods) {
-    		Verifier v = m.getAnnotation(Verifier.class);
-    		if(v != null && verifyVerifyMethod(m)) {
-    			ret.add(m);
-    		}
-    	}
-    	return ret;
-	}
-
-    private boolean verifyVerifyMethod(Method m) {
-    	Class returnType = m.getReturnType();
-    	if(returnType == Void.TYPE) {
-    		if(log.isInfoEnabled()) {
-    			log.info("検証メソッド" + m.toString() + "は戻り値を返却しません。");
-    		}
-    	} else if(!Messages.class.isAssignableFrom(returnType)) {
-    		log.warn("検証メソッド" + m.toString() + "は適切な返却値を持たないため検証メソッドとは認識しません。");
-    		//例外あげるべきかなぁ・・・
-    		return false;
-    	}
-    	Class[] paramTypes = m.getParameterTypes();
-    	if(paramTypes.length > 1) {
-    		log.warn("検証メソッド" + m.toString() + "は適切なパラメタではないため検証メソッドとは認識しません。");
-    		return false;
-    	} else if(paramTypes.length == 1 && !WhenVerifier.class.isAssignableFrom(paramTypes[0])) {
-    		log.warn("検証メソッド" + m.toString() + "は適切なパラメタではないため検証メソッドとは認識しません。");
-    		return false;
-    	}
-		return true;
-	}
     
     public static boolean isProxy(Object target) {
     	return BasicService.getService().getProxyChecker().isProxy(target);

@@ -13,6 +13,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import jp.rough_diamond.commons.resource.Messages;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,6 +34,9 @@ abstract class CallbackEventListener implements Comparable<CallbackEventListener
 	
 	abstract void callback(Object eventSource, CallbackEventType type) 
 						throws IllegalAccessException, InvocationTargetException;
+	abstract Messages validate(Object eventSource, WhenVerifier when) 
+						throws IllegalArgumentException, IllegalAccessException, InvocationTargetException;
+	
 	abstract boolean isSelfCallback();
 
 	int getPriority() {
@@ -70,6 +75,40 @@ abstract class CallbackEventListener implements Comparable<CallbackEventListener
 	    if(annotation == null) {
 	    	return false;
 	    }
+		List<Class<?>> paramType = makeParamTypes(listener, srcType, m);
+		if(paramType == null) {
+			return false;
+		}
+		if(paramType.size() == 0) {
+			return true;
+		} else if(isAssignableFroms(paramType, CallbackEventType.class)) {
+			return true;
+		} else if(CallbackEventType.VERIFIER.getAnnotation() == annotationType) {
+			if(isAssignableFroms(paramType, WhenVerifier.class) ||
+			   isAssignableFroms(paramType, CallbackEventType.class, WhenVerifier.class)) {
+				return true;
+			}
+		}
+		if(log.isDebugEnabled()) {
+			log.debug(m.toString() + "は引数タイプが誤っているためコールバックメソッドとして認識しません。");
+		}
+		return false;
+	}
+
+	static boolean isAssignableFroms(List<Class<?>> targetTypes, Class... baseTypes) {
+		if(targetTypes.size() != baseTypes.length) {
+			return false;
+		}
+		for(int i = 0 ; i < targetTypes.size() ; i++) {
+			if(!baseTypes[i].isAssignableFrom(targetTypes.get(i))){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	static List<Class<?>> makeParamTypes(Object listener,
+			Class srcType, Method m) {
 		List<Class<?>> paramType;
 		if(listener == null) {
 			paramType = Arrays.asList(m.getParameterTypes());
@@ -78,27 +117,18 @@ abstract class CallbackEventListener implements Comparable<CallbackEventListener
 				if(log.isDebugEnabled()) {
 					log.debug(m.toString() + "は引数がないのでコールバックメソッドとして認識しません。");
 				}
-				return false;
+				return null;
 			}
 			if(!m.getParameterTypes()[0].isAssignableFrom(srcType)) {
 				if(log.isDebugEnabled()) {
 					log.debug(m.toString() + "は第１引数のタイプが不一致なのでコールバックメソッドとして認識しません。");
 				}
-				return false;
+				return null;
 			}
 			paramType = Arrays.asList(m.getParameterTypes());
 			paramType = paramType.subList(1, paramType.size());
 		}
-		if(paramType.size() == 0) {
-			return true;
-		} else if(paramType.size() == 1 && CallbackEventType.class.isAssignableFrom(paramType.get(0))) {
-			return true;
-		} else {
-			if(log.isDebugEnabled()) {
-				log.debug(m.toString() + "は引数タイプが誤っているためコールバックメソッドとして認識しません。");
-			}
-		}
-		return false;
+		return paramType;
 	}
 	
 	static class SelfEventListener extends CallbackEventListener {
@@ -118,6 +148,19 @@ abstract class CallbackEventListener implements Comparable<CallbackEventListener
         		method.invoke(eventSource, type);
         	}
 		}
+		@Override
+		Messages validate(Object eventSource, WhenVerifier when) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        	if(log.isDebugEnabled()) {
+        		log.debug(String.format("CallBack EventType[Verifier]:%s(%s)#%s()", 
+        				eventSource.getClass().getName(), method.getDeclaringClass().getName(), method.getName()));
+        	}
+        	if(method.getParameterTypes().length == 0) {
+        		return (Messages)method.invoke(eventSource);
+        	} else {
+        		return (Messages)method.invoke(eventSource, when);
+        	}
+		}
+		
 		@Override
 		boolean isSelfCallback() {
 			return true;
@@ -147,6 +190,26 @@ abstract class CallbackEventListener implements Comparable<CallbackEventListener
         		method.invoke(listener, eventSource, type);
         	}
 		}
+		@Override
+		Messages validate(Object eventSource, WhenVerifier when)
+				throws IllegalArgumentException, IllegalAccessException,
+				InvocationTargetException {
+        	if(log.isDebugEnabled()) {
+        		log.debug(String.format("CallBack EventType[Verifier]:%s(%s)#%s(%s)", 
+        				listener.getClass().getName(), method.getDeclaringClass().getName(), method.getName(), eventSource.getClass().getName()));
+        	}
+        	List<Class<?>> paramTypes = Arrays.asList(method.getParameterTypes());
+        	if(isAssignableFroms(paramTypes, eventSource.getClass())) {
+        		return (Messages)method.invoke(listener, eventSource);
+        	} else if(isAssignableFroms(paramTypes, eventSource.getClass(), CallbackEventType.class)) {
+        		return (Messages)method.invoke(listener, eventSource, CallbackEventType.VERIFIER);
+        	} else if(isAssignableFroms(paramTypes, eventSource.getClass(), WhenVerifier.class)) {
+        		return (Messages)method.invoke(listener, eventSource, when);
+        	} else {
+        		return (Messages)method.invoke(listener, eventSource, CallbackEventType.VERIFIER, when);
+        	}
+		}
+
 		@Override
 		boolean isSelfCallback() {
 			return false;
