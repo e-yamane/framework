@@ -97,8 +97,12 @@ public class BasicServiceTest extends DataLoadingTestCase {
 			u.setName("verify4");
 			msgs = u.validateObject();
 			System.out.println(msgs);
-			assertTrue("エラーが発生していません。", msgs.hasError());
+			assertFalse("エラーが発生しています。", msgs.hasError());
 
+			msgs = BasicService.getService().validate(u, WhenVerifier.INSERT);
+			System.out.println(msgs);
+			assertTrue("エラーが発生していません。", msgs.hasError());
+			
 			u.setName("verify5");
 			msgs = u.validateObject();
 			System.out.println(msgs);
@@ -267,7 +271,7 @@ public class BasicServiceTest extends DataLoadingTestCase {
 			return ret;
 		}
 
-		@Verifier
+		@Verifier(when = {WhenVerifier.INSERT})
 		public Messages verifyUnit(Unit unit, CallbackEventType eventType, WhenVerifier when) {
 			Messages ret = new Messages();
 			if(unit.getName().equals("verify4")) {
