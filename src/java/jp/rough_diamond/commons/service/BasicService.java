@@ -682,23 +682,6 @@ abstract public class BasicService implements Service {
 				}
 			}
     	}
-//    	Set<Method> set = getVerifier(o, when);
-//		for(Method m : set) {
-//			Verifier v = m.getAnnotation(Verifier.class);
-//			if(!v.isForceExec() && hasError) {
-//				break;
-//			}
-//			Object retTmp;
-//			if(m.getParameterTypes().length == 0) {
-//				retTmp = m.invoke(o); 
-//			} else {
-//				retTmp = m.invoke(o, when);
-//			}
-//			if(retTmp != null) {
-//				ret.add((Messages)retTmp);
-//			}
-//            hasError = ret.hasError();
-//		}
     	List<PropertyDescriptor> list = getNestedComponentGetters(o.getClass());
 		for(PropertyDescriptor pd : list) {
 			Method m = pd.getReadMethod();
@@ -827,68 +810,6 @@ abstract public class BasicService implements Service {
             throw new RuntimeException();
         }
     }
-    
-//	private Map<Class, SortedSet<Method>> verifierMap = new HashMap<Class, SortedSet<Method>>();
-//	
-//	SortedSet<Method> getVerifier(Object o, WhenVerifier when) {
-//		SortedSet<Method> tmp = getVerifier(o);
-//		SortedSet<Method> ret = new TreeSet<Method>(VerifierSorter.INSTANCE);
-//		for(Method m : tmp) {
-//			Verifier v = m.getAnnotation(Verifier.class);
-//			for(WhenVerifier w : v.when()) {
-//				if(w == when) {
-//					ret.add(m);
-//					break;
-//				}
-//			}
-//		}
-//		return ret;
-//	}
-//	
-//	SortedSet<Method> getVerifier(Object o) {
-//		Class cl = o.getClass();
-//		SortedSet<Method> ret = verifierMap.get(cl);
-//		if(ret == null) {
-//			SortedSet<Method> tmp = findVerifier(cl);
-//			verifierMap.put(cl, tmp);
-//			ret = tmp;
-//		}
-//		return ret;
-//	}
-//	
-//    private SortedSet<Method> findVerifier(Class cl) {
-//    	SortedSet<Method> ret = new TreeSet<Method>(VerifierSorter.INSTANCE);
-//    	Method[] methods = cl.getMethods();
-//    	for(Method m : methods) {
-//    		Verifier v = m.getAnnotation(Verifier.class);
-//    		if(v != null && verifyVerifyMethod(m)) {
-//    			ret.add(m);
-//    		}
-//    	}
-//    	return ret;
-//	}
-//
-//    private boolean verifyVerifyMethod(Method m) {
-//    	Class returnType = m.getReturnType();
-//    	if(returnType == Void.TYPE) {
-//    		if(log.isInfoEnabled()) {
-//    			log.info("検証メソッド" + m.toString() + "は戻り値を返却しません。");
-//    		}
-//    	} else if(!Messages.class.isAssignableFrom(returnType)) {
-//    		log.warn("検証メソッド" + m.toString() + "は適切な返却値を持たないため検証メソッドとは認識しません。");
-//    		//例外あげるべきかなぁ・・・
-//    		return false;
-//    	}
-//    	Class[] paramTypes = m.getParameterTypes();
-//    	if(paramTypes.length > 1) {
-//    		log.warn("検証メソッド" + m.toString() + "は適切なパラメタではないため検証メソッドとは認識しません。");
-//    		return false;
-//    	} else if(paramTypes.length == 1 && !WhenVerifier.class.isAssignableFrom(paramTypes[0])) {
-//    		log.warn("検証メソッド" + m.toString() + "は適切なパラメタではないため検証メソッドとは認識しません。");
-//    		return false;
-//    	}
-//		return true;
-//	}
     
     public static boolean isProxy(Object target) {
     	return BasicService.getService().getProxyChecker().isProxy(target);
