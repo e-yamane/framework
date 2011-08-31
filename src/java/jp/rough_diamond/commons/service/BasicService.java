@@ -12,9 +12,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -714,6 +716,41 @@ abstract public class BasicService implements Service {
 		return ret;
     }
 
+	public final static String SKIP_UNIQUE_CHECK_TYPES = "skipUniqueCheckTypes";
+	Set<Class<?>> skipUniqueCheckTypes = new HashSet<Class<?>>();
+	Set<Class<?>> notSkipUniqueCheckTypes = new HashSet<Class<?>>();
+	boolean isSkipUniqueCheckType(Class<?> cl, List<String> skipTypes) {
+		if(skipUniqueCheckTypes.contains(cl)) {
+			return true;
+		}
+		if(notSkipUniqueCheckTypes.contains(cl)) {
+			return false;
+		}
+		boolean ret = isSkipUniqueCheckType2(cl, skipTypes);
+		if(ret) {
+			skipUniqueCheckTypes.add(cl);
+		} else {
+	    	notSkipUniqueCheckTypes.add(cl);
+		}
+    	return ret;
+	}
+	
+	boolean isSkipUniqueCheckType2(Class<?> cl, List<String> skipTypes) {
+		if(skipTypes == null) {
+			return false;
+		}
+    	for(String type : skipTypes) {
+    		try {
+				if(Class.forName(type).isAssignableFrom(cl)) {
+					return true;
+				}
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+    	}
+    	return false;
+	}
+
 	/**
 	 * 永続対象オブジェクトのユニーク性を検証する
 	 * @param o		検証対象オブジェクト
@@ -721,8 +758,11 @@ abstract public class BasicService implements Service {
      * @return		検証失敗した場合の原因メッセージ群
 	 */
     public Messages checkUnique(Object o, WhenVerifier when) {
-    	List<Unique> uniqueList = findUnique(o.getClass());
     	Messages ret = new Messages();
+    	if(isSkipUniqueCheckType(o.getClass(), (List<String>)DIContainerFactory.getDIContainer().getObject(SKIP_UNIQUE_CHECK_TYPES))) {
+    		return ret;
+    	}
+    	List<Unique> uniqueList = findUnique(o.getClass());
     	if(uniqueList.size() == 0) {
     		return ret;
     	}

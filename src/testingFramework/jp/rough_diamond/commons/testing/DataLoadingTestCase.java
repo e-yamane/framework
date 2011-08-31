@@ -200,7 +200,7 @@ public abstract class DataLoadingTestCase extends TestCase {
     	protected Configuration addingProperties() {
     		Configuration cfg = super.addingProperties();
     		cfg.setProperty(Environment.DRIVER, 				"org.h2.Driver");
-    		cfg.setProperty(Environment.URL, 					"jdbc:h2:mem:mymemdb;MVCC=TRUE");
+    		cfg.setProperty(Environment.URL, 					"jdbc:h2:mem:mymemdb");
     		cfg.setProperty(Environment.USER, 					"SA");
     		cfg.setProperty(Environment.PASS, 					"");
     		cfg.setProperty(Environment.DIALECT, 				H2DialectExt.class.getName());

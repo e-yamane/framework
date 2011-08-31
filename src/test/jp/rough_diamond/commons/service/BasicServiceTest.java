@@ -18,6 +18,7 @@ import jp.rough_diamond.commons.di.CompositeDIContainer;
 import jp.rough_diamond.commons.di.DIContainer;
 import jp.rough_diamond.commons.di.DIContainerFactory;
 import jp.rough_diamond.commons.di.MapDIContainer;
+import jp.rough_diamond.commons.entity.Numbering;
 import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.extractor.Condition;
@@ -189,6 +190,18 @@ public class BasicServiceTest extends DataLoadingTestCase {
 		Unit u2 = BasicService.getService().findByPK(Unit.class, 1L);
 		assertEquals("ユニット名が誤っています。", "xyz", u2.getName());
 		assertEquals("ユニット名が誤っています。", "abc", u1.getName());
+	}
+	
+	public void testIsSkipUniqueCheckType() throws Exception {
+		BasicService bs = BasicService.getService();
+		List<String> list = new ArrayList<String>();
+		list.add(Unit.class.getName());
+		assertFalse("Unitクラスのユニークチェックをします。", bs.isSkipUniqueCheckType2(Unit.class, null));
+		assertTrue("Unitクラスのユニークチェックをしません。", bs.isSkipUniqueCheckType2(Unit.class, list));
+		assertFalse("Numberingクラスのユニークチェックをします。", bs.isSkipUniqueCheckType2(Numbering.class, list));
+		list.add(Object.class.getName());
+		assertTrue("Unitクラスのユニークチェックをしません。", bs.isSkipUniqueCheckType2(Unit.class, list));
+		assertTrue("Numberingクラスのユニークチェックをしません。", bs.isSkipUniqueCheckType2(Numbering.class, list));
 	}
 	
 	public static class 更新メソッドを使わずにデータが更新されないことを確認するService implements Service {
