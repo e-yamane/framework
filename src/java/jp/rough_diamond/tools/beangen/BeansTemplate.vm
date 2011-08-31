@@ -12,7 +12,7 @@ package $bean.packageName;
 #if ($bean.packageName == '')
  * @see $bean.className
 #else
- * @see ${bean.packageName}.Base${bean.className}
+ * @see ${parentPackage}Base${bean.className}
 #end
 **/
 public class ${bean.className}${bean.classSuffix} extends ${parentPackage}Base${bean.className}${bean.classSuffix} {
