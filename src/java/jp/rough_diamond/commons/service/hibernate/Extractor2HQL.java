@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 import jp.rough_diamond.commons.extractor.And;
 import jp.rough_diamond.commons.extractor.Avg;
+import jp.rough_diamond.commons.extractor.Case;
 import jp.rough_diamond.commons.extractor.CombineCondition;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Count;
@@ -36,6 +37,7 @@ import jp.rough_diamond.commons.extractor.Eq;
 import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
 import jp.rough_diamond.commons.extractor.FreeFormat;
+import jp.rough_diamond.commons.extractor.Function;
 import jp.rough_diamond.commons.extractor.Ge;
 import jp.rough_diamond.commons.extractor.Gt;
 import jp.rough_diamond.commons.extractor.In;
@@ -381,11 +383,10 @@ public class Extractor2HQL {
 	}
 
 	private String makeGroupByCouse(Object value, String delimitor) {
-		if(value instanceof Property) {
-			builder.append(delimitor);
-			builder.append(VALUE_MAKE_STRATEGY_MAP.get(value.getClass()).makeValue(this, (Value)value));
-			delimitor = ", ";
-		} else if(value instanceof FreeFormat) {
+		if(value instanceof SummaryFunction) {
+			return delimitor;
+		}
+		if(value instanceof FreeFormat) {
 			FreeFormat ff = (FreeFormat)value;
 			if(ff.includeSummaryFunction()) {
 				for(Object o : ff.values) {
@@ -396,6 +397,10 @@ public class Extractor2HQL {
 				builder.append(VALUE_MAKE_STRATEGY_MAP.get(value.getClass()).makeValue(this, (Value)value));
 				delimitor = ", ";
 			}
+		} else {
+			builder.append(delimitor);
+			builder.append(VALUE_MAKE_STRATEGY_MAP.get(value.getClass()).makeValue(this, (Value)value));
+			delimitor = ", ";
 		}
 		return delimitor;
 	}
@@ -421,9 +426,7 @@ public class Extractor2HQL {
 
     private void setParameter(Object query, Extractor extractor) {
     	for(ExtractValue ev : extractor.getValues()) {
-    		if(ev.value instanceof Extractor) {
-    			setParameter(query, (Extractor)ev.value);
-    		}
+    		setParameter(query, ev.value);
     	}
     	List<Condition<? extends Value>> list = new ArrayList<Condition<? extends Value>>(extractor.getConditionIterator());
     	list.addAll(extractor.getHavingIterator());
@@ -432,7 +435,23 @@ public class Extractor2HQL {
         }
     }
 
-    private void setParameter(Object query, Condition<? extends Value> con) {
+	private void setParameter(Object query, Value value) {
+		if(value instanceof Extractor) {
+			setParameter(query, (Extractor)value);
+		} else if(value instanceof Case) {
+			setParameter(query, ((Case)value).condition);
+		} else if(value instanceof Function) {
+			setParameter(query, ((Function)value).value);
+		} else if(value instanceof FreeFormat) {
+			for(Object o : ((FreeFormat)value).values) {
+				if(o instanceof Value) {
+					setParameter(query, (Value)o);
+				}
+			}
+		}
+	}
+
+	private void setParameter(Object query, Condition<? extends Value> con) {
     	ConditionStrategy<Condition> strategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(con.getClass()); 
     	strategy.setParameter(query, this, con);
     }
@@ -669,6 +688,21 @@ public class Extractor2HQL {
 			@Override
 			public String makeValue(Extractor2HQL generator, DateToString v) {
 				return DateToStringConvertor.getConvertor(HibernateUtils.getDialect().getClass()).convert(generator, v);
+			}
+    	});
+    	tmp.put(Case.class, new ValueMaker<Case>() {
+			@Override
+			public String makeValue(Extractor2HQL generator, Case v) {
+		        ConditionStrategy<Condition> conStrategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(v.condition.getClass());
+		        String conText = conStrategy.makeWhereCouse(generator, v.condition);
+		        ValueMaker vm = VALUE_MAKE_STRATEGY_MAP.get(v.thenValue.getClass());
+				String thenText = vm.makeValue(generator, v.thenValue);
+		        vm = VALUE_MAKE_STRATEGY_MAP.get(v.elseValue.getClass());
+				String elseText = vm.makeValue(generator, v.elseValue);
+				String ret = String.format(
+						"case when %s then %s else %s end", 
+						conText, thenText, elseText);
+				return ret;
 			}
     	});
     	VALUE_MAKE_STRATEGY_MAP = Collections.unmodifiableMap(tmp);

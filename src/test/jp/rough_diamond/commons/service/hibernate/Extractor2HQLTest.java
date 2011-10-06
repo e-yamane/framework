@@ -17,6 +17,7 @@ import jp.rough_diamond.commons.entity.Numbering;
 import jp.rough_diamond.commons.entity.ScalableNumber;
 import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.extractor.Avg;
+import jp.rough_diamond.commons.extractor.Case;
 import jp.rough_diamond.commons.extractor.CombineCondition;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.Count;
@@ -734,6 +735,54 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		ex.addExtractValue(new ExtractValue("value", new Property(Unit.RATE + ScalableNumber.VALUE)));
 		ex.add(Condition.eq(new Property(Unit.BASE), u));
 		assertEquals("件数が誤っています。", 4, BasicService.getService().getCountByExtractor(ex));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void testCaseを使ってみる() throws Exception {
+		//select case then id = 1 then id else 100 end from unit
+		Extractor ex = new Extractor(Unit.class);
+		Condition con = Condition.eq(new Property(Unit.ID), 1);
+		Value thenValue = new Property(Unit.ID);
+		Value elseValue = new FreeFormat("100");
+		Case c = new Case(con, thenValue, elseValue);
+		ex.addExtractValue(new ExtractValue("zzz", c, Long.class));
+		ex.addOrder(Order.asc(new Property(Unit.ID)));
+		ex.setReturnType(Long.class);
+		List<Long> list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 5, list.size());
+		assertEquals("値が誤っています。", 1L, list.get(0).longValue());
+		assertEquals("値が誤っています。", 100L, list.get(1).longValue());
+		assertEquals("値が誤っています。", 100L, list.get(2).longValue());
+		assertEquals("値が誤っています。", 100L, list.get(3).longValue());
+		assertEquals("値が誤っています。", 100L, list.get(4).longValue());
+		
+		//select sum(case then id = 1 then id else 100 end) from unit
+		ex = new Extractor(Unit.class);
+		Sum sum = new Sum(c);
+		ex.addExtractValue(new ExtractValue("zzz", sum, Long.class));
+		ex.setReturnType(Long.class);
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("値が誤っています。", 401L, list.get(0).longValue());
+		
+		//select base_unit_id, sum(case then id = 1 then id else 100 end) from unit group by base_unit_id
+		ex = new Extractor(Unit.class);
+		ex.addExtractValue(new ExtractValue("id", new Property(Unit.BASE + "." + Unit.ID), Long.class));
+		ex.addExtractValue(new ExtractValue("sum", sum, Long.class));
+		ex.addOrder(Order.asc(new Property(Unit.BASE + "." + Unit.ID)));
+		List<Map<String, Object>> list2 = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 2, list2.size());
+		assertEquals("値が誤っています。", new Long(301L), list2.get(0).get("sum"));
+		assertEquals("値が誤っています。", new Long(100L), list2.get(1).get("sum"));
+		
+		//select sum(case then id = 1 then id else 100 end * 10) from unit
+		ex = new Extractor(Unit.class);
+		Sum sum2 = new Sum(new FreeFormat("? * 10", c));
+		ex.addExtractValue(new ExtractValue("zzz", sum2, Long.class));
+		ex.setReturnType(Long.class);
+		list = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 1, list.size());
+		assertEquals("値が誤っています。", 4010L, list.get(0).longValue());
 	}
 	
 	public void testIn句に空集合を渡した場合は何もヒットしないこと() throws Exception {
