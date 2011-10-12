@@ -7,6 +7,10 @@
 package jp.rough_diamond.commons.util;
 
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -25,6 +29,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 	private final static Log log = LogFactory.getLog(PropertyUtils.class);
+	
+	/**
+	 * getterメソッドにこのアノテーションが付与されていれば、プロパティのコピーは行わない
+	 */
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.METHOD)
+	public static @interface SkipProperty { };
+	
 	private static ThreadLocal<Stack<?>> copyStack = new ThreadLocal<Stack<?>>(){
 		@Override
 		protected Stack<?> initialValue() {
@@ -90,11 +102,24 @@ public class PropertyUtils extends org.apache.commons.beanutils.PropertyUtils {
 		for(int i = 0 ; i < pds.length ; i++) {
 			String propName = pds[i].getName();
 			Method getter = getGetterMethod(src, propName);
-			if(pds[i].getWriteMethod() != null && getter != null) {
+			if(isTargetProperty(pds[i], getter)) {
 				ret.put(pds[i].getName(), getter.invoke(src));
 			}
 		}
 		return ret;
+	}
+	
+	static boolean isTargetProperty(PropertyDescriptor descPD, Method getter) {
+		if(getter == null) {
+			return false;
+		}
+		if(getter.getAnnotation(SkipProperty.class) != null) {
+			return false;
+		}
+		if(descPD.getWriteMethod() == null) {
+			return false;
+		}
+		return true;
 	}
 	
 	@SuppressWarnings("unchecked")

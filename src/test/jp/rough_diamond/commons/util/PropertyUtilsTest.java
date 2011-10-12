@@ -55,6 +55,16 @@ public class PropertyUtilsTest extends TestCase {
 		assertEquals("値が誤っています。", "abc", map.get("c"));
 	}
 	
+	public void testSkipPropertyアノテーションが機能している事() throws Exception {
+		Bean4 bean4 = new Bean4();
+		Bean5 bean5 = new Bean5();
+		bean5.setA("xyz");
+
+		assertNull("初期値が想定外です。", bean4.getA());
+		PropertyUtils.copyProperties(bean5, bean4);
+		assertNull("値がコピーされています。", bean4.getA());
+	}
+	
 	public static class Bean1 {
 		List<String> list;
 
@@ -133,6 +143,14 @@ public class PropertyUtilsTest extends TestCase {
 		void foo() {
 			b = c;
 			c = b;
+		}
+	}
+	
+	public static class Bean5 extends Bean4 {
+		@Override
+		@PropertyUtils.SkipProperty
+		public String getA() {
+			return super.getA();
 		}
 	}
 	

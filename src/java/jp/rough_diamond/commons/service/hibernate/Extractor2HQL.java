@@ -429,17 +429,51 @@ public class Extractor2HQL {
     		setParameter(query, ev.value);
     	}
     	List<Condition<? extends Value>> list = new ArrayList<Condition<? extends Value>>(extractor.getConditionIterator());
-    	list.addAll(extractor.getHavingIterator());
         for(Condition<? extends Value> con : list) {
        		setParameter(query, con);
         }
+        if(usingGroupBy) {
+        	for(ExtractValue ev : extractor.getValues()) {
+        		setParameterGroupByCouse(query, ev.value);
+        	}
+        }
+        for(Condition<? extends Value> con : extractor.getHavingIterator()) {
+       		setParameter(query, con);
+        }
+        for(Order<? extends Value> v : extractor.getOrderIterator()) {
+       		setParameter(query, v.label);
+        }
     }
-
+    
+    private void setParameterGroupByCouse(Object query, Object value) {
+		if(value instanceof SummaryFunction) {
+			return;
+		}
+		if(value instanceof FreeFormat) {
+			FreeFormat ff = (FreeFormat)value;
+			if(ff.includeSummaryFunction()) {
+				for(Object o : ff.values) {
+					setParameterGroupByCouse(query, o);
+				}
+			} else {
+				setParameter(query, ff);
+			}
+		} else if(value instanceof Value){
+			Value v = (Value)value;
+			setParameter(query, v);
+		}
+    }
+    
 	private void setParameter(Object query, Value value) {
 		if(value instanceof Extractor) {
 			setParameter(query, (Extractor)value);
 		} else if(value instanceof Case) {
-			setParameter(query, ((Case)value).condition);
+			Case c = (Case)value;
+			if(c.condition instanceof Condition) {
+				setParameter(query, (Condition)c.condition);
+			} else {
+				setParameter(query, (Value)c.condition);
+			}
 		} else if(value instanceof Function) {
 			setParameter(query, ((Function)value).value);
 		} else if(value instanceof FreeFormat) {
@@ -693,8 +727,16 @@ public class Extractor2HQL {
     	tmp.put(Case.class, new ValueMaker<Case>() {
 			@Override
 			public String makeValue(Extractor2HQL generator, Case v) {
-		        ConditionStrategy<Condition> conStrategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(v.condition.getClass());
-		        String conText = conStrategy.makeWhereCouse(generator, v.condition);
+				String conText = null;
+				if(v.condition instanceof Condition) {
+					Condition con = (Condition)v.condition;
+			        ConditionStrategy<Condition> conStrategy = (ConditionStrategy<Condition>) CONDITION_STRATEGY_MAP2.get(v.condition.getClass());
+			        conText = conStrategy.makeWhereCouse(generator, con);
+				} else {
+					Value value = (Value)v.condition;
+			        ValueMaker vm = VALUE_MAKE_STRATEGY_MAP.get(value.getClass());
+			        conText = vm.makeValue(generator, value);
+				}
 		        ValueMaker vm = VALUE_MAKE_STRATEGY_MAP.get(v.thenValue.getClass());
 				String thenText = vm.makeValue(generator, v.thenValue);
 		        vm = VALUE_MAKE_STRATEGY_MAP.get(v.elseValue.getClass());

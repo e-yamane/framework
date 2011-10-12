@@ -21,6 +21,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import jp.rough_diamond.commons.util.PropertyUtils.SkipProperty;
+
 
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -118,6 +120,19 @@ abstract public class AbstractObjectToJAXBElement extends AbstractTransformer {
 				continue;
 			}
 			if(srcPD.getName().equals("class")) {
+				continue;
+			}
+			Method getter = srcPD.getReadMethod();
+			if(getter == null) {
+				if(log.isDebugEnabled()) {
+					log.warn(pd.getName() + "プロパティのgetterメソッドが変換前オブジェクトに存在しません。スキップします。");
+				}
+				continue;
+			}
+			if(getter.getAnnotation(SkipProperty.class) != null) {
+				if(log.isDebugEnabled()) {
+					log.warn(pd.getName() + "プロパティは、スキップ対象プロパティです。スキップします。");
+				}
 				continue;
 			}
 			Object srcVal = PropertyUtils.getProperty(src, srcPD.getName());

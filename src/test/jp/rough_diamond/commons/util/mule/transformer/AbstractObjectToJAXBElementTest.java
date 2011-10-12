@@ -83,14 +83,17 @@ public class AbstractObjectToJAXBElementTest extends TestCase {
 		detail1.setItemId(1L);
 		InBeanDetails detail2 = new InBeanDetails();
 		detail2.setItemId(2L);
+		InBeanDetails detail3 = new InBeanDetails2();
+		detail3.setItemId(3L);
 		
-		t.copyJAXBElement(factory, pd, new InBeanDetails[]{detail1, detail2}, dest);
+		t.copyJAXBElement(factory, pd, new InBeanDetails[]{detail1, detail2, detail3}, dest);
 		JAXBElement<ArrayOfDetails> details = dest.getDetails();
 		assertNotNull("Nullです。", details);
 		List<Details> list = details.getValue().getAcceptDetails();
-		assertEquals("要素数が誤っています。", 2, list.size());
+		assertEquals("要素数が誤っています。", 3, list.size());
 		assertEquals("値が誤っています。", 1L, list.get(0).getItemId().getValue().longValue());
 		assertEquals("値が誤っています。", 2L, list.get(1).getItemId().getValue().longValue());
+		assertNull("値が誤っています。", list.get(2).getItemId());
 
 		List<InBeanDetails> baseList = new ArrayList<InBeanDetails>();
 		baseList.add(detail2);
@@ -113,6 +116,14 @@ public class AbstractObjectToJAXBElementTest extends TestCase {
 
 		public void setItemId(Long itemId) {
 			this.itemId = itemId;
+		}
+	}
+	
+	public static class InBeanDetails2 extends InBeanDetails {
+		@Override
+		@jp.rough_diamond.commons.util.PropertyUtils.SkipProperty
+		public Long getItemId() {
+			return super.getItemId();
 		}
 	}
 	

@@ -783,6 +783,19 @@ public class Extractor2HQLTest extends DataLoadingTestCase {
 		list = BasicService.getService().findByExtractor(ex);
 		assertEquals("返却数が誤っています。", 1, list.size());
 		assertEquals("値が誤っています。", 4010L, list.get(0).longValue());
+		
+		//select case then id = 1 then id else 100 end, sum(id) from unit group by case then id = 1 then id else 100 end order by case then id = 1 then id else 100 end
+		ex = new Extractor(Unit.class);
+		Case c2 = new Case(new FreeFormat("? = ?", new Property(Unit.ID), 1), thenValue, elseValue);
+		ex.addExtractValue(new ExtractValue("id", c2, Long.class));
+		ex.addExtractValue(new ExtractValue("sum", new Sum(new Property(Unit.ID)), Long.class));
+		ex.addOrder(Order.asc(c2));
+		list2 = BasicService.getService().findByExtractor(ex);
+		assertEquals("返却数が誤っています。", 2, list2.size());
+		assertEquals("返却値が誤っています。", new Long(1L), list2.get(0).get("id"));
+		assertEquals("返却値が誤っています。", new Long(100L), list2.get(1).get("id"));
+		assertEquals("返却値が誤っています。", new Long(1L), list2.get(0).get("sum"));
+		assertEquals("返却値が誤っています。", new Long(14L), list2.get(1).get("sum"));
 	}
 	
 	public void testIn句に空集合を渡した場合は何もヒットしないこと() throws Exception {
