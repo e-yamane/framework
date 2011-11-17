@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -801,21 +802,28 @@ abstract public class BasicService implements Service {
 	
 	protected static Messages makeUniqueErrorMessage(Object o, Unique u, Check c) {
 		Messages ret = new Messages();
+		final String key = "errors.duplicate";
+		ResourceBundle rb = ResourceManager.getResource();
 		String targetProperty = u.entity() + "." + c.properties()[0];
+		String uniqueDescription = u.entity() + "._UNQ_." + c.name();
+		if(rb.containsKey(uniqueDescription)) {
+			ret.add(targetProperty, new Message(key, rb.getString(uniqueDescription)));
+			return ret;
+		}
 		String[] strArray = c.properties()[0].split("\\.");
 		if(strArray.length == 1) {
-			ret.add(targetProperty, new Message("errors.duplicate", 
-						ResourceManager.getResource().getString(targetProperty)));
+			ret.add(targetProperty, new Message(key, rb.getString(targetProperty)));
+			return ret;
 		} else {
 			int i = 0;
 			Object base = o;
 			for( ; i < strArray.length - 1 ; i++) {
 				base = jp.rough_diamond.commons.util.PropertyUtils.getProperty(base, strArray[0]);
 			}
-			ret.add(targetProperty, new Message("errors.duplicate",
-					ResourceManager.getResource().getString(base.getClass().getSimpleName() + "." + strArray[i])));
+			ret.add(targetProperty, new Message(key,
+					rb.getString(base.getClass().getSimpleName() + "." + strArray[i])));
+			return ret;
 		}
-		return ret;
 	}
 
 	protected Extractor getMutchingExtractor(Object o, Check check) {

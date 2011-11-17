@@ -313,6 +313,4 @@ public abstract class BaseUnit  implements Serializable {
     }
 
 //ForeignProperties.vm finish.
-
-
 }

@@ -15,6 +15,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Check {
 	/**
+	 * ユニーク名
+	 * @return
+	 */
+	String name() default "";
+	
+	/**
 	 * ユニークチェックを行うプロパティ群
 	 * エラーメッセージとしては、最初のプロパティが使われる
 	 * @return

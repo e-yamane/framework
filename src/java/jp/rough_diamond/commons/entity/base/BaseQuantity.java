@@ -80,6 +80,4 @@ public abstract class BaseQuantity extends java.lang.Number implements Serializa
     }
 
 //ForeignProperties.vm finish.
-
-
 }

@@ -80,6 +80,4 @@ public abstract class BaseAmount extends java.lang.Number implements Serializabl
     }
 
 //ForeignProperties.vm finish.
-
-
 }
