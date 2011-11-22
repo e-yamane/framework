@@ -150,8 +150,22 @@ public class HibernateBasicService extends BasicService {
 		        query.setCacheable(true);
 	        }
         	isLoading.set(Boolean.TRUE);
-        	list = (List<T>) Extractor2HQL.makeList(type, extractor, query.list());
+        	List<T> listTmp = (List<T>) Extractor2HQL.makeList(type, extractor, query.list());
         	isLoading.remove();
+        	list = new ArrayList<T>(listTmp.size());
+        	for(T o : listTmp) {
+        		if(isProxy(o)) {
+        			try {
+	        			ClassMetadata cm = getRealType((Class<?>)o.getClass());
+	        			o = (T)HibernateUtils.getSession().get(Class.forName(cm.getEntityName()), 
+	        								cm.getIdentifier(o, EntityMode.POJO), getLockMode(lock));
+	        			BasicServiceInterceptor.addPostLoadObject(o);
+        			} catch(ClassNotFoundException e) {
+        				throw new RuntimeException(e);
+        			}
+        		}
+        		list.add(o);
+        	}
 	        List<Object> loadedObjects = BasicServiceInterceptor.popPostLoadedObjects();
 	        fireEvent(CallbackEventType.POST_LOAD, loadedObjects);
 	        if(isNoCache) {
