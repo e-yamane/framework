@@ -694,11 +694,15 @@
     <property name="filtering.filename" value="${conf.dir}/filtering.ci.properties" />
     <antcall target="ci-preprocess" />
     <antcall target="makeCIConfig" />
-    <antcall target="makeSchemaAccessor" />
-    <antcall target="DB-init" />
+    <antcall target="ci-preprocess-db" />
     <antcall target="test" />
     <antcall target="findbugs" />
     <antcall target="ci-postprocess" />
+  </target>
+
+  <target name="ci-preprocess-db" unless="do.not.use.makeSchemaAccessor">
+    <antcall target="makeSchemaAccessor" />
+    <antcall target="DB-init" />
   </target>
 
   <target name="ci-preprocess" if="ci.preprocess.name">
