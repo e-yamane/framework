@@ -323,7 +323,10 @@ public class Extractor2HQL {
 	private Query makeCountQuery() {
         builder.append("select ");
         if(extractor.getValues().size() == 0) {
-        	builder.append("count(distinct ");
+        	builder.append("count(");
+        	if(extractor.isDistinct()) {
+            	builder.append("distinct ");
+        	}
         	builder.append(getAlias(extractor.target, extractor.targetAlias));
         	ClassMetadata cm = HibernateUtils.getSession().getSessionFactory().getClassMetadata(extractor.target);
         	builder.append(".");

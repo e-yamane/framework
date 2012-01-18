@@ -24,6 +24,7 @@ import jp.rough_diamond.commons.entity.Unit;
 import jp.rough_diamond.commons.extractor.Condition;
 import jp.rough_diamond.commons.extractor.ExtractValue;
 import jp.rough_diamond.commons.extractor.Extractor;
+import jp.rough_diamond.commons.extractor.InnerJoin;
 import jp.rough_diamond.commons.extractor.Property;
 import jp.rough_diamond.commons.resource.Message;
 import jp.rough_diamond.commons.resource.Messages;
@@ -54,6 +55,33 @@ public class BasicServiceTest extends DataLoadingTestCase {
 		FindResult<Unit> fr = BasicService.getService().findByExtractorWithCount(e);
 		assertEquals("全体件数が誤ってます。", 5, fr.count);
 		assertEquals("取得件数が誤っています。", 1, fr.list.size());
+	}
+	
+	public void testJoinを用いた検索結果でコレクションサイズと件数が一致しない不具合解消のテスト() throws Exception {
+		Extractor ex = new Extractor(Unit.class);
+		ex.addInnerJoin(new InnerJoin(new Property(Unit.class, null, null),
+				new Property(Unit.class, "child", Unit.BASE)));
+		ex.add(Condition.eq(new Property(Unit.class, "child", Unit.BASE +"." + Unit.ID), 1L));
+		FindResult<Unit> result = BasicService.getService().findByExtractorWithCount(ex);
+		assertEquals("件数が誤っています。", 4, result.list.size());
+		assertEquals("総件数が誤っています。", 4, result.count);
+		
+		ex.setDistinct(true);
+		result = BasicService.getService().findByExtractorWithCount(ex);
+		assertEquals("件数が誤っています。", 1, result.list.size());
+		assertEquals("総件数が誤っています。", 1, result.count);
+
+		//ExtractValue付きの場合はPreparedStatementを使用するのでこっちも確認
+		ex.addExtractValue(new ExtractValue("id", new Property(Unit.ID)));
+		ex.setDistinct(false);
+		result = BasicService.getService().findByExtractorWithCount(ex);
+		assertEquals("件数が誤っています。", 4, result.list.size());
+		assertEquals("総件数が誤っています。", 4, result.count);
+
+		ex.setDistinct(true);
+		result = BasicService.getService().findByExtractorWithCount(ex);
+		assertEquals("件数が誤っています。", 1, result.list.size());
+		assertEquals("総件数が誤っています。", 1, result.count);
 	}
 	
 	public void testVerifierCallback() throws Exception {
