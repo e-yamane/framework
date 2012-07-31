@@ -96,7 +96,7 @@ public class BasicServiceTest extends DataLoadingTestCase {
 		System.out.println(DIContainerFactory.getDIContainer().getClass().getName());
 		try {
 			SortedSet<CallbackEventListener> listeners = BasicService.getService().getEventListener(Unit.class, CallbackEventType.VERIFIER);
-			assertEquals("返却数が誤っています。", 4, listeners.size());
+			assertEquals("返却数が誤っています。", 5, listeners.size());
 			
 			
 			Unit u = BasicService.getService().findByPK(Unit.class, 1L);
@@ -320,7 +320,21 @@ public class BasicServiceTest extends DataLoadingTestCase {
 			}
 			return ret;
 		}
+
+		@Verifier
+		public Messages verifyObject(Object unit) {
+			Messages ret = new Messages();
+			return ret;
+		}
+
+		@Verifier
+		public Messages verifyUnitExt(UnitExt unit) {
+			Messages ret = new Messages();
+			return ret;
+		}
 	}
+	
+	public static class UnitExt extends Unit {}
 	
 	public static class CallbackListener {
 		//自己参照イベントより後に来ること

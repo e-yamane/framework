@@ -100,7 +100,7 @@ abstract class CallbackEventListener implements Comparable<CallbackEventListener
 			return false;
 		}
 		for(int i = 0 ; i < targetTypes.size() ; i++) {
-			if(!baseTypes[i].isAssignableFrom(targetTypes.get(i))){
+			if(!targetTypes.get(i).isAssignableFrom(baseTypes[i])){
 				return false;
 			}
 		}
