@@ -42,13 +42,16 @@ public class UserCacheFilter implements Filter {
     private String userSessionName;
     private String clearObjectPrefix;
     
-    private UserChangeListenerImpl listener;
+    private AbstractUserChangeListener listener;
     private FilterConfig config;
     
     public void init(FilterConfig arg0) throws ServletException {
         this.config = arg0;
-        listener = new UserChangeListenerImpl();
-        UserController controller = UserController.getController();
+        
+        String sessionFixationSheild = this.config.getInitParameter("sessionFixationSheild");
+		listener = (sessionFixationSheild == null) ? new NormalUserChangeListener() : new SessionFixationSheildListener();
+
+		UserController controller = UserController.getController();
         controller.addListener(listener);
         
         userSessionName = config.getInitParameter("sessionName");
@@ -89,8 +92,54 @@ public class UserCacheFilter implements Filter {
     	
     }
     
-    private final class UserChangeListenerImpl implements UserChangeListener {
-        private ThreadLocal<HttpServletRequest> tl = new ThreadLocal<HttpServletRequest>();
+    abstract private class AbstractUserChangeListener implements UserChangeListener {
+        protected final ThreadLocal<HttpServletRequest> tl = new ThreadLocal<HttpServletRequest>();
+		@Override
+		public void notify(Object oldUser, Object newUser) {
+            log.debug("ユーザー変更要求です。");
+            HttpServletRequest request = tl.get();
+            if(request == null) {
+                log.debug("リクエストが渡ってないのでセットしません");
+                return;
+            }
+            HttpSession session = request.getSession(false);
+            if(newUser == null && session != null) {
+                log.debug("セッションをクリアします。");
+                clearSession(session);
+                return;
+            } else if(newUser != null) {
+            	prepare();
+            	session = request.getSession();
+                Object user = session.getAttribute(userSessionName);
+                if(user == null || !user.equals(newUser)) {
+                    clearSession(session);
+                    log.debug("セッションをセットします。");
+                    session.setAttribute(userSessionName, newUser);
+                } else {
+                    log.debug("セッション的に変化は無いのでセッションのクリアは行いません");
+                    session.setAttribute(userSessionName, newUser);
+                }
+            }
+		}
+		
+		abstract protected void prepare();
+    }
+    
+    private final class NormalUserChangeListener extends AbstractUserChangeListener {
+		@Override
+		protected void prepare() {
+		}
+    }
+    
+    private final class SessionFixationSheildListener extends AbstractUserChangeListener {
+		@Override
+		protected void prepare() {
+			tl.get().getSession().invalidate();
+		}
+    }
+    
+/*
+    	private ThreadLocal<HttpServletRequest> tl = new ThreadLocal<HttpServletRequest>();
 
         public void notify(Object oldUser, Object newUser) {
             log.debug("ユーザー変更要求です。");
@@ -117,7 +166,8 @@ public class UserCacheFilter implements Filter {
             }
         }
     }
-
+*/
+    
     @SuppressWarnings("unchecked")
     private void clearSession(HttpSession session) {
     	if(clearObjectPrefix == null) {
