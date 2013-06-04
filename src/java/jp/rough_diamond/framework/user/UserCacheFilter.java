@@ -105,14 +105,14 @@ public class UserCacheFilter implements Filter {
             HttpSession session = request.getSession(false);
             if(newUser == null && session != null) {
                 log.debug("セッションをクリアします。");
-                clearSession(session);
+                clearSession();
                 return;
             } else if(newUser != null) {
-            	prepare();
             	session = request.getSession();
                 Object user = session.getAttribute(userSessionName);
                 if(user == null || !user.equals(newUser)) {
-                    clearSession(session);
+                    clearSession();
+                	session = request.getSession();
                     log.debug("セッションをセットします。");
                     session.setAttribute(userSessionName, newUser);
                 } else {
@@ -122,19 +122,22 @@ public class UserCacheFilter implements Filter {
             }
 		}
 		
-		abstract protected void prepare();
+		abstract protected void clearSession();
     }
     
     private final class NormalUserChangeListener extends AbstractUserChangeListener {
 		@Override
-		protected void prepare() {
+		protected void clearSession() {
+			HttpSession session = tl.get().getSession();
+			UserCacheFilter.this.clearSession(session);
 		}
     }
     
     private final class SessionFixationSheildListener extends AbstractUserChangeListener {
 		@Override
-		protected void prepare() {
-			tl.get().getSession().invalidate();
+		protected void clearSession() {
+			HttpSession session = tl.get().getSession();
+			session.invalidate();
 		}
     }
     
