@@ -7,6 +7,7 @@
 package jp.rough_diamond.commons.resource;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -31,7 +32,7 @@ public class LocaleFilter implements Filter {
         try {
             chain.doFilter(request, response);
         } finally {
-            controller.setLocale(null);
+            controller.setLocale(Locale.getDefault());
         }
     }
 
