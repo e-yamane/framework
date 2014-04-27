@@ -12,6 +12,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jp.rough_diamond.commons.util.WithoutClassLoaderPropertyUtilsBean;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.Action;
@@ -45,12 +49,30 @@ public class BaseRequestProcessor extends RequestProcessor {
 			}
 		} else {
 			try {
-				super.processPopulate(request, response, form, mapping);
+				processPopulate2(request, response, form, mapping);
 			} finally {
 				populated.set(Boolean.TRUE);
 			}
 		}
     }
+
+	protected void processPopulate2(HttpServletRequest request,
+			HttpServletResponse response, ActionForm form, ActionMapping mapping)
+			throws ServletException {
+		boolean isClassloaderPopulate = Boolean.valueOf(servlet.getInitParameter("allowClassLoaderPopulate"));
+		log.debug(isClassloaderPopulate);
+		if(isClassloaderPopulate) {
+			super.processPopulate(request, response, form, mapping);
+			return;
+		}
+		BeanUtilsBean org = BeanUtilsBean.getInstance();
+		try {
+			BeanUtilsBean.setInstance(new BeanUtilsBean(new ConvertUtilsBean(), new WithoutClassLoaderPropertyUtilsBean()));
+			super.processPopulate(request, response, form, mapping);
+		} finally {
+			BeanUtilsBean.setInstance(org);
+		}
+	}
 
 	@Override
 	protected void doForward(String arg0, HttpServletRequest arg1, HttpServletResponse arg2) throws IOException, ServletException {
