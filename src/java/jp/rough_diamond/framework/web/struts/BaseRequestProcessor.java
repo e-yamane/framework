@@ -12,7 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jp.rough_diamond.commons.util.WithoutClassLoaderPropertyUtilsBean;
+import jp.rough_diamond.commons.util.ClassLoaderIgnoreablePropertyUtilsBean;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
@@ -22,14 +22,28 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionServlet;
 import org.apache.struts.action.RequestProcessor;
+import org.apache.struts.config.ModuleConfig;
 
 public class BaseRequestProcessor extends RequestProcessor {
 	private final static Log log = LogFactory.getLog(BaseRequestProcessor.class);
 
 	ThreadLocal<ServletException> populateException = new ThreadLocal<ServletException>();
 	ThreadLocal<Boolean> populated = new ThreadLocal<Boolean>();
+
+	private final ClassLoaderIgnoreablePropertyUtilsBean propertyUtilsBean = new ClassLoaderIgnoreablePropertyUtilsBean(Boolean.TRUE);
 	
+	@Override
+	public void init(ActionServlet servlet, ModuleConfig moduleConfig) throws ServletException {
+		super.init(servlet, moduleConfig);
+		boolean isClassloaderPopulate = Boolean.valueOf(servlet.getInitParameter("allowClassLoaderPopulate"));
+		log.debug(isClassloaderPopulate);
+		if(!isClassloaderPopulate) {
+			BeanUtilsBean.setInstance(new BeanUtilsBean(new ConvertUtilsBean(), propertyUtilsBean));
+		}
+	}
+
 	@Override
     public void process(HttpServletRequest request,
             HttpServletResponse response) throws IOException, ServletException {
@@ -48,31 +62,15 @@ public class BaseRequestProcessor extends RequestProcessor {
 				throw populateException.get();
 			}
 		} else {
+			Boolean org = propertyUtilsBean.setClassLoaderPopulate(Boolean.FALSE);
 			try {
-				processPopulate2(request, response, form, mapping);
+				super.processPopulate(request, response, form, mapping);
 			} finally {
+				propertyUtilsBean.setClassLoaderPopulate(org);
 				populated.set(Boolean.TRUE);
 			}
 		}
     }
-
-	protected void processPopulate2(HttpServletRequest request,
-			HttpServletResponse response, ActionForm form, ActionMapping mapping)
-			throws ServletException {
-		boolean isClassloaderPopulate = Boolean.valueOf(servlet.getInitParameter("allowClassLoaderPopulate"));
-		log.debug(isClassloaderPopulate);
-		if(isClassloaderPopulate) {
-			super.processPopulate(request, response, form, mapping);
-			return;
-		}
-		BeanUtilsBean org = BeanUtilsBean.getInstance();
-		try {
-			BeanUtilsBean.setInstance(new BeanUtilsBean(new ConvertUtilsBean(), new WithoutClassLoaderPropertyUtilsBean()));
-			super.processPopulate(request, response, form, mapping);
-		} finally {
-			BeanUtilsBean.setInstance(org);
-		}
-	}
 
 	@Override
 	protected void doForward(String arg0, HttpServletRequest arg1, HttpServletResponse arg2) throws IOException, ServletException {

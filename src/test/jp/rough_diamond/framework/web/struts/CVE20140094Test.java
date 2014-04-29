@@ -14,7 +14,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 
-import jp.rough_diamond.commons.util.WithoutClassLoaderPropertyUtilsBean;
+import jp.rough_diamond.commons.util.ClassLoaderIgnoreablePropertyUtilsBean;
 import junit.framework.TestCase;
 
 /**
@@ -24,7 +24,7 @@ public class CVE20140094Test extends TestCase {
 	public void testCalssLoaderAccess() throws Exception {
 		BeanUtilsBean org = BeanUtilsBean.getInstance();
 		try {
-			BeanUtilsBean.setInstance(new BeanUtilsBean(new ConvertUtilsBean(), new WithoutClassLoaderPropertyUtilsBean()));
+			BeanUtilsBean.setInstance(new BeanUtilsBean(new ConvertUtilsBean(), new ClassLoaderIgnoreablePropertyUtilsBean()));
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("this.this.this.cl.foo", "hoge");
 			map.put("this.map(hoge)", "foo");
